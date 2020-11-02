@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+{% block header %}
+{% endblock %}
+{% block title %}
+    Home
+{% endblock %}
+{% block page_name %} id="home-page" {% endblock %}
+{% block main %}
+    <div class="message head">
+        <div class="message-label">Welcome, Human!</div>
+    </div>
+
+    <div class="text-box">
+        <textarea id="text-box-field" class="text-box-field boxshadow" autocomplete="off" name="text-box-field" placeholder="Input text to parse" type="text"></textarea>
+    </div>
+
+    <div class="tags-area">
+        
+        <button class="btn1 new-tag">+</button>
+        
+        <input type="text" class="create-tag new-tag-input" placeholder="Label" style="display: none;">
+
+        <div class="create-tag color-selector-custom" style="display: none;">
+            <button class="btn1 create-tag color-selector-button" style="display: none;">Select Color...</button>
+            <div class="color-selector-options boxshadow" style="display: none;">
+
+                <button class="color-selector-option">
+                    <div class="tag-color red" data-color="red"></div>
+                    <div class="color-selector-text">&nbsp red</div>
+                </button>
+
+                <button class="color-selector-option">
+                    <div class="tag-color green"></div>
+                    <div class="colors-selector-text">&nbsp green</div>
+                </button>
+
+                <button class="color-selector-option">
+                    <div class="tag-color blue"></div>
+                    <div class="color-selector-text">&nbsp blue</div>
+                </button>
+
+                <button class="color-selector-option">
+                    <div class="tag-color yellow"></div>
+                    <div class="color-selector-text">&nbsp yellow</div>
+                </button>
+
+                <button class="color-selector-option">
+                    <div class="tag-color purple"></div>
+                    <div class="color-selector-text">&nbsp purple</div>
+                </button>
+
+                <button class="color-selector-option">
+                    <div class="tag-color orange"></div>
+                    <div class="color-selector-text">&nbsp orange</div>
+                </button>
+
+                <button class="color-selector-option">
+                    <div class="tag-color gray"></div>
+                    <div class="color-selector-text">&nbsp gray</div>
+                </button>
+
+            </div>    
+        </div>
+
+        <button class="btn1 create-tag submit-new-tag" id="submit-new-tag" style="display: none;">DONE</button>
+
+        <div class="tags">
+            <div class="tag no-tags">
+                <div class="tag-name">No Tags</div>
+            </div>
+        </div>
+
+        <div class="run-buttons">
+            <button class="btn1 run">RUN...</button>
+            <div class="run-options boxshadow" style="display: none;">
+                <button class="btn1 run-manual">MANUAL</button>
+                <button class="btn1 run-corrections">CORRECTIONS</button>
+                <button class="btn1 run-automatic">AUTOMATIC</button>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="sentences-area"></div>
+
+    <div class="footer-buttons">
+        <button class="btn1 clear-tags">CLEAR TAGS</button>
+        <button class="btn1 clear-sentences">CLEAR SENTENCES</button>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,18 @@
+@font-face {
+  font-family: 'Futura Std Light';
+  src: url('Futura Std Light.eot');
+  src: url('Futura Std Light.eot?#iefix') format('embedded-opentype'),
+       url('Futura Std Light.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'FuturaStd-Light';
+  src: url('FuturaStd-Light.svg#FuturaStd-Light') format('svg'),
+       url('FuturaStd-Light.ttf') format('truetype'),
+       url('FuturaStd-Light.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+

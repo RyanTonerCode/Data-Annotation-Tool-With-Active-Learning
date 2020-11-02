@@ -1,0 +1,814 @@
+/* HEADER */
+.header 
+{
+    background-color: #e4e3e3;
+    padding: 10px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 60px;
+    width: 100%;
+    z-index: 5;
+    box-sizing: content-box;
+    overflow: visible;
+}
+.header-name
+{
+    height: 60px;
+    background-color: transparent;
+    position: fixed;
+    color: rgb(84, 162, 226);
+    cursor: pointer;
+    border: 0px solid black;
+    top: 10px;
+    left: 20px;
+    transform: translate(0%, 0%);
+    white-space: nowrap;  
+    overflow: visible;
+}
+.header-title
+{
+    font-family: 'futura';
+    font-size: 28px;
+    z-index: 6;
+    overflow: visible;
+    padding-top: 10px;
+}
+.by-who
+{
+    font-family: 'lulo';
+    color: black;
+    font-size: 10px;
+    transform: translate(115px, -2px);
+}
+.menu-strip .left
+{
+    position: fixed;
+    top: 25px;
+    left: 50%;
+    transform: translate(-50%, 0%);
+}
+.menu-strip .right
+{
+    position: fixed;
+    top: 25px;
+    right: 20px;
+    transform: translate(0%, 0%);
+}
+.menu-strip button
+{
+    font-size: 16px;
+    color: white;
+    height: 30px;
+    background-color: transparent;
+    color: goldenrod;
+    cursor: pointer;
+    border: 0px solid white;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
+    transition: 0.4s;
+    font-family: 'avenir';
+    border-radius: 5px;
+}
+.menu-strip button:hover
+{
+    background-color: transparent;
+    color: rgb(168, 128, 27);
+    border: 0px solid white;
+}
+.menu-strip .account-button, .menu-strip .logout-button, .menu-strip .register-button, .menu-strip .login-button
+{
+    color: gray;
+}
+.menu-items, .menu-dropdown-button
+{
+    display: none;
+}
+
+
+
+
+
+/* BODY */
+body
+{
+    margin-top: 100px;
+    overflow-x: hidden;
+}
+button, input
+{
+    outline-width: 0;
+    white-space: nowrap;
+    cursor: pointer;
+    border: none;
+}
+a
+{
+    text-decoration: none;
+    color: black;
+    cursor: pointer;
+}
+
+
+.message
+{
+    text-align: center;
+    width: 100%;
+    font-family: 'futura';
+    color: gray;
+}
+.message-light
+{
+    font-family: 'futura-light';
+}
+.message.head
+{
+    margin-top: 0px;
+}
+
+
+
+
+.boxshadow
+{
+    box-shadow: 1px 2px 4px rgba(0, 0, 0, .5);
+    -webkit-appearance: none;
+    -webkit-box-shadow: 1px 2px 4px rgba(0, 0, 0, .5);
+    padding: 10px;
+}
+div.top
+{
+    margin-top: 25px;
+}
+
+
+
+
+/* INPUT TEXT BOX */
+.text-box
+{
+    width: 80%;
+    margin-top: 30px;
+    margin-left: 10%;
+    margin-right: 10%;
+    position: relative;
+    display: inline-block;
+    transition: all .7s ease-in-out;
+}
+.text-box textarea
+{
+    padding: 16px;
+    border: none;
+    box-sizing: border-box;
+    color: black;
+    font-size: 16px;
+    width: 100%;
+    height: 250px;
+    border-radius: 20px;
+    resize: none;
+}
+.text-box textarea:not(:focus)
+{
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+.text-box textarea:focus
+{
+    outline-width: 0;
+    outline: none;
+}
+
+
+
+/* TAGGING BAR AREA */
+.tags-area
+{
+    width: 80%;
+    margin-top: 30px;
+    margin-left: 10%;
+    margin-right: 10%;
+    position: relative;
+    display: inline-block;
+    transition: all .7s ease-in-out;
+    border-radius: 10px;
+    background-color: #ebebeb;
+    padding: 10px;
+    box-sizing: border-box;
+    padding-bottom: 0;
+    font-family: 'avenir';
+}
+.tags-area div
+{
+    display: inline-block;
+}
+.tags-area button.btn1
+{   
+    font-size: 16px;
+    color: white;
+    height: 30px;
+    background-color: goldenrod;
+    color: white;
+    cursor: pointer;
+    padding-left: 10px;
+    padding-right: 10px;
+    transition: 0.4s;
+    border-radius: 5px;
+    font-family: 'avenir';
+    margin-bottom: 10px;
+}
+.tags-area button.btn1:hover
+{
+    color: white;
+    background-color: gray;
+    border: 0px solid white;
+}
+.create-tag, .new-tag, .tags
+{
+    float: left;
+    margin-right: 5px;
+}
+
+
+
+
+/* CREATE TAG */
+.new-tag-input
+{
+    height: 30px;
+    padding: 6px;
+    box-sizing: border-box;
+    color: black;
+    font-size: 16px;
+    border-radius: 5px;
+    /* transform: translateY(2px); */
+    margin-bottom: 10px;
+}
+
+.color-selector-custom
+{
+    width: 150px;
+    position: relative;
+}
+.color-selector-custom button.btn1
+{
+    width: 150px;
+}
+.color-selector-options, .run-options
+{
+    z-index: 2;
+    position: absolute;
+    left: 0;
+    top: 35px;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: white;
+    width: 150px;
+    box-sizing: border-box;
+}
+.color-selector-option
+{
+    display: block;
+    background-color: white;
+    color: rgb(54, 54, 54);
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    display: inline-block;
+    font-family: 'avenir';
+    text-align: left;
+    width: 140px;
+}
+.color-selector-option:hover
+{
+    background-color: rgb(160, 160, 160);
+    color: white;
+}
+
+
+#submit-new-tag
+{
+    background-color: green;
+}
+#submit-new-tag:hover
+{
+    background-color: gray;
+}
+
+
+
+
+
+
+
+
+/* MANAGE TAGS */
+.tags 
+{
+    display: inline-block;
+    background-color: #3f3f3f;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    padding-right: 35px;
+    margin-bottom: 10px;
+}
+.tag-container
+{
+    position: relative;
+}
+.tag
+{
+    height: 20px;
+    margin-left: 45px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.4s;
+    position: relative;
+    padding: 0;
+    box-sizing: border-box;
+}
+.tag.no-tags
+{
+    margin-left: 25px;
+}
+.tag-color
+{
+    width: 15px;
+    height: 15px;
+    background-color: #000;
+    border-radius: 5px;
+    transform: translateY(2px);
+}
+.tag-name
+{
+    padding-left: 5px;
+}
+.tag .delete, .tag .tag-overlay, .sentence-delete
+{
+    opacity: 0;
+    transition: 0.4s;
+    background-color: #5f5f5fca;
+    color: red;
+    position: absolute;
+    width: 100%;
+    /* height: 100%; */
+    text-align: center;
+    border-radius: 5px;
+    top: 0;
+    /* left: -5px; */
+    left: 0;
+    padding-left: 5px;
+    padding-right: 5px;
+    z-index: 1;
+    cursor: pointer;
+}
+.tag .tag-overlay
+{
+    color: rgb(0, 255, 0);
+}
+.tag:hover .delete, .tag:hover .tag-overlay, .sentence:hover .sentence-delete
+{
+    opacity: 1;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+.radio-container 
+{
+    position: absolute;
+    left: 25px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+/* Hide the browser's default radio button */
+.radio-container input 
+{
+    display: none;
+}
+/* Create a custom radio button */
+.radio-container .checkmark 
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    /* background-color: #eee; */
+    border-radius: 5px;
+}
+/* Show the indicator (dot/circle) when checked */
+.radio-container input:checked ~ .checkmark:after 
+{
+    content: "";
+    position: absolute;
+}
+/* Style the indicator (dot/circle) */
+.radio-container .checkmark:after 
+{
+    top: 6px;
+    left: 6px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+.run-buttons
+{
+    position: relative;
+    float: right;
+
+    /* margin-bottom: 10px; */
+}
+.run-buttons button.btn1
+{
+    background-color: red;
+}
+.run-options
+{
+    right: 0px;
+    left: auto;
+    background-color: red;
+}
+.run-options button
+{
+    width: 100%;
+}
+
+
+
+
+
+/* SENTENCES AREA */
+.sentences-area
+{
+    width: 80%;
+    margin-top: 30px;
+    margin-left: 10%;
+    margin-right: 10%;
+    position: relative;
+    box-shadow: 40px;
+    transition: all .7s ease-in-out;
+    border-radius: 10px;
+    font-family: 'avenir';
+    border-collapse: collapse;
+    overflow: hidden;
+}
+.sentences-area .sentence-area:nth-child(odd) 
+{
+    background-color: #CCCCCC;
+}
+
+
+
+
+.sentence-area
+{
+    padding: 10px;
+    background-color: #ebebeb;
+    width: 100%;
+    padding-left: 20px;
+    /* display: inline-block; */
+    position: relative;
+
+    /* height: 60px; */
+    height: au;
+}
+.sentence-area div:not(.tag)
+{
+    /* float: left; */
+    display: inline-block;
+}
+.sentence-area .word
+{
+    position: relative;
+    /* min-width: 60px; */
+    display: block;
+    margin-right: 15px;
+    /* margin-top: 10px; */
+}
+.sentence-area .word-text
+{
+    display: contents;
+}
+.sentence-area .select-tag-button
+{
+    display: block;
+    position: relative;
+}
+.sentence-area button.btn2
+{   
+    font-size: 16px;
+    color: white;
+    height: 25px;
+    background-color: goldenrod;
+    color: white;
+    cursor: pointer;
+    padding-left: 10px;
+    padding-right: 10px;
+    transition: 0.4s;
+    border-radius: 5px;
+    font-family: 'avenir';
+    margin-left: -2px;
+}
+.sentence-area button.btn2:hover
+{
+    background-color: gray;
+}
+.sentence-area .tag
+{
+    height: 25px;
+    margin-left: 0;
+    margin-right: 5px;
+    padding-top: 3px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+}
+.sentence-area .tag .delete
+{
+    transform: translateX(-5px);
+    font-size: 16px;
+    font-family: avenir;
+    padding-bottom: 3px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.footer-buttons
+{
+    width: 80%;
+    margin-top: 30px;
+    margin-left: 10%;
+    margin-right: 10%;
+    position: relative;
+    display: inline-block;
+    box-shadow: 40px;
+    transition: all .7s ease-in-out;
+    border-radius: 10px;
+    background-color: #ebebeb;
+    padding: 10px;
+    box-sizing: border-box;
+    /* text-align: center; */
+
+}
+.footer-buttons button.btn1
+{   
+    font-size: 16px;
+    color: white;
+    height: 30px;
+    background-color: rgb(255, 142, 113);
+    color: white;
+    cursor: pointer;
+    border: 0px solid white;
+    padding-left: 10px;
+    padding-right: 10px;
+    transition: 0.4s;
+    border-radius: 5px;
+    display: inline-block;
+    font-family: 'avenir';
+    /* text-align: center; */
+}
+.footer-buttons button.btn1:hover
+{
+    background-color: gray;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.alert 
+{
+    /* display: none; Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 5; /* Sit on top */
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+#loading.alert 
+{
+    padding-top: calc(50vh - 150px);
+    background-color: rgba(0,0,0,0.7); /* Black w/ opacity */
+}
+.alert-content 
+{
+    position: relative;
+    background-color: #ecebeb;
+    margin: auto;
+    padding: 20px;
+    border: 0px solid #888;
+    width: 550px;
+    max-height: 75vh;
+    overflow-y: scroll;
+    height: auto;
+}
+#loading .alert-content
+{
+    background-color: transparent;
+    text-align: center;
+}
+#gif
+{
+    text-align: center;
+    margin: auto;
+    width: 150px;
+}
+.alert-close 
+{
+    position: absolute;
+    color: #aaaaaa;
+    font-size: 60px;
+    font-weight: bold;
+    padding: 5px;
+    z-index: 5;
+    cursor: pointer;
+    right: 20px;
+    top: 0px;
+}
+.alert-close:hover, .alert-close:focus 
+{
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+#alert-stuff
+{
+    position: relative;
+    /* width: 500px; */
+}
+.alert-desc
+{
+    margin-top: 0px;
+    position: relative;
+    width: 90%;
+    font-family: 'futura';
+    color: gray;
+    left: 0;
+}
+#alert-stuff .form
+{
+    padding: 0;
+    padding-left: 10px;
+}
+#okay-button
+{
+    margin-top: 10px;
+    margin-right: 10px;
+}
+
+
+
+
+
+
+
+.red
+{
+    background-color: red;
+}
+.green
+{
+    /* background-color: rgb(24, 161, 0); */
+    background-color: green;
+}
+.blue
+{
+    /* background-color: rgb(41, 119, 223); */
+    background-color: blue;
+}
+.dodgerblue
+{
+    background-color: dodgerblue;
+}
+.orange
+{
+    background-color: orange;
+}
+.purple
+{
+    background-color: purple;
+}
+.yellow
+{
+    background-color: yellow;
+}
+.gray
+{
+    background-color: gray;
+}
+
+
+
+
+
+
+/* FONT */
+@font-face
+{
+  font-family: "lulo";
+  src: url("font/lulo/neu.eot");
+  src: url("font/lulo/lulo.woff") format("woff"),
+  url("font/lulo/lulo.ttf") format("truetype"),
+  url("font/lulo/lulo.svg") format("svg");
+}
+@font-face
+{
+  font-family: "cassandra";
+  src: url("font/cassandra/Cassandra\ Personal\ Use.eot");
+  src: url("font/cassandra/CassandraPersonalUse-Regular.woff") format("woff"),
+  url("font/cassandra/CassandraPersonalUse-Regular.ttf") format("truetype"),
+  url("font/cassandra/CassandraPersonalUse-Regular.svg") format("svg");
+}
+@font-face
+{
+  font-family: "avenir";
+  src: url("font/avenir-next/AvenirNext-Bold.eot");
+  src: url("font/avenir-next/AvenirNext-Bold.woff") format("woff"),
+  url("font/avenir-next/AvenirNext-Bold.ttf") format("truetype"),
+  url("font/avenir-next/AvenirNext-Bold.svg") format("svg");
+}
+@font-face
+{
+  font-family: "avenir-light";
+  src: url("font/avenir-next/AvenirNext-Regular.eot");
+  src: url("font/avenir-next/AvenirNext-Regular.woff") format("woff"),
+  url("font/avenir-next/AvenirNext-Regular.ttf") format("truetype"),
+  url("font/avenir-next/AvenirNext-Regular.svg") format("svg");
+}
+@font-face
+{
+  font-family: "futura";
+  src: url("font/futura/Futura-Bold.eot");
+  src: url("font/futura/Futura-Bold.woff") format("woff"),
+  url("font/futura/Futura-Bold.ttf") format("truetype"),
+  url("font/futura/Futura-Bold.svg") format("svg");
+}
+@font-face
+{
+  font-family: "futura-light";
+  src: url("font/futura-light/Futura\ Std\ Light.eot");
+  src: url("font/futura-light/FuturaStd-Light.woff") format("woff"),
+  url("font/futura-light/FuturaStd-Light.ttf") format("truetype"),
+  url("font/futura-light/FuturaStd-Light.svg") format("svg");
+}

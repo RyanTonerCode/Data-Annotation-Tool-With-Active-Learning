@@ -1,0 +1,18 @@
+@font-face {
+  font-family: 'Cassandra Personal Use';
+  src: url('Cassandra Personal Use.eot');
+  src: url('Cassandra Personal Use.eot?#iefix') format('embedded-opentype'),
+       url('Cassandra Personal Use.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'CassandraPersonalUse-Regular';
+  src: url('CassandraPersonalUse-Regular.svg#CassandraPersonalUse-Regular') format('svg'),
+       url('CassandraPersonalUse-Regular.ttf') format('truetype'),
+       url('CassandraPersonalUse-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+

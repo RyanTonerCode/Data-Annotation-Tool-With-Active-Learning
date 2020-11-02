@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block header %}
+{% endblock %}
+{% block title %}
+    ERROR
+{% endblock %}
+{% block page_name %} id="error-page" {% endblock %}
+
+{% block main %}
+<div class="form">
+    <div class="form-desc">
+        Error {{ code }}
+        <br>
+        {{ message }}
+        <br>
+        <a class="form-desc-button" href="/{{ route }}">go back</a>
+    </div>
+</div>
+
+{% endblock %}

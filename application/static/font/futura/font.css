@@ -1,0 +1,60 @@
+@font-face {
+  font-family: 'Futura-Bold';
+  src: url('Futura-Bold.eot');
+  src: url('Futura-Bold.eot?#iefix') format('embedded-opentype'),
+       url('Futura-Bold.svg#Futura-Bold') format('svg'),
+       url('Futura-Bold.ttf') format('truetype'),
+       url('Futura-Bold.woff') format('woff'),
+       url('Futura-Bold.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Futura-CondensedExtraBold';
+  src: url('Futura-CondensedExtraBold.eot');
+  src: url('Futura-CondensedExtraBold.eot?#iefix') format('embedded-opentype'),
+       url('Futura-CondensedExtraBold.svg#Futura-CondensedExtraBold') format('svg'),
+       url('Futura-CondensedExtraBold.ttf') format('truetype'),
+       url('Futura-CondensedExtraBold.woff') format('woff'),
+       url('Futura-CondensedExtraBold.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Futura-CondensedMedium';
+  src: url('Futura-CondensedMedium.eot');
+  src: url('Futura-CondensedMedium.eot?#iefix') format('embedded-opentype'),
+       url('Futura-CondensedMedium.svg#Futura-CondensedMedium') format('svg'),
+       url('Futura-CondensedMedium.ttf') format('truetype'),
+       url('Futura-CondensedMedium.woff') format('woff'),
+       url('Futura-CondensedMedium.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Futura-Medium';
+  src: url('Futura-Medium.eot');
+  src: url('Futura-Medium.eot?#iefix') format('embedded-opentype'),
+       url('Futura-Medium.svg#Futura-Medium') format('svg'),
+       url('Futura-Medium.ttf') format('truetype'),
+       url('Futura-Medium.woff') format('woff'),
+       url('Futura-Medium.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Futura-MediumItalic';
+  src: url('Futura-MediumItalic.eot');
+  src: url('Futura-MediumItalic.eot?#iefix') format('embedded-opentype'),
+       url('Futura-MediumItalic.svg#Futura-MediumItalic') format('svg'),
+       url('Futura-MediumItalic.ttf') format('truetype'),
+       url('Futura-MediumItalic.woff') format('woff'),
+       url('Futura-MediumItalic.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
