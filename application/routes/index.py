@@ -1,5 +1,11 @@
 from application import app
 from application.imports import session, render_template, os, request, json, re
+from werkzeug.middleware.shared_data import SharedDataMiddleware
+from flask import send_file,after_this_request
+from werkzeug.utils import secure_filename
+import io
+import pandas as pd
+import nltk
 
 @app.route("/", methods=["GET", "POST"])
 @app.route("/home", methods=["GET", "POST"])
@@ -100,8 +106,7 @@ def home():
 
             return sentences_html
 
-
-
+                
         def create_sentences(text):
             sentences = []
             sentence_tags = []
@@ -215,3 +220,60 @@ def home():
 
 
     return render_template("index.html")
+   
+UPLOAD_FOLDER = "C:/Users/Kyler/Desktop/Senior-Design-Prototype-1-main/application/upload_folder"
+app.config['UPLOAD_FOLDER']=UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+Sentence_structure=""
+@app.route('/success',methods = ['GET','POST'])
+def uploaded_file():
+    if request.method == 'POST':  
+        if request.files:
+            f = request.files['file']  
+            Sentence_structure=f.filename
+            f.save(os.path.join(app.config['UPLOAD_FOLDER'],f.filename))
+            path=[x for x in os.walk(app.config['UPLOAD_FOLDER'])]
+            subpath=path[0][2][0]
+            dataset=pd.read_csv(os.path.join(app.config['UPLOAD_FOLDER'],subpath))
+            data = dataset.iloc[:,0]
+            data= data[0]
+            sentence_data = {"sentences": [], "sentence_tags": []}
+            sentences = []
+            sentence_tags = []
+            d = ".!?"
+            sentence = ""
+            leading_space = False
+            for char in data:
+                if not leading_space:
+                    sentence += char
+                leading_space = False
+                if char == "." or char =="?" or char == "!":
+                    sentences.append(sentence)
+                    sentence = ""
+                    leading_space = True
+
+            for sentence in sentences:
+                tags = []
+                for word in sentence.split():
+                    tag = 0
+                    tags.append(tag)
+                sentence_tags.append(tags)
+            jsonFile = "C:/Users/Kyler/Desktop/Senior-Design-Prototype-1-main/application/data/sentence_data.json"
+            if os.path.isfile(jsonFile):
+                with open(jsonFile) as json_data:
+                    sentence_data = json.load(json_data)
+            sentence_data = {"sentences": sentences, "sentence_tags": sentence_tags}
+            out_file = open("application/data/sentence_data.json", "w")
+            json.dump(sentence_data,out_file , indent=6)
+            out_file.close()  
+            os.remove(os.path.join(app.config['UPLOAD_FOLDER'],subpath))
+       
+            return render_template("index.html", name = f.filename) 
+@app.route('/downloads/tags',methods = ['GET','POST'])  
+def download_file_labels():
+    return send_file("C:/Users/Kyler/Desktop/Senior-Design-Prototype-1-main/application/data/tag_data.json", as_attachment=True)
+@app.route('/downloads/labels',methods = ['GET','POST'])  
+def download_file_annotation():
+    return send_file("C:/Users/Kyler/Desktop/Senior-Design-Prototype-1-main/application/data/sentence_data.json", as_attachment=True)
+                               
+                               
