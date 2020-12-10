@@ -172,7 +172,7 @@ $(document).ready(function(){
 
 
 
-    // ALERT POPUP 
+   // ALERT POPUP 
     function showAlert(text)
     {
         $(".search-box").removeClass("top");

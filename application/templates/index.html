@@ -87,6 +87,12 @@
     <div class="footer-buttons">
         <button class="btn1 clear-tags">CLEAR TAGS</button>
         <button class="btn1 clear-sentences">CLEAR SENTENCES</button>
+        <button class="btn1 upload" type='file'  > <form action = "/success" method = "post" enctype="multipart/form-data">  
+            <input type="file" name="file" /> 
+            <input type = "submit" value="Upload"></button>
+        <button class="btn1 download-tag"><a href="{{url_for('download_file_labels')}}"> DOWNLOAD TAGS </button>
+        <button class="btn1 download-labels"><a href="{{url_for('download_file_annotation')}}"> DOWNLOAD LABELS </button>
+    </form>  
     </div>
-
+   
 {% endblock %}
