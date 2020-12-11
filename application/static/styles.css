@@ -579,7 +579,7 @@ div.top
 
 
 
-.footer-buttons
+.footer-buttons:not(.upload)
 {
     width: 80%;
     margin-top: 30px;
@@ -596,7 +596,7 @@ div.top
     /* text-align: center; */
 
 }
-.footer-buttons button.btn1
+.footer-buttons button.btn1:not(.upload)
 {   
     font-size: 16px;
     color: white;
@@ -613,12 +613,46 @@ div.top
     font-family: 'avenir';
     /* text-align: center; */
 }
-.footer-buttons button.btn1:hover
+.footer-buttons button.btn1:not(.upload):hover
 {
     background-color: gray;
 }
-
-
+.footer-buttons .btn1.upload
+{
+    font-size: 16px;
+    color: white;
+    height: 30px;
+    background-color: rgb(255, 142, 113);
+    color: white;
+    padding-left: 10px;
+    padding-right: 10px;
+    transition: 0.4s;
+    border-radius: 5px;
+    display: inline-block;
+    font-family: 'avenir';
+}
+input[type="file"]
+{
+    display: none;
+}
+.footer-inner-button 
+{
+    font-size: 10px;
+    padding: 2px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+    background-color: #8a8a8a;
+    color: white;
+    font-family: 'avenir';
+    display: inline-block;
+    transition: all 0.4s;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.footer-inner-button:hover
+{
+    background-color: #CCCCCC;
+}
 
 
 

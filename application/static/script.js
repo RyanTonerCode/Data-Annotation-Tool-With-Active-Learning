@@ -227,7 +227,11 @@ $(document).ready(function(){
     {        
         ajax("/", JSON.stringify({clear_sentences: ""}), update_sentences);
     });
-
+    document.getElementById("file-upload").onchange = function() //when a file is chosen to upload
+    {
+        document.getElementById("file-upload-form").submit();
+    };
+    
 
 
 

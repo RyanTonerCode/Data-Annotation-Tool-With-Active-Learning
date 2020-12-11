@@ -88,12 +88,16 @@
         <button class="btn1 clear-tags">CLEAR TAGS</button>
         <button class="btn1 clear-sentences">CLEAR SENTENCES</button>
         <button class="btn1 upload" type='file'>
-        <form action="/success" method="post" enctype="multipart/form-data">  
-            <input type="file" name="file" /> 
-            <input type = "submit" value="Upload"></button>
-            <button class="btn1 download-tag"><a href="{{url_for('download_file_labels')}}"> DOWNLOAD TAGS </button>
-            <button class="btn1 download-labels"><a href="{{url_for('download_file_annotation')}}"> DOWNLOAD LABELS </button>
-        </form>  
+            <form id="file-upload-form" action="/success" method="post" enctype="multipart/form-data">  
+                <label for="file-upload" class="footer-inner-button">Choose File</label>
+                <input id="file-upload" type="file" name="file"/> 
+                
+                <!-- <input class="footer-inner-button" type="submit" value="Upload"> -->
+            </form>
+        </button>
+        <button class="btn1 download-tag"><a style="color: white" href="{{url_for('download_file_labels')}}">DOWNLOAD TAGS</button>
+        <button class="btn1 download-labels"><a style="color: white" href="{{url_for('download_file_annotation')}}">DOWNLOAD LABELS</button>
+        
     </div>
    
 {% endblock %}
