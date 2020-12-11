@@ -1,1 +1,1 @@
-{"sentences": ["How are you?"], "sentence_tags": [[0, 0, 0]]}
+{"sentences": ["Hi, how are you?", "I'm well, thanks!", "That's so great to hear, as I was a little bit worried that something could be amiss.", "However, if there is anything I can do to help you in any way, shape, or form, I'd be happy to, so long as it doesn't involve the death of a fellow human."], "sentence_tags": [[5, 2, 0, 2], [5, 3, 3], [0, 3, 3, 0, 0, 5, 5, 5, 5, 4, 4, 4, 5, 4, 0, 0, 4], [5, 5, 5, 5, 2, 0, 0, 0, 0, 2, 2, 0, 2, 2, 0, 0, 0, 0, 0, 3, 5, 5, 5, 5, 5, 2, 2, 0, 2, 5, 5, 2, 2]]}

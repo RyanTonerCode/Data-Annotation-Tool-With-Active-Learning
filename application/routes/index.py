@@ -79,7 +79,7 @@ def home():
 
 
 
-        def create_sentence_html(sentence_data):
+        def create_sentence_html(sentence_data, selected_sentece = 0, selected_word = 0):
             sentences_html = ""
             if sentence_data != {}:
 
@@ -100,7 +100,12 @@ def home():
                             word_tag_color = tag_data["tags"][str(word_tag_index)]["color"]
                             tag_html = "<div class='sentence-tag tag'><div class='tag-color " + word_tag_color + "'></div><div class='tag-name'>" + word_tag_name + "</div><div class='delete'>X</div></div>"
                         
-                        sentences_html += "<div class='word' data-index='" + str(word_index) + "'> <div class='word-text'>" + word + "</div> " + tag_html + " </div> "
+                        word_class = "word" #the standard word should have a class as just 'word'
+
+                        if sentence_index == selected_sentece and word_index == selected_word: #always load the page with the first word of the first sentence selected, unless the vars are passed in
+                            word_class += " selected"
+
+                        sentences_html += "<div class='" + word_class + "' data-index='" + str(word_index) + "'> <div class='word-text'>" + word + "</div> " + tag_html + " </div> "
 
                     sentences_html += "</div>"
 
@@ -202,7 +207,7 @@ def home():
             with open(jsonFile, 'w') as outfile:
                 json.dump(sentence_data, outfile)
 
-            return create_sentence_html(sentence_data)
+            return create_sentence_html(sentence_data, sentence_index, word_index)
 
 
 
@@ -220,6 +225,14 @@ def home():
 
 
     return render_template("index.html")
+   
+
+
+
+
+
+
+
    
 UPLOAD_FOLDER = "C:/Users/Kyler/Desktop/Senior-Design-Prototype-1-main/application/upload_folder"
 app.config['UPLOAD_FOLDER']=UPLOAD_FOLDER
