@@ -579,7 +579,7 @@ div.top
 
 
 
-.footer-buttons:not(.upload)
+.footer-buttons
 {
     width: 80%;
     margin-top: 30px;
@@ -596,7 +596,7 @@ div.top
     /* text-align: center; */
 
 }
-.footer-buttons button.btn1:not(.upload)
+.footer-buttons button.btn1
 {   
     font-size: 16px;
     color: white;
@@ -613,11 +613,11 @@ div.top
     font-family: 'avenir';
     /* text-align: center; */
 }
-.footer-buttons button.btn1:not(.upload):hover
+.footer-buttons button.btn1:hover
 {
     background-color: gray;
 }
-.footer-buttons .btn1.upload
+/* .footer-buttons .btn1.upload
 {
     font-size: 16px;
     color: white;
@@ -631,10 +631,7 @@ div.top
     display: inline-block;
     font-family: 'avenir';
 }
-input[type="file"]
-{
-    display: none;
-}
+
 .footer-inner-button 
 {
     font-size: 10px;
@@ -652,10 +649,15 @@ input[type="file"]
 .footer-inner-button:hover
 {
     background-color: #CCCCCC;
+} */
+input[type="file"]
+{
+    display: none;
 }
-
-
-
+.footer-inner-button
+{
+    cursor:  ;
+}
 
 
 
@@ -756,8 +758,24 @@ input[type="file"]
 {
     margin-top: 10px;
     margin-right: 10px;
+    background-color: goldenrod;
+    color: white;
+    padding-top: 15px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    border: none;
+    font-family: 'avenir';
+    font-size: x-large;
+    -webkit-appearance: none;
+    cursor: pointer;
+    transition: .4s;
 }
-
+#okay-button:hover
+{
+    background-color: gray;
+    color: white;
+}
 
 
 

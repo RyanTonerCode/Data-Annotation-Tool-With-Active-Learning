@@ -231,7 +231,15 @@ $(document).ready(function(){
     {
         document.getElementById("file-upload-form").submit();
     };
-    
+    $(document).on("click", ".download-tags", function() //when we click DOWNLOAD TAGS
+    {        
+        ajax("/", JSON.stringify({download_tags: ""}));
+    });
+    $(document).on("click", ".download-sentences", function() //when we click DOWNLOAD SENTENCES
+    {        
+        ajax("/", JSON.stringify({download_sentences: ""}));
+    });
+
 
 
 
