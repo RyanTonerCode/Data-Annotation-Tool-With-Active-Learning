@@ -125,7 +125,7 @@ $(document).ready(function(){
     {
         var number_of_sentences = document.getElementsByClassName("sentence-area").length;
         var words_in_sentence = document.getElementsByClassName("sentence-area")[selected_sentence].children.length;
-        console.log(e.key);
+        // console.log(e.key);
 
         if (e.key == "ArrowRight")
         {
@@ -182,7 +182,7 @@ $(document).ready(function(){
                 document.getElementsByClassName("sentence-area")[selected_sentence].children[selected_word].classList.add("selected")
             }
         }
-        else if (e.key in ["1","2","3","4","5","6","7","8","9"])
+        else if (e.key in ["1","2","3","4","5","6","7","8","9"]) //tag a word when we click a number, that number in line on the tag bar will be what it is
         {
             var sentence_index = selected_sentence;
             var word_index = selected_word;
@@ -198,7 +198,7 @@ $(document).ready(function(){
                 ajax("/", JSON.stringify({tag_word}), update_sentences);    
             }
         }
-        else if (e.key == "x")
+        else if (e.key == "x") //when we click x, delete tag from selected word
         {
             var sentence_index = selected_sentence;
             var word_index = selected_word;
