@@ -7,6 +7,7 @@ from werkzeug.utils import redirect, secure_filename
 import io
 import pandas as pd
 import nltk
+import time
 
 @app.route("/", methods=["GET", "POST"])
 @app.route("/<alert>", methods=["GET", "POST"])
@@ -45,8 +46,8 @@ def home(alert=None):
             if os.path.isfile(file_path):
                 with open(file_path) as json_file:
                     user_data = json.load(json_file)
-                    tag_data = user_data["tag_data"]
 
+            tag_data = user_data["tag_data"]
             new_tag = {"name": tag_name, "color": tag_color}
             if new_tag not in tag_data["tags"].values() and tag_color != "" and tag_name != "":
                 tag_index = tag_data["index"] + 1 #create next tag index
@@ -143,10 +144,9 @@ def home(alert=None):
 
             file_path = "application/data/data.json"
             if os.path.isfile(file_path):
+                time.sleep(0.001)
                 with open(file_path) as json_file:
-                    # print(json_file)
                     user_data = json.load(json_file)
-                    # print(user_data)
                     
             if text != "": #dont do nothin if they put nothin in
                 user_data["sentences"] += sentences
@@ -286,7 +286,25 @@ def home(alert=None):
             return {"file": text, "name": input, "extension": "txt"}
             # return send_file("data/download/sentences.txt", as_attachment=True) #why does this need application removed???
 
-    
+        if key=="download_csv":
+            # file = send_file("data/data.json", as_attachment=True)
+            user_data = None
+            file_path = "application/data/data.json"
+            with open(file_path) as json_file:
+                user_data = json.load(json_file)
+            
+            csv = ""
+            for sentence_index, sentence in enumerate(user_data["sentences"]):
+                for word_index, word in enumerate(sentence.split()):
+                    tag_index = str(user_data["sentence_tags"][sentence_index][word_index])
+                    tag_info = user_data["tag_data"]["tags"][tag_index] if int(tag_index) > 0 else "no_tag"
+                    tag_info = str(tag_info).replace(",", "+")
+                    word_ = word.replace(",", "¬")
+                    print(word)
+                    new_item =  word_ + "©" + tag_info                        
+                    csv += new_item + ","
+            return {"file": csv, "name": input, "extension": "csv"}
+
 
 
 

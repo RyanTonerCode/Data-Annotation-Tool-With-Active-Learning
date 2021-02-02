@@ -288,7 +288,7 @@ $(document).ready(function(){
         }
         else if (dict["extension"] == "csv")
         {
-            var url = ""; // NOT IMPLEMENTED
+            var url = "data:text/plain;charset=utf-8," + encodeURIComponent(data);
         }
 
         element.href = url; 
@@ -338,7 +338,16 @@ $(document).ready(function(){
             $("#alert-stuff").html("");
         });
     });
-
+    $(document).on("click", ".download-csv", function() //when we click DOWNLOAD CSV
+    {        
+        choose_filename(4);
+        $(document).on("click", "#download-button.id-4", function() 
+        {        
+            ajax("/", JSON.stringify({download_csv: $("#download-name").val()}), download);
+            $("#alert").css("display", "none");
+            $("#alert-stuff").html("");
+        });
+    });
 
 
 
