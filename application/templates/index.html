@@ -92,29 +92,17 @@
 
         <span>upload:</span>
         <button class="btn1 upload" type='file'>
-            <form id="file-upload-form-1" action="/" method="post" enctype="multipart/form-data">  
-                <label for="file-upload-1" class="footer-inner-button">ALL</label>
-                <input id="file-upload-1" type="file" name="file"/> 
-            </form>
-        </button>
-        <button class="btn1 upload" type='file'>
-            <form id="file-upload-form-2" action="/" method="post" enctype="multipart/form-data">  
-                <label for="file-upload-2" class="footer-inner-button">TAGS</label>
-                <input id="file-upload-2" type="file" name="file"/> 
-            </form>
-        </button>
-        <button class="btn1 upload" type='file'>
-            <form id="file-upload-form-3" action="/" method="post" enctype="multipart/form-data">  
-                <label for="file-upload-3" class="footer-inner-button">SENTENCES</label>
-                <input id="file-upload-3" type="file" name="file"/> 
+            <form id="file-upload-form" action="/" method="post" enctype="multipart/form-data">  
+                <label for="file-upload" class="footer-inner-button">JSON, TXT, CSV</label>
+                <input id="file-upload" type="file" name="file" accept=".json, .txt, .csv"/> 
             </form>
         </button>
 
         <span>download:</span>
-        <button class="btn1 download-all">ALL</button>
+        <button class="btn1 download-all">JSON</button>
+        <button class="btn1 download-csv">CSV</button>
         <button class="btn1 download-tags">TAGS</button>
         <button class="btn1 download-sentences">SENTENCES</button>
-        <button class="btn1 download-csv">CSV</button>
         
     </div>
    

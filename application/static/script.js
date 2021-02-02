@@ -7,13 +7,13 @@ $(document).ready(function(){
     }
     initialize();
 
+
+
     /* TAGS BAR */
     $(document).on("click", ".new-tag", function() //when we click new tag (+) button
     {
         $(".create-tag").toggle();
     });
-
-
     $(document).on("click", ".color-selector-button", function() //when we click SELECT COLOR... button
     {
         $(".color-selector-options").toggle();
@@ -28,27 +28,26 @@ $(document).ready(function(){
         }
         color_html = color_html.firstElementChild.className.replace('tag-color ','');
         // color_html = color_html.firstElementChild.dataset.color;
-        // console.log(color_html);
         $(".color-selector-button").css("background-color", color_html);
         $(".color-selector-button").attr("color", color_html);
     });
-
-    // ajax("/", JSON.stringify({new_tag: ["", ""]}), update_tags); //////////////////////////////////////// INITIATE TAGS!
-
     $(document).on("click", ".submit-new-tag", function() //when we click DONE (for new tag) button
     {
         $(".create-tag").hide();
         var tag_name = $(".new-tag-input").val();
-        // console.log(tag_name);
         var tag_color = $(".color-selector-button").first().attr("color");
-        // console.log(tag_color);
         var new_tag = [tag_name, tag_color]
         $(".new-tag-input").val("");
         $(".color-selector-button").first().css("background-color", "").attr("color", null);
 
         ajax("/", JSON.stringify({new_tag}), update_tags);
     });
-
+    $(document).on("click", ".tags .delete", function(e) //when we click delete tag (X) button
+    {
+        var index = e.target.dataset.index;
+        // console.log(index);
+        ajax("/", JSON.stringify({delete_tag: index}), update_tags);
+    });
     function update_tags(data)
     {
         if (data != "")
@@ -57,16 +56,9 @@ $(document).ready(function(){
         }
     }
 
-    $(document).on("click", ".tags .delete", function(e) //when we click delete tag (X) button
-    {
-        var index = e.target.dataset.index;
-        // console.log(index);
-        ajax("/", JSON.stringify({delete_tag: index}), update_tags);
-    });
 
 
-    // ajax("/", JSON.stringify({run_manual: ""}), update_sentences); //////////////////////////////////////// INITIATE SENTENCES!
-
+    /* RUN BUTTONS */
     $(document).on("click", ".run", function() //when we click RUN... button
     {
         $(".run-options").toggle();
@@ -78,22 +70,18 @@ $(document).ready(function(){
     $(document).on("click", ".run-manual", function() //when we click RUN-MANUAL button
     {
         var text = $("#text-box-field").val();
-        // console.log(text);
         ajax("/", JSON.stringify({run_manual: text}), update_sentences);
     });
     $(document).on("click", ".run-corrections", function() //when we click RUN-CORRECTIONS button
     {
         var text = $("#text-box-field").val();
-        // console.log(text);
         ajax("/", JSON.stringify({run_corrections: text}), update_sentences);
     });
     $(document).on("click", ".run-automatic", function() //when we click RUN-AUTOMATIC button
     {
         var text = $("#text-box-field").val();
-        // console.log(text);
         ajax("/", JSON.stringify({run_automatic: text}), update_sentences);
     });
-
     function update_sentences(data)
     {
         $(".sentences-area").html(data);
@@ -101,43 +89,34 @@ $(document).ready(function(){
 
 
 
-
+    /* ADD OR REMOVE TAG FROM WORD */
     $(document).on("click", ".select-tag-button", function(e) //when we click TAG button below a word
     {
         var sentence_index = this.parentElement.parentElement.dataset.index;
         var word_index = this.parentElement.dataset.index;
         var tag_index = $("input[name=radio]:checked").val();
-
-        // console.log(sentence_index);
-
         var tag_word = [sentence_index, word_index, tag_index];
         ajax("/", JSON.stringify({tag_word}), update_sentences);
     });
-
     $(document).on("click", ".sentences-area .delete", function(e) //when we click delete tag word
     {
         var sentence_index = this.parentElement.parentElement.parentElement.dataset.index;
         var word_index = this.parentElement.parentElement.dataset.index;
-
-        var tag_word = [sentence_index, word_index, -1];
+        var tag_word = [sentence_index, word_index, 0];
         ajax("/", JSON.stringify({tag_word}), update_sentences);
     });
 
 
+
+    /* KEYDOWN - SENTENCE NAV, TAGGING */
     var selected_sentence = 0;
     var selected_word = 0;
-
     $(document).keydown(function(e)
     {
         var number_of_sentences = document.getElementsByClassName("sentence-area").length;
-        if ($("input").is(":focus") || $("textarea").is(":focus") || number_of_sentences == 0) //dont do stuff from keys if typing somewhere or if there arent any sentences yet
-        {
-            return;
-        }
+        if ($("input").is(":focus") || $("textarea").is(":focus") || number_of_sentences == 0) { return; }
+        //dont do stuff from keys if typing somewhere (text field) or if there arent any sentences yet
         var words_in_sentence = document.getElementsByClassName("sentence-area")[selected_sentence].children.length;
-        // console.log(e.key);
-
-        // console.log(selected_sentence, selected_word, number_of_sentences, words_in_sentence);
 
         if (e.key == "ArrowRight")
         {
@@ -196,7 +175,6 @@ $(document).ready(function(){
         }
         else if (["1","2","3","4","5","6","7","8","9"].includes(e.key)) //tag a word when we click a number, that number in line on the tag bar will be what it is
         {
-            // console.log(["1","2","3","4","5","6","7","8","9"]);
             var sentence_index = selected_sentence;
             var word_index = selected_word;
             var tag_index = parseInt(e.key) - 1; //in what place on the tag bar is the tag we want? nothing to do with its unique ID number
@@ -205,8 +183,6 @@ $(document).ready(function(){
             if (tag_index <= number_of_tags - 1) //if we are within the number of tags
             {
                 var tag_id = document.getElementsByClassName("tag-container")[tag_index].children[1].children[1].dataset.index;
-                console.log(tag_id);
-
                 var tag_word = [sentence_index, word_index, tag_id];
                 ajax("/", JSON.stringify({tag_word}), update_sentences);    
             }
@@ -224,52 +200,85 @@ $(document).ready(function(){
 
 
 
-
-
-
-
-
-
-
-
+    /* CLEAR BUTTONS */
     $(document).on("click", ".clear-all", function() //when we click CLEAR ALL
     {        
         ajax("/", JSON.stringify({clear_all: ""}));
+        initialize();
     });
     $(document).on("click", ".clear-tags", function() //when we click CLEAR TAGS
     {        
         ajax("/", JSON.stringify({clear_tags: ""}));
+        initialize();
     });
     $(document).on("click", ".clear-sentences", function() //when we click CLEAR SENTENCES
     {        
         ajax("/", JSON.stringify({clear_sentences: ""}), update_sentences);
+        initialize();
     });
 
 
-    document.getElementById("file-upload-1").onchange = function() //when a file is chosen to upload for ALL (json, csv [?])
+
+    /* UPLOAD BUTTONS */
+    document.getElementById("file-upload").onchange = function() //when a file is chosen to upload
     {
-        document.getElementById("file-upload-form-1").submit();
-        initialize();
-    };
-    document.getElementById("file-upload-2").onchange = function() //when a file is chosen to upload for TAGS (json)
-    {
-        document.getElementById("file-upload-form-2").submit();
-        initialize();
-    };
-    document.getElementById("file-upload-3").onchange = function() //when a file is chosen to upload for SENTENCES (txt)
-    {
-        document.getElementById("file-upload-form-3").submit();
+        document.getElementById("file-upload-form").submit();
         initialize();
     };
 
 
 
-
-
-
+    /* DOWNLOAD BUTTONS */
+    $(document).on("click", ".download-all", function() //when we click DOWNLOAD JSON
+    {       
+        choose_filename(1); 
+        $(document).on("click", "#download-button.id-1", function() 
+        {        
+            request_file({download_all: $("#download-name").val()});
+        });
+    });
+    $(document).on("click", ".download-csv", function() //when we click DOWNLOAD CSV
+    {        
+        choose_filename(4);
+        $(document).on("click", "#download-button.id-4", function() 
+        {        
+            request_file({download_csv: $("#download-name").val()});
+        });
+    });
+    $(document).on("click", ".download-tags", function() //when we click DOWNLOAD TAGS
+    {        
+        choose_filename(2);
+        $(document).on("click", "#download-button.id-2", function() 
+        {        
+            request_file({download_tags: $("#download-name").val()});
+        });
+    });
+    $(document).on("click", ".download-sentences", function() //when we click DOWNLOAD SENTENCES
+    {        
+        choose_filename(3);
+        $(document).on("click", "#download-button.id-3", function() 
+        {        
+            request_file({download_sentences: $("#download-name").val()});
+        });
+    });
+    function choose_filename(id_num)
+    {
+        $(':focus').blur()
+        $(".search-box").removeClass("top");
+        var stuff = "<div class='form'><div class='alert-desc'>"
+        stuff += "<input type='text' name='download-name' placeholder='Filename' id='download-name' class='new-tag-input' autofocus></div>"
+        stuff += "<button class='form-button id-" + id_num + "' id='download-button'>DOWNLOAD</button></div>" 
+        $("#alert-stuff").html(stuff);
+        $("#alert").css("display", "block");    
+    }
+    function request_file(query)
+    {
+        ajax("/", JSON.stringify(query), download);
+        $("#alert").css("display", "none");
+        $("#alert-stuff").html("");
+    }
     function download(dict)
     {
-        // console.log(dict);
         fileName = dict["name"] + "." + dict["extension"];
         data = dict["file"];
         var element = document.createElement("a"); 
@@ -296,63 +305,6 @@ $(document).ready(function(){
         element.click(); 
         window.URL.revokeObjectURL(url); 
     }
-
-    function choose_filename(id_num)
-    {
-        $(':focus').blur()
-        $(".search-box").removeClass("top");
-        var stuff = "<div class='form'><div class='alert-desc'>"
-        stuff += "<input type='text' name='download-name' placeholder='Filename' id='download-name' class='new-tag-input' autofocus></div>"
-        stuff += "<button class='form-button id-" + id_num + "' id='download-button'>DOWNLOAD</button></div>" 
-        $("#alert-stuff").html(stuff);
-        $("#alert").css("display", "block");    
-    }
-
-    $(document).on("click", ".download-all", function() //when we click DOWNLOAD ALL
-    {       
-        choose_filename(1); 
-        $(document).on("click", "#download-button.id-1", function() 
-        {        
-            ajax("/", JSON.stringify({download_all: $("#download-name").val()}), download);
-            $("#alert").css("display", "none");
-            $("#alert-stuff").html("");
-        });
-    });
-    $(document).on("click", ".download-tags", function() //when we click DOWNLOAD TAGS
-    {        
-        choose_filename(2);
-        $(document).on("click", "#download-button.id-2", function() 
-        {        
-            ajax("/", JSON.stringify({download_tags: $("#download-name").val()}), download);
-            $("#alert").css("display", "none");
-            $("#alert-stuff").html("");
-        });
-    });
-    $(document).on("click", ".download-sentences", function() //when we click DOWNLOAD SENTENCES
-    {        
-        choose_filename(3);
-        $(document).on("click", "#download-button.id-3", function() 
-        {        
-            ajax("/", JSON.stringify({download_sentences: $("#download-name").val()}), download);
-            $("#alert").css("display", "none");
-            $("#alert-stuff").html("");
-        });
-    });
-    $(document).on("click", ".download-csv", function() //when we click DOWNLOAD CSV
-    {        
-        choose_filename(4);
-        $(document).on("click", "#download-button.id-4", function() 
-        {        
-            ajax("/", JSON.stringify({download_csv: $("#download-name").val()}), download);
-            $("#alert").css("display", "none");
-            $("#alert-stuff").html("");
-        });
-    });
-
-
-
-
-
 
 
 
@@ -381,8 +333,7 @@ $(document).ready(function(){
 
 
 
-
-   // ALERT POPUP 
+    /* ALERT POPUP */
     function showAlert(text)
     {
         $(".search-box").removeClass("top");
@@ -404,12 +355,7 @@ $(document).ready(function(){
 
 
 
-
-
-
-
-
-
+    /* AJAX function with optional callback function parameter */
     function ajax(url_, data_, function_)
     {
         var params = 
@@ -419,7 +365,6 @@ $(document).ready(function(){
             contentType: "application/json",
             data: data_,
         };
-        //console.log(params);
         $.ajax(params).done
         (
             function(data)
@@ -432,6 +377,9 @@ $(document).ready(function(){
         );
     }  
 
+
+
+    /* for delaying things to avoid conundrums */
     function debounce(fn, delay) 
     {
         var timer = null;
