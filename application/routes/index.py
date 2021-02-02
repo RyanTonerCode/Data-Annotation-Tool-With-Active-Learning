@@ -9,9 +9,10 @@ import pandas as pd
 import nltk
 
 @app.route("/", methods=["GET", "POST"])
+@app.route("/<alert>", methods=["GET", "POST"])
 @app.route("/home", methods=["GET", "POST"])
 @app.route("/index.html", methods=["GET", "POST"])
-def home():
+def home(alert=None):
     if request.method == "POST":
         key = ""
         input = ""
@@ -217,7 +218,7 @@ def home():
             if os.path.isfile(file_path):
                 os.remove(file_path)
 
-            return redirect(url_for("index.html"))
+            return redirect(url_for("home"))
 
         if key=="clear_tags":
             file_path = "application/data/data.json"
@@ -228,10 +229,14 @@ def home():
 
                 user_data["tag_data"] = {"index": 0, "tags": {}} #create index counter and empty dict for tags
 
+                for sentence_index, sentence in enumerate(user_data["sentence_tags"]):
+                    for word_index, word in enumerate(sentence):
+                        user_data["sentence_tags"][sentence_index][word_index] = 0
+
                 with open(file_path, 'w') as json_file:
                     json.dump(user_data, json_file)
 
-                return create_tag_html(user_data["tag_data"])
+                return redirect(url_for("home"))
 
         if key=="clear_sentences":
             file_path = "application/data/data.json"
@@ -281,10 +286,6 @@ def home():
             return {"file": text, "name": input, "extension": "txt"}
             # return send_file("data/download/sentences.txt", as_attachment=True) #why does this need application removed???
 
-        if key=="delete_download_files":
-            filelist = [f for f in os.listdir("application/data/download")] #remove upload files
-            for f in filelist:
-                os.remove(os.path.join("application/data/download", f))
     
 
 
@@ -342,13 +343,14 @@ def home():
                     for f in filelist:
                         os.remove(os.path.join("application/data/upload", f))
 
-                    return render_template("index.html", alert="file upload successful")
+                    # return render_template("index.html", alert="file upload successful")
+                    return redirect(url_for("home", alert="file upload successful"))
 
             return render_template("index.html", alert="error uploading files")
 
 
 
-    return render_template("index.html")
+    return render_template("index.html", alert=alert)
    
 
 

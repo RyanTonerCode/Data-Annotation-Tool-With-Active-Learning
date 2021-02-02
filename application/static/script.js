@@ -238,7 +238,7 @@ $(document).ready(function(){
     });
     $(document).on("click", ".clear-tags", function() //when we click CLEAR TAGS
     {        
-        ajax("/", JSON.stringify({clear_tags: ""}), update_tags);
+        ajax("/", JSON.stringify({clear_tags: ""}));
     });
     $(document).on("click", ".clear-sentences", function() //when we click CLEAR SENTENCES
     {        
