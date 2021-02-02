@@ -1,5 +1,11 @@
 $(document).ready(function(){
 
+    function initialize()
+    {
+        ajax("/", JSON.stringify({new_tag: ["", ""]}), update_tags); //////////////////////////////////////// INITIATE TAGS!
+        ajax("/", JSON.stringify({run_manual: ""}), update_sentences); //////////////////////////////////////// INITIATE SENTENCES!
+    }
+    initialize();
 
     /* TAGS BAR */
     $(document).on("click", ".new-tag", function() //when we click new tag (+) button
@@ -27,7 +33,7 @@ $(document).ready(function(){
         $(".color-selector-button").attr("color", color_html);
     });
 
-    ajax("/", JSON.stringify({new_tag: ["", ""]}), update_tags);
+    // ajax("/", JSON.stringify({new_tag: ["", ""]}), update_tags); //////////////////////////////////////// INITIATE TAGS!
 
     $(document).on("click", ".submit-new-tag", function() //when we click DONE (for new tag) button
     {
@@ -59,7 +65,7 @@ $(document).ready(function(){
     });
 
 
-    ajax("/", JSON.stringify({run_manual: ""}), update_sentences);
+    // ajax("/", JSON.stringify({run_manual: ""}), update_sentences); //////////////////////////////////////// INITIATE SENTENCES!
 
     $(document).on("click", ".run", function() //when we click RUN... button
     {
@@ -124,8 +130,14 @@ $(document).ready(function(){
     $(document).keydown(function(e)
     {
         var number_of_sentences = document.getElementsByClassName("sentence-area").length;
+        if ($("input").is(":focus") || $("textarea").is(":focus") || number_of_sentences == 0) //dont do stuff from keys if typing somewhere or if there arent any sentences yet
+        {
+            return;
+        }
         var words_in_sentence = document.getElementsByClassName("sentence-area")[selected_sentence].children.length;
         // console.log(e.key);
+
+        // console.log(selected_sentence, selected_word, number_of_sentences, words_in_sentence);
 
         if (e.key == "ArrowRight")
         {
@@ -167,7 +179,7 @@ $(document).ready(function(){
                 document.getElementsByClassName("sentence-area")[selected_sentence].children[selected_word].classList.remove("selected")
                 selected_sentence--;
                 words_in_sentence = document.getElementsByClassName("sentence-area")[selected_sentence].children.length; //get wordcount of sentence above
-                words_in_sentence >= selected_word ? selected_word = selected_word : selected_word = words_in_sentence - 1; //move straight up if possible, otherwise go to end
+                words_in_sentence >= selected_word + 1 ? selected_word = selected_word : selected_word = words_in_sentence - 1; //move straight up if possible, otherwise go to end
                 document.getElementsByClassName("sentence-area")[selected_sentence].children[selected_word].classList.add("selected")
             }
         }
@@ -178,12 +190,13 @@ $(document).ready(function(){
                 document.getElementsByClassName("sentence-area")[selected_sentence].children[selected_word].classList.remove("selected")
                 selected_sentence++;
                 words_in_sentence = document.getElementsByClassName("sentence-area")[selected_sentence].children.length; //get wordcount of sentence below
-                words_in_sentence >= selected_word ? selected_word = selected_word : selected_word = words_in_sentence - 1; //move straight down if possible, otherwise go to end
+                words_in_sentence >= selected_word + 1 ? selected_word = selected_word : selected_word = words_in_sentence - 1; //move straight down if possible, otherwise go to end
                 document.getElementsByClassName("sentence-area")[selected_sentence].children[selected_word].classList.add("selected")
             }
         }
-        else if (e.key in ["1","2","3","4","5","6","7","8","9"]) //tag a word when we click a number, that number in line on the tag bar will be what it is
+        else if (["1","2","3","4","5","6","7","8","9"].includes(e.key)) //tag a word when we click a number, that number in line on the tag bar will be what it is
         {
+            // console.log(["1","2","3","4","5","6","7","8","9"]);
             var sentence_index = selected_sentence;
             var word_index = selected_word;
             var tag_index = parseInt(e.key) - 1; //in what place on the tag bar is the tag we want? nothing to do with its unique ID number
@@ -219,6 +232,10 @@ $(document).ready(function(){
 
 
 
+    $(document).on("click", ".clear-all", function() //when we click CLEAR ALL
+    {        
+        ajax("/", JSON.stringify({clear_all: ""}));
+    });
     $(document).on("click", ".clear-tags", function() //when we click CLEAR TAGS
     {        
         ajax("/", JSON.stringify({clear_tags: ""}), update_tags);
@@ -227,17 +244,99 @@ $(document).ready(function(){
     {        
         ajax("/", JSON.stringify({clear_sentences: ""}), update_sentences);
     });
-    document.getElementById("file-upload").onchange = function() //when a file is chosen to upload
+
+
+    document.getElementById("file-upload-1").onchange = function() //when a file is chosen to upload for ALL (json, csv [?])
     {
-        document.getElementById("file-upload-form").submit();
+        document.getElementById("file-upload-form-1").submit();
+        initialize();
     };
+    document.getElementById("file-upload-2").onchange = function() //when a file is chosen to upload for TAGS (json)
+    {
+        document.getElementById("file-upload-form-2").submit();
+        initialize();
+    };
+    document.getElementById("file-upload-3").onchange = function() //when a file is chosen to upload for SENTENCES (txt)
+    {
+        document.getElementById("file-upload-form-3").submit();
+        initialize();
+    };
+
+
+
+
+
+
+    function download(dict)
+    {
+        // console.log(dict);
+        fileName = dict["name"] + "." + dict["extension"];
+        data = dict["file"];
+        var element = document.createElement("a"); 
+        element.style = "display: none"; 
+        document.body.appendChild(element); 
+
+        if (dict["extension"] == "json")
+        {
+            var json = JSON.stringify(data), 
+            blob = new Blob([json], {type: "octet/stream"}), 
+            url = window.URL.createObjectURL(blob); 
+        }
+        else if (dict["extension"] == "txt")
+        {
+            var url = "data:text/plain;charset=utf-8," + encodeURIComponent(data);
+        }
+        else if (dict["extension"] == "csv")
+        {
+            var url = ""; // NOT IMPLEMENTED
+        }
+
+        element.href = url; 
+        element.download = fileName; 
+        element.click(); 
+        window.URL.revokeObjectURL(url); 
+    }
+
+    function choose_filename(id_num)
+    {
+        $(':focus').blur()
+        $(".search-box").removeClass("top");
+        var stuff = "<div class='form'><div class='alert-desc'>"
+        stuff += "<input type='text' name='download-name' placeholder='Filename' id='download-name' class='new-tag-input' autofocus></div>"
+        stuff += "<button class='form-button id-" + id_num + "' id='download-button'>DOWNLOAD</button></div>" 
+        $("#alert-stuff").html(stuff);
+        $("#alert").css("display", "block");    
+    }
+
+    $(document).on("click", ".download-all", function() //when we click DOWNLOAD ALL
+    {       
+        choose_filename(1); 
+        $(document).on("click", "#download-button.id-1", function() 
+        {        
+            ajax("/", JSON.stringify({download_all: $("#download-name").val()}), download);
+            $("#alert").css("display", "none");
+            $("#alert-stuff").html("");
+        });
+    });
     $(document).on("click", ".download-tags", function() //when we click DOWNLOAD TAGS
     {        
-        ajax("/", JSON.stringify({download_tags: ""}));
+        choose_filename(2);
+        $(document).on("click", "#download-button.id-2", function() 
+        {        
+            ajax("/", JSON.stringify({download_tags: $("#download-name").val()}), download);
+            $("#alert").css("display", "none");
+            $("#alert-stuff").html("");
+        });
     });
     $(document).on("click", ".download-sentences", function() //when we click DOWNLOAD SENTENCES
     {        
-        ajax("/", JSON.stringify({download_sentences: ""}));
+        choose_filename(3);
+        $(document).on("click", "#download-button.id-3", function() 
+        {        
+            ajax("/", JSON.stringify({download_sentences: $("#download-name").val()}), download);
+            $("#alert").css("display", "none");
+            $("#alert-stuff").html("");
+        });
     });
 
 
@@ -278,7 +377,6 @@ $(document).ready(function(){
     function showAlert(text)
     {
         $(".search-box").removeClass("top");
-        $("#listDropdown").slideUp(750, function(){setTimeout(function(){$(".listDropdown").empty();},250);});
         var stuff = "<div class='form'><div class='alert-desc'>" + text + "</div>"
         stuff += "<button class='form-button' id='okay-button'>OKAY</button></div>" 
         $("#alert-stuff").html(stuff);
@@ -287,10 +385,12 @@ $(document).ready(function(){
     $(document).on("click", "#okay-button", function() //when we click the alert okay button
     {
         $("#alert").css("display", "none");
+        $("#alert-stuff").html("");
     });
     $(document).on("click", ".alert-close", function() //when we click the alert x button
     {
         $("#alert").css("display", "none");
+        $("#alert-stuff").html("");
     });
 
 

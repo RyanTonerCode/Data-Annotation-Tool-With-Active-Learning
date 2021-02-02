@@ -85,19 +85,35 @@
     <div class="sentences-area"></div>
 
     <div class="footer-buttons">
-        <button class="btn1 clear-tags">CLEAR TAG</button>
-        <button class="btn1 clear-sentences">CLEAR SENTENCES</button>
+        <span>clear:</span>
+        <button class="btn1 clear-all">ALL</button>
+        <button class="btn1 clear-tags">TAGS</button>
+        <button class="btn1 clear-sentences">SENTENCES</button>
+
+        <span>upload:</span>
         <button class="btn1 upload" type='file'>
-            <form id="file-upload-form" action="/success" method="post" enctype="multipart/form-data">  
-                <label for="file-upload" class="footer-inner-button">UPLOAD FILE</label>
-                <input id="file-upload" type="file" name="file"/> 
-                <!-- <input class="footer-inner-button" type="submit" value="Upload"> -->
+            <form id="file-upload-form-1" action="/" method="post" enctype="multipart/form-data">  
+                <label for="file-upload-1" class="footer-inner-button">ALL</label>
+                <input id="file-upload-1" type="file" name="file"/> 
             </form>
         </button>
-        <!-- <button class="btn1 download-tags">DOWNLOAD TAGS</button>
-        <button class="btn1 download-sentences">DOWNLOAD SENTENCES</button> -->
-        <button class="btn1 download-tag"><a style="color: white" href="{{url_for('download_file_labels')}}"> DOWNLOAD TAGS </button>
-        <button class="btn1 download-labels"><a style="color: white" href="{{url_for('download_file_annotation')}}"> DOWNLOAD SENTENCES </button>    
+        <button class="btn1 upload" type='file'>
+            <form id="file-upload-form-2" action="/" method="post" enctype="multipart/form-data">  
+                <label for="file-upload-2" class="footer-inner-button">TAGS</label>
+                <input id="file-upload-2" type="file" name="file"/> 
+            </form>
+        </button>
+        <button class="btn1 upload" type='file'>
+            <form id="file-upload-form-3" action="/" method="post" enctype="multipart/form-data">  
+                <label for="file-upload-3" class="footer-inner-button">SENTENCES</label>
+                <input id="file-upload-3" type="file" name="file"/> 
+            </form>
+        </button>
+
+        <span>download:</span>
+        <button class="btn1 download-all">ALL</button>
+        <button class="btn1 download-tags">TAGS</button>
+        <button class="btn1 download-sentences">SENTENCES</button>
         
     </div>
    

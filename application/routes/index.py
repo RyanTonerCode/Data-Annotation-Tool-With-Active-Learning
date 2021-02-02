@@ -1,8 +1,9 @@
+from flask.helpers import url_for
 from application import app
 from application.imports import apology, session, render_template, os, request, json, re
 from werkzeug.middleware.shared_data import SharedDataMiddleware
 from flask import send_file, after_this_request, send_from_directory
-from werkzeug.utils import secure_filename
+from werkzeug.utils import redirect, secure_filename
 import io
 import pandas as pd
 import nltk
@@ -12,9 +13,12 @@ import nltk
 @app.route("/index.html", methods=["GET", "POST"])
 def home():
     if request.method == "POST":
-        # print(request.get_json())
-        key = next(iter(request.get_json().keys()))
-        data = request.get_json()[key]
+        key = ""
+        input = ""
+        if not request.files:
+            # print(request.get_json())
+            key = next(iter(request.get_json().keys()))
+            input = request.get_json()[key]
 
         def create_tag_html(tag_data):
             tags_html = ""
@@ -31,14 +35,16 @@ def home():
 
 
         if key=="new_tag":
-            tag_name = data[0]
-            tag_color = data[1] 
+            tag_name = input[0]
+            tag_color = input[1] 
             tag_data = {"index": 0, "tags": {}} #create index counter and empty dict for tags
+            user_data = {"sentences": [], "sentence_tags": [], "tag_data": []}
         
-            jsonFile = "application/data/tag_data.json"
-            if os.path.isfile(jsonFile):
-                with open(jsonFile) as json_data:
-                    tag_data = json.load(json_data)
+            file_path = "application/data/data.json"
+            if os.path.isfile(file_path):
+                with open(file_path) as json_file:
+                    user_data = json.load(json_file)
+                    tag_data = user_data["tag_data"]
 
             new_tag = {"name": tag_name, "color": tag_color}
             if new_tag not in tag_data["tags"].values() and tag_color != "" and tag_name != "":
@@ -46,53 +52,50 @@ def home():
                 tag_data["index"] += 1 #increment index counter
                 tag_data["tags"][tag_index] = new_tag #add new tag by index
 
-            with open(jsonFile, 'w') as outfile:
-                json.dump(tag_data, outfile)
+            with open(file_path, 'w') as outfile:
+                user_data["tag_data"] = tag_data
+                json.dump(user_data, outfile)
 
             return create_tag_html(tag_data)
 
 
 
         if key=="delete_tag":
-            tag_index = data
-            jsonFile = "application/data/tag_data.json"
-            if os.path.isfile(jsonFile):
-                with open(jsonFile) as json_data:
-                    tag_data = json.load(json_data)
-                    tag_data["tags"].pop(str(tag_index)) #remove key-value pair from dict
-                    
-                with open(jsonFile, 'w') as outfile:
-                    json.dump(tag_data, outfile)
+            tag_index = input
+            file_path = "application/data/data.json"
+            if os.path.isfile(file_path):
+                user_data = None
+                with open(file_path) as json_file:
+                    user_data = json.load(json_file)
 
-            jsonFile = "application/data/sentence_data.json"
-            if os.path.isfile(jsonFile):
-                with open(jsonFile) as json_data:
-                    sentence_data = json.load(json_data)
-                    
-                    for sentence_index, sentence in enumerate(sentence_data["sentence_tags"]):
-                        for word_index, word in enumerate(sentence):
-                            if word == int(tag_index):
-                                sentence_data["sentence_tags"][sentence_index][word_index] = 0
+                tag_data = user_data["tag_data"]
+                sentence_tags = user_data["sentence_tags"]
+                tag_data["tags"].pop(str(tag_index)) #remove key-value pair from dict
+                
+                for sentence_index, sentence in enumerate(sentence_tags):
+                    for word_index, word in enumerate(sentence):
+                        if word == int(tag_index):
+                            sentence_tags[sentence_index][word_index] = 0
 
-                with open(jsonFile, 'w') as outfile:
-                    json.dump(sentence_data, outfile)
+                user_data["tag_data"] = tag_data
+                user_data["sentence_tags"] = sentence_tags
 
+                with open(file_path, 'w') as json_file:
+                    json.dump(user_data, json_file)
 
 
-        def create_sentence_html(sentence_data, selected_sentece = 0, selected_word = 0):
+
+        def create_sentence_html(user_data, selected_sentece = 0, selected_word = 0):
             sentences_html = ""
-            if sentence_data != {}:
+            sentences = user_data["sentences"]
+            sentence_tags = user_data["sentence_tags"]
+            tag_data = user_data["tag_data"]
 
-                tag_data = {}
-                jsonFile = "application/data/tag_data.json"
-                if os.path.isfile(jsonFile):
-                    with open(jsonFile) as json_data:
-                        tag_data = json.load(json_data)
-
-                for sentence_index, sentence in enumerate(sentence_data["sentences"]):
+            if sentences != {} and sentence_tags != {}:
+                for sentence_index, sentence in enumerate(sentences):
                     sentences_html += "<div class='sentence-area' data-index='" + str(sentence_index) + "'>"
                     for word_index, word in enumerate(sentence.split()):
-                        word_tag_index = sentence_data["sentence_tags"][sentence_index][word_index]
+                        word_tag_index = sentence_tags[sentence_index][word_index]
                         tag_html = "<button class='btn2 select-tag-button'>tag</button>"
                         
                         if word_tag_index != 0:
@@ -115,7 +118,7 @@ def home():
         def create_sentences(text):
             sentences = []
             sentence_tags = []
-            sentence_data = {"sentences": [], "sentence_tags": []}
+            user_data = {"sentences": [], "sentence_tags": [], "tag_data": []}
 
             if text != "": #dont do nothin if they put nothin in
                 d = ".!?"
@@ -137,103 +140,225 @@ def home():
                         tags.append(tag)
                     sentence_tags.append(tags)
 
-            jsonFile = "application/data/sentence_data.json"
-            if os.path.isfile(jsonFile):
-                with open(jsonFile) as json_data:
-                    sentence_data = json.load(json_data)
+            file_path = "application/data/data.json"
+            if os.path.isfile(file_path):
+                with open(file_path) as json_file:
+                    # print(json_file)
+                    user_data = json.load(json_file)
+                    # print(user_data)
                     
             if text != "": #dont do nothin if they put nothin in
-                sentence_data["sentences"] += sentences
-                sentence_data["sentence_tags"] += sentence_tags
+                user_data["sentences"] += sentences
+                user_data["sentence_tags"] += sentence_tags
 
-            return sentence_data
+            return user_data
 
 
         if key=="run_manual":
-            text = data
-            sentence_data = create_sentences(text)
-            jsonFile = "application/data/sentence_data.json"
-            with open(jsonFile, 'w') as outfile:
-                json.dump(sentence_data, outfile)
+            text = input
+            user_data = create_sentences(text)
+            file_path = "application/data/data.json"
+            with open(file_path, 'w') as outfile:
+                json.dump(user_data, outfile)
 
-            return create_sentence_html(sentence_data)
+            return create_sentence_html(user_data)
 
         if key=="run_corrections":
-            text = data
-            sentence_data = create_sentences(text)
-            #modify sentence_data here with AI
-            jsonFile = "application/data/sentence_data.json"
-            with open(jsonFile, 'w') as outfile:
-                json.dump(sentence_data, outfile)
-            return create_sentence_html(sentence_data) #add param, change fn so that AI learns of any changes made to tags
+            text = input
+            user_data = create_sentences(text)
+            #modify user_data here with AI
+            file_path = "application/data/data.json"
+            with open(file_path, 'w') as outfile:
+                json.dump(user_data, outfile)
+
+            return create_sentence_html(user_data) #add param, change fn so that AI learns of any changes made to tags
 
         if key=="run_automatic":
-            text = data
-            sentence_data = create_sentences(text)
-            #modify sentence_data here with AI
-            jsonFile = "application/data/sentence_data.json"
-            with open(jsonFile, 'w') as outfile:
-                json.dump(sentence_data, outfile)
-            return create_sentence_html(sentence_data)
+            text = input
+            user_data = create_sentences(text)
+            #modify user_data here with AI
+            file_path = "application/data/data.json"
+            with open(file_path, 'w') as outfile:
+                json.dump(user_data, outfile)
+
+            return create_sentence_html(user_data)
 
 
 
         if key=="tag_word":
-            indices = data
+            indices = input
             sentence_index = int(indices[0])
             word_index = int(indices[1])
             tag_index = int(indices[2])
 
-            sentence_data = {}
+            user_data = {}
 
-            jsonFile = "application/data/sentence_data.json"
-            if os.path.isfile(jsonFile):
-                with open(jsonFile) as json_data:
-                    sentence_data = json.load(json_data)
+            file_path = "application/data/data.json"
+            if os.path.isfile(file_path):
+                with open(file_path) as json_file:
+                    user_data = json.load(json_file)
+
+            sentence_tags = user_data["sentence_tags"]
                     
             if tag_index >= 0: #if adding tag to word     
-                tag_data = {}
-
-                jsonFile2 = "application/data/tag_data.json"
-                if os.path.isfile(jsonFile2):
-                    with open(jsonFile2) as json_data2:
-                        tag_data = json.load(json_data2)
-
-                sentence_data["sentence_tags"][sentence_index][word_index] = tag_index #set tag by index
+                sentence_tags[sentence_index][word_index] = tag_index #set tag by index
             
             elif tag_index == -1: #if removing tag from word
-                sentence_data["sentence_tags"][sentence_index][word_index] = 0
+                sentence_tags[sentence_index][word_index] = 0
             
-            with open(jsonFile, 'w') as outfile:
-                json.dump(sentence_data, outfile)
+            with open(file_path, 'w') as outfile:
+                json.dump(user_data, outfile)
 
-            return create_sentence_html(sentence_data, sentence_index, word_index)
+            return create_sentence_html(user_data, sentence_index, word_index)
 
 
+        if key=="clear_all":
+            file_path = "application/data/data.json"
+            if os.path.isfile(file_path):
+                os.remove(file_path)
 
+            return redirect(url_for("index.html"))
 
         if key=="clear_tags":
-            jsonFile = "application/data/tag_data.json"
-            if os.path.isfile(jsonFile):
-                os.remove(jsonFile)
+            file_path = "application/data/data.json"
+            if os.path.isfile(file_path):
+                user_data = None
+                with open(file_path) as json_file:
+                    user_data = json.load(json_file)
 
+                user_data["tag_data"] = {"index": 0, "tags": {}} #create index counter and empty dict for tags
+
+                with open(file_path, 'w') as json_file:
+                    json.dump(user_data, json_file)
+
+                return create_tag_html(user_data["tag_data"])
 
         if key=="clear_sentences":
-            jsonFile = "application/data/sentence_data.json"
-            if os.path.isfile(jsonFile):
-                os.remove(jsonFile)
+            file_path = "application/data/data.json"
+            if os.path.isfile(file_path):
+                user_data = None
+                with open(file_path) as json_file:
+                    user_data = json.load(json_file)
+
+                user_data["sentences"] = []
+                user_data["sentence_tags"] = []
+
+                with open(file_path, 'w') as json_file:
+                    json.dump(user_data, json_file)
+
+                return create_sentence_html(user_data)
+
+        if key=="download_all":
+            # file = send_file("data/data.json", as_attachment=True)
+            file = None
+            file_path = "application/data/data.json"
+            with open(file_path) as json_file:
+                file = json.load(json_file)
+            return {"file": file, "name": input, "extension": "json"}
 
         if key=="download_tags":
-            return send_file("data/tag_data.json", as_attachment=True)
+            file_path = "application/data/data.json"
+            # new_file_path = "application/data/download/tag_data.json"
+            tag_data = None
+            with open(file_path) as json_file:
+                user_data = json.load(json_file)
+            tag_data = user_data["tag_data"]
+            file = {"tag_data": tag_data}
+            # return send_file("data/download/tag_data.json", as_attachment=True) #why does this need application removed???
+            return {"file": file, "name": input, "extension": "json"}
+
         
         if key=="download_sentences":
-            return send_file("data/sentence_data.json", as_attachment=True)
+            file_path = "application/data/data.json"
+            # new_file_path = "application/data/download/sentences.txt"
+            text = ""
+            with open(file_path) as json_file:
+                user_data = json.load(json_file)
+                sentences = user_data["sentences"]
+                for sentence in sentences:
+                    text += sentence + " "
+
+            return {"file": text, "name": input, "extension": "txt"}
+            # return send_file("data/download/sentences.txt", as_attachment=True) #why does this need application removed???
+
+        if key=="delete_download_files":
+            filelist = [f for f in os.listdir("application/data/download")] #remove upload files
+            for f in filelist:
+                os.remove(os.path.join("application/data/download", f))
+    
+
+
+
+
+        if request.files:
+            #if there are files to upload from request
+            upload_folder = "application/data/upload"
+            allowed_extensions = {'txt', 'json', 'csv'}
+            file = request.files["file"]
+            filename = secure_filename(file.filename)
+            if filename != "":
+                file_extension = filename.rsplit('.', 1)[1].lower()
+                if '.' in filename and file_extension in allowed_extensions:
+                    file.save(os.path.join(upload_folder, filename))
+
+                    if file_extension == "json":
+                        new_data = None
+                        with open(upload_folder + "/" + filename) as json_file:
+                            new_data = json.load(json_file)
+
+                        keys = new_data.keys()
+                        user_data = None
+                        with open("application/data/data.json") as json_file2:
+                            user_data = json.load(json_file2)
+
+                        if len(keys) == 3: #uploaded all
+                            user_data = new_data
+                        elif len(keys) == 1: #uploaded tags
+                            user_data["tag_data"] = new_data["tag_data"]
+
+                        with open("application/data/data.json", 'w') as json_file2:
+                            json.dump(user_data, json_file2)
+
+                    elif file_extension == "txt":
+                        text = ""
+                        with open(upload_folder + "/" + filename) as txt_file:
+                            text = txt_file.read()
+                        user_data = create_sentences(text)
+                        file_path = "application/data/data.json"
+                        with open(file_path, 'w') as outfile:
+                            json.dump(user_data, outfile)
+
+                        # return create_sentence_html(user_data)
+                        # return render_template("index.html")
+
+                    elif file_extension == "csv":
+                        filelist = [f for f in os.listdir("application/data/upload")] #delete after implementation
+                        for f in filelist:
+                            os.remove(os.path.join("application/data/upload", f))
+
+                        return render_template("index.html", alert="implement csv upload")
+
+                    filelist = [f for f in os.listdir("application/data/upload")] #remove upload files
+                    for f in filelist:
+                        os.remove(os.path.join("application/data/upload", f))
+
+                    return render_template("index.html", alert="file upload successful")
+
+            return render_template("index.html", alert="error uploading files")
 
 
 
     return render_template("index.html")
    
 
+
+
+
+
+# @app.route("/upload", methods=["GET", "POST"])
+# def upload_file():
+#     if request.method == "POST":
+#         pass
 
 
 
@@ -247,6 +372,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 @app.route('/success', methods = ['GET','POST'])
 def uploaded_file():
     if request.method == 'POST':  
+        print(request.files)
         if request.files:
             f = request.files['file']  
             f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))
@@ -284,10 +410,10 @@ def uploaded_file():
                     tags.append(tag)
                 sentence_tags.append(tags)
 
-            jsonFile = "application/data/sentence_data.json"
-            if os.path.isfile(jsonFile):
-                with open(jsonFile) as json_data:
-                    sentence_data = json.load(json_data)
+            file_path = "application/data/sentence_data.json"
+            if os.path.isfile(file_path):
+                with open(file_path) as json_file:
+                    sentence_data = json.load(json_file)
 
             sentence_data = {"sentences": sentences, "sentence_tags": sentence_tags}
             out_file = open("application/data/sentence_data.json", "w")
@@ -297,12 +423,20 @@ def uploaded_file():
        
             # return render_template("index.html", name = f.filename) 
             return render_template("index.html") 
-        
-
-@app.route('/downloads/tags',methods = ['GET','POST'])  
-def download_file_labels():
-    return send_file("data/tag_data.json", as_attachment=True)
     
-@app.route('/downloads/labels',methods = ['GET','POST'])  
-def download_file_annotation():
-    return send_file("data/sentence_data.json", as_attachment=True)
+
+
+
+
+
+##### DATA STRUCTURE: #####
+# JSON file --> user_data
+# One dictionary: "sentences", "sentence_tags", "tag_data"
+# user_data["sentences"] = a list of strings, each string is one sentence fully intact
+# user_data["sentence_tags"] = a list of lists of integers, each child list represents a sentence, each number represents a word's tag index number
+# the sentences and sentence_tags data can be correlated by list[i]
+# user_data["tag_data"] = a dictionary: "index", "tags"
+# user_data["tag_data"]["index"] = running index (integer) of how many tags have ever been created, so each new tag has a unique index ID number
+# user_data["tag_data"]["tags"] = a dictionary: keys = tag ID numbers (strings), values = dictionary: "name", "color"
+# user_data["tag_data"]["tags"][tag ID number]["name"] = name of tag (string)
+# user_data["tag_data"]["tags"][tag ID number]["color"] = color of tag (string)

@@ -596,6 +596,14 @@ div.top
     /* text-align: center; */
 
 }
+.footer-buttons span
+{
+    font-size: 16px;
+    color: #3f3f3f;
+    padding-left: 10px;
+    padding-right: 5px;
+    font-family: 'avenir';
+}
 .footer-buttons button.btn1
 {   
     font-size: 16px;
@@ -754,7 +762,7 @@ input[type="file"]
     padding: 0;
     padding-left: 10px;
 }
-#okay-button
+#okay-button, #download-button
 {
     margin-top: 10px;
     margin-right: 10px;
@@ -771,7 +779,7 @@ input[type="file"]
     cursor: pointer;
     transition: .4s;
 }
-#okay-button:hover
+#okay-button:hover, #download-button:hover
 {
     background-color: gray;
     color: white;
