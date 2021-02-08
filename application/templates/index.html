@@ -85,24 +85,43 @@
     <div class="sentences-area"></div>
 
     <div class="footer-buttons">
-        <span>clear:</span>
-        <button class="btn1 clear-all">ALL</button>
-        <button class="btn1 clear-tags">TAGS</button>
-        <button class="btn1 clear-sentences">SENTENCES</button>
 
-        <span>upload:</span>
-        <button class="btn1 upload" type='file'>
-            <form id="file-upload-form" action="/" method="post" enctype="multipart/form-data">  
-                <label for="file-upload" class="footer-inner-button">JSON, TXT, CSV</label>
-                <input id="file-upload" type="file" name="file" accept=".json, .txt, .csv"/> 
-            </form>
-        </button>
+        <div class="footer-block">
+            <span>clear:</span>
+            <div class="footer-sub-block">
+                <button class="btn1 clear-all">ALL DATA</button>
+                <button class="btn1 clear-tags">TAGS + LABELS</button>
+                <button class="btn1 clear-sentences">TEXT</button>
+            </div>
+        </div>
 
-        <span>download:</span>
-        <button class="btn1 download-all">JSON</button>
-        <button class="btn1 download-csv">CSV</button>
-        <button class="btn1 download-tags">TAGS</button>
-        <button class="btn1 download-sentences">SENTENCES</button>
+        <div class="footer-block">
+            <span>upload:</span>
+            <div class="footer-sub-block">
+                <button class="btn1 upload" type='file'>
+                    <form id="file-upload-form" action="/" method="post" enctype="multipart/form-data">  
+                        <label for="file-upload" class="footer-inner-button">JSON, TXT, CSV</label>
+                        <input id="file-upload" type="file" name="file" accept=".json, .txt, .csv"/> 
+                    </form>
+                </button>
+            </div>
+        </div>
+
+        <div class="footer-block">
+            <span>save json:</span>
+            <div class="footer-sub-block">
+                <button class="btn1 download-all">ALL DATA</button>
+                <button class="btn1 download-tags">TAGS</button>
+            </div>
+        </div>
+
+        <div class="footer-block">
+            <span>export:</span>
+            <div class="footer-sub-block">
+                <button class="btn1 download-csv">ALL CSV</button>
+                <button class="btn1 download-sentences">TEXT</button>
+            </div>
+        </div>  
         
     </div>
    
