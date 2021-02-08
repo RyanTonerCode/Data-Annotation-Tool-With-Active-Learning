@@ -236,6 +236,17 @@ $(document).ready(function(){
     /* UPLOAD BUTTONS */
     document.getElementById("file-upload").onchange = function() //when a file is chosen to upload
     {
+        // console.log($("#file-upload").val());
+        filename = $("#file-upload").val();
+        const lastDot = filename.lastIndexOf('.');
+        const ext = filename.substring(lastDot + 1);
+        if (ext == "txt" || $(".sentences-area").html() == "")
+        {
+            document.getElementById("file-upload-form").submit();
+            initialize();    
+            return;
+        }
+      
         content = "If you would like to save data before overwriting, enter a name below. Either way, click continue to import your file. TXT files do not overwrite any data. <br><br>";
         content += "<input type='text' name='download-name' placeholder='Filename' id='download-name' class='new-tag-input' autofocus>";
         button = "<button class='form-button' id='upload-continue-button'>CONTINUE</button>";
