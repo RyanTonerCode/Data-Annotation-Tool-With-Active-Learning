@@ -236,17 +236,17 @@ $(document).ready(function(){
     /* UPLOAD BUTTONS */
     document.getElementById("file-upload").onchange = function() //when a file is chosen to upload
     {
-        // console.log($("#file-upload").val());
         filename = $("#file-upload").val();
         const lastDot = filename.lastIndexOf('.');
         const ext = filename.substring(lastDot + 1);
-        if (ext == "txt" || $(".sentences-area").html() == "")
+        if (ext == "txt" || $(".sentences-area").html() == "") //only ask to save file if there is something to save or adding txt
         {
             document.getElementById("file-upload-form").submit();
             initialize();    
             return;
         }
       
+        //Uploading a full dataset (JSON or CSV) will overwrite any existing data. To save your data, enter a filename before clicking continue. 
         content = "If you would like to save data before overwriting, enter a name below. Either way, click continue to import your file. TXT files do not overwrite any data. <br><br>";
         content += "<input type='text' name='download-name' placeholder='Filename' id='download-name' class='new-tag-input' autofocus>";
         button = "<button class='form-button' id='upload-continue-button'>CONTINUE</button>";
@@ -344,14 +344,12 @@ $(document).ready(function(){
         element.download = fileName; 
         element.click(); //download the file
         window.URL.revokeObjectURL(url); //I think this means: don't actually open a new window?
-        // console.log("Download complete!");
 
         if (upload_after_download) //if there is something waiting to upload
         {
             setTimeout(function() //wait 100ms to give enough time to download (is this reliable?)
             {
                 upload_after_download = false; //reset flag
-                // console.log("Uploading...");
                 document.getElementById("file-upload-form").submit(); //submit file upload form
                 initialize();    
             }, 100);
