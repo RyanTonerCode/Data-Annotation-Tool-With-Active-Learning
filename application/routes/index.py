@@ -1,6 +1,14 @@
 from application import app
 from application.imports import apology, session, render_template, os, request, json, redirect, secure_filename, time, send_file, after_this_request, send_from_directory, url_for, SharedDataMiddleware
 import pandas as pd
+import cv2
+import numpy as np
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+from sklearn.model_selection import train_test_split
+from application.routes.train_ai import train_ai
+
 
 @app.route("/", methods=["GET", "POST"]) #standard path url
 @app.route("/<alert>", methods=["GET", "POST"]) #for redirect with alert
@@ -147,6 +155,20 @@ def home(alert = None):
                 user_data["sentence_tags"] += sentence_tags
 
             return user_data
+
+
+
+        def ai(user_data, corrections=False):
+
+                #load model here
+                new_user_data = user_data
+                #format new user data for AI
+                #make predictions for tags using model, make threshold
+                #apply predictions to new user data
+
+                #decide how to implement corrections -- are we re-training the model here? ealier? later? never? who knows! where the wind blows...
+                #use train_ai function?
+                return new_user_data
 
 
 
