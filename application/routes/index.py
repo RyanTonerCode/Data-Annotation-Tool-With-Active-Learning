@@ -30,11 +30,13 @@ def home(alert = None):
                 tag_name = tag_data["tags"][tag_index]["name"]
                 tag_color = tag_data["tags"][tag_index]["color"]
 
-                radio_button = '''<label class="radio-container"><input type="radio" checked="checked" name="radio" value="''' + str(tag_index) + '''"><span class="checkmark ''' + tag_color + ''' "></span></label>'''
-                tags_html += "<div class='tag-container'>" + radio_button + "<div class='tag'><div class='tag-name'>" + tag_name + "</div><div class='delete' data-index='" + str(tag_index) + "'>X</div></div></div>"
+                radio_button = "<label class='radio-container'><input type='radio' checked='checked' name='radio' value='" + str(tag_index) + "'><span class='checkmark " + tag_color + "'></span></label>"
+                tags_html += "<div class='tag-container'>" + radio_button + "<div class='tag'><div class='tag-name'>" + tag_name + "</div>"
+                tags_html += "<div class='tag-overlay' data-index='" + str(tag_index) + "'>edit</div>"
+                tags_html += "<div class='tag-edit-menu boxshadow' style='display: none;'><div class='tag-edit-menu-item modify'>modify</div><div class='tag-edit-menu-item delete'>delete</div></div></div></div>"
             
             if tags_html == "": 
-                tags_html = '''<div class="tag no-tags"><div class="tag-name">No Tags</div></div>'''
+                tags_html = "<div class='tag no-tags'><div class='tag-name'>No Tags</div></div>"
             
             return tags_html
         
@@ -43,6 +45,7 @@ def home(alert = None):
         if key=="new_tag": #create a new tag with a name and color, and a unique ID -- then return a new HTML tag bar
             tag_name = input[0]
             tag_color = input[1] 
+            tag_index = str(input[2]) #must be in string form or it breaks the data
             tag_data = {"index": 0, "tags": {}} #create index counter and empty dict for tags
             user_data = {"sentences": [], "sentence_tags": [], "tag_data": tag_data}
         
@@ -54,9 +57,10 @@ def home(alert = None):
             tag_data = user_data["tag_data"]
             new_tag = {"name": tag_name, "color": tag_color}
             if new_tag not in tag_data["tags"].values() and tag_color != "" and tag_name != "": #if tag is valid and unique
-                tag_index = tag_data["index"] + 1 #create next tag index, beginning at 1
-                tag_data["index"] += 1 #increment index counter
-                tag_data["tags"][tag_index] = new_tag #add new tag by index
+                if tag_index == 0: #if it is a new tag, not modified
+                    tag_data["index"] += 1 #increment index counter
+                    tag_index = tag_data["index"] #create next tag index, beginning at 1
+                tag_data["tags"][tag_index] = new_tag #add new tag by index, or replace modified tag
 
             user_data["tag_data"] = tag_data
             with open(file_path, 'w') as outfile:

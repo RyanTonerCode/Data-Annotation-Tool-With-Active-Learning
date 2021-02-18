@@ -345,7 +345,7 @@ div.top
 {
     padding-left: 5px;
 }
-.tag .delete, .tag .tag-overlay, .sentence-delete
+.tag .tag-overlay, .sentence-tag .delete
 {
     opacity: 0;
     transition: 0.4s;
@@ -364,11 +364,34 @@ div.top
     z-index: 1;
     cursor: pointer;
 }
-.tag .tag-overlay
+.tag .tag-overlay /* for edit */
 {
     color: rgb(0, 255, 0);
 }
-.tag:hover .delete, .tag:hover .tag-overlay, .sentence:hover .sentence-delete
+.tag-edit-menu
+{
+    left: 0;
+    top: 30px;
+    background-color: #3f3f3f;
+    position: absolute;
+    width: auto;
+    border-radius: 5px;
+    z-index: 1;
+}
+.tag-edit-menu .tag-edit-menu-item
+{
+    /* width: calc(100% - 10px); */
+    border-radius: 5px;
+    padding: 1px;
+    padding-left: 5px;
+    padding-right: 5px;
+    transition: all 0.4s;
+}
+.tag-edit-menu .tag-edit-menu-item:hover
+{
+    background-color: rgb(107, 107, 107);
+}
+.tag:hover .tag-overlay, .sentence-tag:hover .delete
 {
     opacity: 1;
 }
@@ -442,8 +465,6 @@ div.top
 {
     position: relative;
     float: right;
-
-    /* margin-bottom: 10px; */
 }
 .run-buttons button.btn1
 {
