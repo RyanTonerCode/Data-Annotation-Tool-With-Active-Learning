@@ -326,14 +326,16 @@ def home(alert = None):
                             new_data = json.load(json_file)
 
                         keys = new_data.keys()
+                        print("KEYS: ", keys)
                         user_data = None
                         with open("application/data/data.json") as json_file:
                             user_data = json.load(json_file)
 
-                        if len(keys) == 3: #uploaded all data
+                        if len(keys) == 3: #uploaded all data - clears all data
                             user_data = new_data
-                        elif len(keys) == 1: #uploaded only tag data
+                        elif len(keys) == 1: #uploaded only tag data - clears tags and sentence labels
                             user_data["tag_data"] = new_data["tag_data"]
+                            user_data["sentence_tags"] = []                            
 
                         with open("application/data/data.json", 'w') as json_file:
                             json.dump(user_data, json_file) #save user_data
