@@ -96,6 +96,8 @@ $(document).ready(function () {
         var word_index = this.parentElement.dataset.index;
         var tag_index = $("input[name=radio]:checked").val();
         var tag_word = [sentence_index, word_index, tag_index];
+        selected_sentence = sentence_index;
+        selected_word = word_index;
         ajax("/", JSON.stringify({ tag_word }), update_sentences);
     });
     $(document).on("click", ".sentences-area .delete", function (e) //when we click delete tag word
@@ -103,6 +105,8 @@ $(document).ready(function () {
         var sentence_index = this.parentElement.parentElement.parentElement.dataset.index;
         var word_index = this.parentElement.parentElement.dataset.index;
         var tag_word = [sentence_index, word_index, 0];
+        selected_sentence = sentence_index;
+        selected_word = word_index;
         ajax("/", JSON.stringify({ tag_word }), update_sentences);
     });
 
@@ -237,7 +241,7 @@ $(document).ready(function () {
         }
 
         //Uploading a full dataset (JSON or CSV) will overwrite any existing data. To save your data, enter a filename before clicking continue. 
-        content = "If you would like to save data before overwriting, enter a name below. Either way, click continue to import your file. TXT files do not overwrite any data. <br><br>";
+        content = "If you would like to save data before overwriting, enter a name below. Either way, click continue to import your file. JSON tag data and TXT files do not overwrite any data. <br><br>";
         content += "<input type='text' name='download-name' placeholder='Filename' id='download-name' class='new-tag-input' autofocus>";
         button = "<button class='form-button' id='upload-continue-button'>CONTINUE</button>";
         showAlert(content, button);

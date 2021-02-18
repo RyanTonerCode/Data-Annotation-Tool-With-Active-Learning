@@ -140,15 +140,12 @@ def home(alert = None):
                         sentence += char
                     leading_space = False
                     if char in delimiters:
-                    # if char == "." or char =="?" or char == "!":
                         sentences.append(sentence)
                         sentence = "" #reset current sentence
                         leading_space = True #next time, skip over the space between sentences
 
                 for sentence in sentences: #create empty tag IDs for every word in every sentence
                     tags = [0 for x in sentence.split()]
-                    # for word in sentence.split():
-                    #     tags.append(0)
                     sentence_tags.append(tags)
    
                 user_data["sentences"] += sentences #if there's existing data, append the new sentences and don't tamper with the existing tags
@@ -333,9 +330,13 @@ def home(alert = None):
 
                         if len(keys) == 3: #uploaded all data - clears all data
                             user_data = new_data
-                        elif len(keys) == 1: #uploaded only tag data - clears tags and sentence labels
-                            user_data["tag_data"] = new_data["tag_data"]
-                            user_data["sentence_tags"] = []                            
+                        elif len(keys) == 1: #uploaded only tag data - appends tags, doesnt clear anything
+                            for new_tag_index in new_data["tag_data"]["tags"]:
+                                new_tag = new_data["tag_data"]["tags"][new_tag_index]
+                                if new_tag not in user_data["tag_data"]["tags"].values(): #if tag is valid and unique
+                                    user_data["tag_data"]["index"] += 1 #increment index counter
+                                    tag_index = user_data["tag_data"]["index"] #create next tag index, beginning at 1
+                                    user_data["tag_data"]["tags"][tag_index] = new_tag #add new tag by index
 
                         with open("application/data/data.json", 'w') as json_file:
                             json.dump(user_data, json_file) #save user_data
