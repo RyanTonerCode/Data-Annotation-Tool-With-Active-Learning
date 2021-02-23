@@ -179,6 +179,14 @@ div.top
     outline-width: 0;
     outline: none;
 }
+.text-box .btn1
+{
+    position: absolute;
+    bottom: 5px;
+    right: 10px;
+    border-radius: 20px;
+    background-color: green;
+}
 
 
 
@@ -199,11 +207,19 @@ div.top
     padding-bottom: 0;
     font-family: 'avenir';
 }
-.tags-area div
+.tags-area div:not(.tags-area-overlay)
 {
     display: inline-block;
 }
-.tags-area button.btn1
+.tags-area-overlay
+{
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0; bottom: 0; left: 0; right: 0;
+    z-index: 2;
+}
+.tags-area button.btn1, .btn1 /* SWITCH? */
 {   
     font-size: 16px;
     color: white;
@@ -218,7 +234,7 @@ div.top
     font-family: 'avenir';
     margin-bottom: 10px;
 }
-.tags-area button.btn1:hover
+.tags-area button.btn1:hover, .btn1:hover /* SWITCH */
 {
     color: white;
     background-color: gray;
@@ -423,24 +439,24 @@ div.top
     display: none;
 }
 /* Create a custom radio button */
-.radio-container .checkmark 
+.radio-container .radio-checkmark 
 {
     position: absolute;
     top: 0;
     left: 0;
     height: 20px;
     width: 20px;
-    /* background-color: #eee; */
     border-radius: 5px;
+    /* background-color: #eee; */
 }
 /* Show the indicator (dot/circle) when checked */
-.radio-container input:checked ~ .checkmark:after 
+.radio-container input:checked ~ .radio-checkmark:after 
 {
     content: "";
     position: absolute;
 }
 /* Style the indicator (dot/circle) */
-.radio-container .checkmark:after 
+.radio-container .radio-checkmark:after 
 {
     top: 6px;
     left: 6px;
@@ -453,22 +469,16 @@ div.top
 
 
 
-
-
-
-
-
-
-
-
 .run-buttons
 {
     position: relative;
     float: right;
+    z-index: 3;
 }
 .run-buttons button.btn1
 {
     background-color: red;
+    margin-bottom: 0;
 }
 .run-options
 {
@@ -514,23 +524,28 @@ div.top
     background-color: #ebebeb;
     width: 100%;
     padding-left: 20px;
-    /* display: inline-block; */
     position: relative;
-
+    /* display: inline-block; */
     /* height: 60px; */
-    height: au;
+    /* height: auto; */
 }
 .sentence-area div:not(.tag)
 {
     /* float: left; */
     display: inline-block;
 }
+.sentence 
+{
+    display: inline-block;
+    width: calc(100% - 50px);
+    margin-left: 50px;
+}
 .sentence-area .word
 {
     position: relative;
-    /* min-width: 60px; */
     display: block;
     margin-right: 15px;
+    /* min-width: 60px; */
     /* margin-top: 10px; */
 }
 .sentence-area .word.selected
@@ -591,7 +606,100 @@ div.top
 
 
 
-
+/* CHECKBOXES */
+.checkbox
+{
+    position: absolute;
+    top: 50px;
+}
+.checkbox-container 
+{
+    cursor: pointer;
+    font-size: 22px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+/* Hide the browser's default checkbox */
+.checkbox-container input 
+{
+    display: none;
+}
+/* Create a custom checkbox */
+.checkbox-checkmark 
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #eee;
+    border-radius: 3px;
+    border: 1px solid gray;
+    transition: 0.4s;
+    transform: translate(-0%, -100%); /*NEW */
+}
+/* On mouse-over, add a grey background color */
+.checkbox-container:hover input ~ .checkbox-checkmark 
+{
+    background-color: rgb(221, 219, 219);
+}
+/* When the checkbox is checked, add a blue background */
+.checkbox-container input:checked ~ .checkbox-checkmark 
+{
+    /* background-color: #2196F3; */
+    background-color: #f32121;
+    border: 0px solid gray;
+}
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkbox-checkmark:after, .checkbox-checkmark:before 
+{
+    content: "";
+    position: absolute;
+    display: none;
+}
+/* Show the checkmark when checked */
+.checkbox-container input:checked ~ .checkbox-checkmark:after, .checkbox-container input:checked ~ .checkbox-checkmark:before 
+{
+    display: block;
+}
+/* Style the checkmark/indicator */
+/* .checkbox-container .checkbox-checkmark:after 
+{
+    left: 9px;
+    top: 5px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+} */
+.checkbox-container .checkbox-checkmark:after, .checkbox-container .checkbox-checkmark:before
+{
+    content:'';
+    position:absolute;
+    width:20px;
+    height:3px;
+    background-color:white;
+    border-radius:1px;
+    top:11px;
+    left:3px;
+}
+.checkbox-container .checkbox-checkmark:before
+{
+    -webkit-transform:rotate(45deg);
+    -moz-transform:rotate(45deg);
+    transform:rotate(45deg);
+}
+.checkbox-container .checkbox-checkmark:after
+{
+    -webkit-transform:rotate(-45deg);
+    -moz-transform:rotate(-45deg);
+    transform:rotate(-45deg);
+}
 
 
 

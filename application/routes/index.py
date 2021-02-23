@@ -7,7 +7,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 from sklearn.model_selection import train_test_split
-from application.routes.train_ai import train_ai
+# from application.routes.train_ai import train_ai
 
 
 @app.route("/", methods=["GET", "POST"]) #standard path url
@@ -30,7 +30,7 @@ def home(alert = None):
                 tag_name = tag_data["tags"][tag_index]["name"]
                 tag_color = tag_data["tags"][tag_index]["color"]
 
-                radio_button = "<label class='radio-container'><input type='radio' checked='checked' name='radio' value='" + str(tag_index) + "'><span class='checkmark " + tag_color + "'></span></label>"
+                radio_button = "<label class='radio-container'><input type='radio' checked='checked' name='radio' value='" + str(tag_index) + "'><span class='radio-checkmark " + tag_color + "'></span></label>"
                 tags_html += "<div class='tag-container'>" + radio_button + "<div class='tag'><div class='tag-name'>" + tag_name + "</div>"
                 tags_html += "<div class='tag-overlay' data-index='" + str(tag_index) + "'>edit</div>"
                 tags_html += "<div class='tag-edit-menu boxshadow' style='display: none;'><div class='tag-edit-menu-item modify'>modify</div><div class='tag-edit-menu-item delete'>delete</div></div></div></div>"
@@ -102,7 +102,10 @@ def home(alert = None):
 
             if sentences != {} and sentence_tags != {}: #if there is any information to display
                 for sentence_index, sentence in enumerate(sentences):
+                    
                     sentences_html += "<div class='sentence-area' data-index='" + str(sentence_index) + "'>"
+                    sentences_html += "<div class='checkbox'><label class='checkbox-container'><input type='checkbox'><span class='checkbox-checkmark'></span></label></div><div class='sentence'>"
+                    
                     for word_index, word in enumerate(sentence.split()):
                         word_tag_index = sentence_tags[sentence_index][word_index] #see what the word's tag is
                         tag_html = "<button class='btn2 select-tag-button'>tag</button>"
@@ -117,7 +120,7 @@ def home(alert = None):
 
                         sentences_html += "<div class='" + word_class + "' data-index='" + str(word_index) + "'> <div class='word-text'>" + word + "</div> " + tag_html + " </div> "
 
-                    sentences_html += "</div>"
+                    sentences_html += "</div></div>"
 
             return sentences_html
 
@@ -174,9 +177,11 @@ def home(alert = None):
 
 
         if "run" in key: #if text is submitted, add it to the data, and regardless, return HTML for sentences area
-            text = input
-            user_data = create_sentences(text) #if text empty, get user_data, if not empty, get user_data with new text implemented
+            #if we did run corrections or automatic, we get list of checked sentences -- don't pass that to user_data!
+            user_data = create_sentences(input if key=="run_manual" else "") #if text empty, get user_data, if not empty, get user_data with new text implemented
             if key=="run_corrections" or key=="run_automatic":
+                exclude_sentences = input #a list of the sentences to exclude from automatic labelling
+                model_path = user_data["model_path"] #may be null
                 pass #modify user data here with AI
 
             file_path = "application/data/data.json"

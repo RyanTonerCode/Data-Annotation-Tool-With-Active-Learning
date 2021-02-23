@@ -12,9 +12,12 @@
 
     <div class="text-box">
         <textarea id="text-box-field" class="text-box-field boxshadow" autocomplete="off" name="text-box-field" placeholder="Input text to parse" type="text"></textarea>
+        <button class="btn1 add-text">add text</button>
+
     </div>
 
     <div class="tags-area">
+        <div class="tags-area-overlay" style="display: none;"></div>
         
         <button class="btn1 new-tag">+</button>
         
@@ -83,12 +86,19 @@
                     </div>
                 </div>
             </div> -->
+
         </div>
 
+        <!-- <div class="run-buttons">
+            loop:
+            <div class='checkbox'><label class='checkbox-container'><input type='checkbox'><span class='checkbox-checkmark'></span></label></div>
+            <button class="btn1 run">RUN AI</button>
+        </div> -->
+
         <div class="run-buttons">
-            <button class="btn1 run">RUN...</button>
+            <button class="btn1 run">RUN AI...</button>
             <div class="run-options boxshadow" style="display: none;">
-                <button class="btn1 run-manual">MANUAL</button>
+                <!-- <button class="btn1 run-manual">MANUAL</button> -->
                 <button class="btn1 run-corrections">CORRECTIONS</button>
                 <button class="btn1 run-automatic">AUTOMATIC</button>
             </div>
