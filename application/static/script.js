@@ -3,14 +3,15 @@ $(document).ready(function()
 
     function initialize()
     {
-        ajax("/", JSON.stringify({new_tag: ["", "", ""]}), update_tags); //////////////////////////////////////// INITIATE TAGS!
-       
-        // ajax("/", JSON.stringify({run_manual: ""}), update_sentences); //////////////////////////////////////// INITIATE SENTENCES!
-        // debounce(function(){ajax("/", JSON.stringify({run_manual: ""}), update_sentences);}, 100);
-       
-        setTimeout(function(){ ajax("/", JSON.stringify({run_manual: ""}), update_sentences); }, 100);
+        ajax("/", JSON.stringify({"run_manual": ""}), initialize_return);
+    }
+    function initialize_return(data)
+    {
+        update_tags(data["tag_data"]);
+        update_sentences(data["sentence_data"]);
     }
     initialize();
+    
 
 
 
@@ -47,9 +48,7 @@ $(document).ready(function()
         $(".new-tag-input").val(""); //clear tag creator textbox
         $(".color-selector-button").first().css("background-color", "goldenrod").html("Select Color..."); //reset tag creator color selector
         $(".submit-new-tag").data("index", 0); //reset index so we dont replace other tags next time by accident
-
-        ajax("/", JSON.stringify({new_tag}));
-        initialize(); //need to initialize because sentences will change if existing tag with labels is modified
+        ajax("/", JSON.stringify({new_tag}), initialize_return);
     });
     $(document).on("click", ".tag-overlay", function(e) //when we click edit button on a tag
     {
@@ -72,7 +71,7 @@ $(document).ready(function()
     $(document).on("click", ".tag-edit-menu-item.delete", function(e) //when we click delete tag
     {
         var tag_index = $(e.target).parent().parent().children(".tag-overlay").data("index");
-        ajax("/", JSON.stringify({delete_tag: tag_index}));
+        ajax("/", JSON.stringify({"delete_tag": tag_index}));
         initialize();
     });
 
@@ -101,21 +100,15 @@ $(document).ready(function()
     {
         var text = $("#text-box-field").val();
         $("#text-box-field").val("");
-        ajax("/", JSON.stringify({run_manual: text}), update_sentences);
+        ajax("/", JSON.stringify({"run_manual": text}), update_sentences);
     });
     $(document).on("click", ".run-corrections", function() //when we click RUN-CORRECTIONS button
     {
         are_you_sure(false)
-        // var text = $("#text-box-field").val();
-        // $("#text-box-field").val("");
-        // ajax("/", JSON.stringify({run_corrections: text}), update_sentences);
     });
     $(document).on("click", ".run-automatic", function() //when we click RUN-AUTOMATIC button
     {
         are_you_sure(true)
-        // var text = $("#text-box-field").val();
-        // $("#text-box-field").val("");
-        // ajax("/", JSON.stringify({run_automatic: text}), update_sentences);
     });
     function are_you_sure(query)
     {
@@ -133,7 +126,6 @@ $(document).ready(function()
             }).get();
             
             ajax("/", JSON.stringify({query_: exclude_sentences}), update_sentences);    
-            // initialize();
             $(".tags-area-overlay").show();
             $("#alert").css("display", "none");
             $("#alert-stuff").html("");
@@ -150,12 +142,11 @@ $(document).ready(function()
     $(document).on("click", ".select-tag-button", function(e) //when we click TAG button below a word
     {
         var sentence_index = $(this).closest(".sentence-area").data("index");
-        var word_index = $(this).closest("word").data("index");
+        var word_index = $(this).closest(".word").data("index");
         var tag_index = $("input[name=radio]:checked").val();
         var tag_word = [sentence_index, word_index, tag_index];
         selected_sentence = sentence_index;
         selected_word = word_index;
-        console.log(tag_word);
         ajax("/", JSON.stringify({tag_word}), update_sentences);
     });
     $(document).on("click", ".sentences-area .delete", function(e) //when we click delete tag word
@@ -165,8 +156,6 @@ $(document).ready(function()
         var tag_word = [sentence_index, word_index, 0];
         selected_sentence = sentence_index;
         selected_word = word_index;
-        // console.log($(this).closest("word"));
-
         ajax("/", JSON.stringify({tag_word}), update_sentences);
     });
 
@@ -181,10 +170,11 @@ $(document).ready(function()
         if ($("input").is(":focus") || $("textarea").is(":focus") || number_of_sentences == 0) { return; }
         //dont do stuff from keys if typing somewhere (text field) or if there arent any sentences yet
         var words_in_sentence = document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children.length;
+        document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.remove("selected")
 
         function advance_right() //in a function so it can be called in other places
         {
-            document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.remove("selected")
+            // document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.remove("selected")
             if (selected_word < words_in_sentence - 1) //if there is at least one more word to right
             {
                 selected_word++;
@@ -194,7 +184,7 @@ $(document).ready(function()
                 selected_sentence++;
                 selected_word = 0; //go to first word in next sentence below
             }
-            document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.add("selected")
+            // document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.add("selected")
         }
 
         if (e.key == "ArrowRight")
@@ -203,7 +193,7 @@ $(document).ready(function()
         }
         else if (e.key == "ArrowLeft")
         {
-            document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.remove("selected")
+            // document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.remove("selected")
             if (selected_word > 0) //if there is at least one more word to left
             {
                 selected_word--;
@@ -214,28 +204,28 @@ $(document).ready(function()
                 words_in_sentence = document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children.length; //get wordcount of sentence above
                 selected_word = words_in_sentence - 1; //go to end of that sentence above
             }
-            document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.add("selected")
+            // document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.add("selected")
         }
         else if (e.key == "ArrowUp")
         {
             if (selected_sentence > 0) //if there is at least one more sentence to above
             {
-                document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.remove("selected")
+                // document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.remove("selected")
                 selected_sentence--;
                 words_in_sentence = document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children.length; //get wordcount of sentence above
                 words_in_sentence >= selected_word + 1 ? selected_word = selected_word : selected_word = words_in_sentence - 1; //move straight up if possible, otherwise go to end
-                document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.add("selected")
+                // document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.add("selected")
             }
         }
         else if (e.key == "ArrowDown")
         {
             if (selected_sentence < number_of_sentences - 1) //if there is at least one more sentence to below
             {
-                document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.remove("selected")
+                // document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.remove("selected")
                 selected_sentence++;
                 words_in_sentence = document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children.length; //get wordcount of sentence below
                 words_in_sentence >= selected_word + 1 ? selected_word = selected_word : selected_word = words_in_sentence - 1; //move straight down if possible, otherwise go to end
-                document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.add("selected")
+                // document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.add("selected")
             }
         }
         else if (["1","2","3","4","5","6","7","8","9"].includes(e.key)) //tag a word when we click a number, that number in line on the tag bar will be what it is
@@ -257,11 +247,12 @@ $(document).ready(function()
         {
             var sentence_index = selected_sentence;
             var word_index = selected_word;
-    
             var tag_word = [sentence_index, word_index, 0];
             ajax("/", JSON.stringify({tag_word}), update_sentences); 
             setTimeout(function(){advance_right();}, 100);   
         }
+
+        document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.add("selected")
 
     });
 
@@ -271,7 +262,6 @@ $(document).ready(function()
     var lastChecked = null;
     $(document).on("click", ".sentence-area input[type=checkbox]",function(e)
     {
-        // console.log("Click", e.target, e.target.checked);
         if (lastChecked)
         {
             if (e.shiftKey) 
@@ -290,22 +280,17 @@ $(document).ready(function()
                 });
                 e.target.checked = !e.target.checked;
             }
-            lastChecked = this;
         }
-        else
-        {
-            lastChecked = this;
-        }  
-
+        
         if (e.metaKey || e.key == "Control")
         {
             var checkboxes = $('.sentence-area .checkbox-container input').length;
             var number_checked = $('.sentence-area .checkbox-container input:checked').length;
             var check_uncheck = !(checkboxes == number_checked + 1)
             $('.sentence-area .checkbox-container input').prop('checked', check_uncheck);
-            // console.log(checkboxes, number_checked + 1, check_uncheck);
-            // console.log(checkboxes == number_checked + 1);
         }
+
+        lastChecked = this;
     });
 
 
@@ -313,17 +298,17 @@ $(document).ready(function()
     /* CLEAR BUTTONS */
     $(document).on("click", ".clear-all", function() //when we click CLEAR ALL
     {        
-        ajax("/", JSON.stringify({clear_all: ""}));
+        ajax("/", JSON.stringify({"clear_all": ""}));
         initialize();
     });
     $(document).on("click", ".clear-tags", function() //when we click CLEAR TAGS
     {        
-        ajax("/", JSON.stringify({clear_tags: ""}));
+        ajax("/", JSON.stringify({"clear_tags": ""}));
         initialize();
     });
     $(document).on("click", ".clear-sentences", function() //when we click CLEAR SENTENCES
     {        
-        ajax("/", JSON.stringify({clear_sentences: ""}));
+        ajax("/", JSON.stringify({"clear_sentences": ""}));
         initialize();
     });
 
@@ -350,7 +335,7 @@ $(document).ready(function()
         var button = "<button class='form-button' id='upload-continue-button'>CONTINUE</button>";
         showAlert(content, button);
 
-        $(document).on("click", "#upload-continue-button", async function()
+        $(document).on("click", "#upload-continue-button", async function() //need async?
         {        
             if ($("#download-name").val() != "") //if they would like to download...
             {
@@ -491,12 +476,7 @@ $(document).ready(function()
         $("#alert-stuff").html(stuff);
         $("#alert").css("display", "block");
     }
-    $(document).on("click", "#okay-button", function() //when we click the alert okay button
-    {
-        $("#alert").css("display", "none");
-        $("#alert-stuff").html("");
-    });
-    $(document).on("click", ".alert-close", function() //when we click the alert x button
+    $(document).on("click", ".alert-close, #okay-button", function() //when we click the alert x button OR alert okay button
     {
         $("#alert").css("display", "none");
         $("#alert-stuff").html("");
