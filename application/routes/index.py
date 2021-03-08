@@ -351,7 +351,7 @@ def home(alert = None):
                         user_data = create_sentences(text)
                         write_json(user_data)
 
-                    elif file_extension == "csv": #not implemented
+                    elif file_extension == "csv":
                         csv = ""
                         with open(os.path.join(upload_folder, filename)) as csv_file:
                             csv = csv_file.read() #read in csv file

@@ -1,5 +1,6 @@
 import os
 import cv2
+import json
 import numpy as np
 import scipy as sp
 import tensorflow as tf
@@ -10,9 +11,6 @@ from sklearn.model_selection import train_test_split
 
 
 def create_model(x_train, x_test, y_train, y_test, NUM_CATEGORIES):
-
-    # Get a compiled neural network
-    # USE RECURRENT MODEL!
     model = keras.models.Sequential()
     model.add(keras.Input(shape=(None, None, None))) #set shape to..... what now? If all sentences are different, what to do... 
     model.add(layers.Dense(256, activation="relu")) # Add a hidden layer of 256 nodes
@@ -53,15 +51,27 @@ def manage_data(x_train, x_test, y_train, y_test, idx):
 
 
 
+def run_model(model, user_data, test_sentences):
+    new_user_data = user_data
+    for i in test_sentences:
+        sentence_tags = model.predict(user_data["sentences"][i])
+        new_user_data["sentence_data"]
+
+
+
 def train_ai(user_data, test_sentences, model_path, mode=0):
     EPOCHS = 10
     TEST_SIZE = 0.4
-    
-    ########
-    # create training data from JSON or CSV file or files exported from app, or other training data
-    ########
-    text, tags = None, None #here, load the training data
-    NUM_CATEGORIES = None #set to number of tags
+
+    text, tags = [], [] #here, load the training data
+    for sentence_index, sentence in enumerate(user_data["sentences"]):
+        for word_index, word in enumerate(sentence.split()):
+            tag_index = str(user_data["sentence_tags"][sentence_index][word_index]) #get tag index ID number from current word
+            tag_info = user_data["tag_data"]["tags"][tag_index] # if int(tag_index) > 0 else "no_tag" #retrieve tag data only if there's a tag
+            text.append(word)
+            tags.append(tag_info)
+
+    NUM_CATEGORIES = len(user_data["tag_data"]["tags"]) #set to number of tags
 
     # Split data into training and testing sets
     tags = tf.keras.utils.to_categorical(tags)
@@ -69,7 +79,7 @@ def train_ai(user_data, test_sentences, model_path, mode=0):
 
     model = create_model(x_train, x_test, y_train, y_test, NUM_CATEGORIES) if mode == 0 else tf.keras.models.load_model(os.path.join("/application/data/ai/", model_path))
     if mode == 2: # fully automatic AI
-        return user_data
+        return run_model(model, user_data, test_sentences)
 
     custom_loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False) # OLD: loss="categorical_crossentropy"
     model.compile(optimizer="adam", loss=custom_loss, metrics=["accuracy"]) # ask adam to optimize the data. let's hope he's having a good day. 
@@ -84,9 +94,5 @@ def train_ai(user_data, test_sentences, model_path, mode=0):
     if not os.exists("/application/data/ai/"):
         os.makedirs("/application/data/ai/")
     model.save(os.path.join("/application/data/ai/", model_path))
-
-    #####################
-    # classify data here!
-    #####################
-
-    return user_data
+    
+    return run_model(model, user_data, test_sentences)
