@@ -53,9 +53,10 @@ def manage_data(x_train, x_test, y_train, y_test, idx):
 
 
 
-def train_ai(mode=0):
+def train_ai(user_data, test_sentences, model_path, mode=0):
     EPOCHS = 10
     TEST_SIZE = 0.4
+    
     ########
     # create training data from JSON or CSV file or files exported from app, or other training data
     ########
@@ -66,14 +67,12 @@ def train_ai(mode=0):
     tags = tf.keras.utils.to_categorical(tags)
     x_train, x_test, y_train, y_test = train_test_split(np.array(text), np.array(tags), test_size=TEST_SIZE)
 
-    model = create_model(x_train, x_test, y_train, y_test, NUM_CATEGORIES) if mode == 0 else tf.keras.models.load_model('/application/data/ai/model')
-    if mode == 2:
-        # fully automatic AI
-        return "new_data"
+    model = create_model(x_train, x_test, y_train, y_test, NUM_CATEGORIES) if mode == 0 else tf.keras.models.load_model(os.path.join("/application/data/ai/", model_path))
+    if mode == 2: # fully automatic AI
+        return user_data
 
-    custom_loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False)
-    # model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"]) #ask adam to optimize the data. let's hope he's having a good day.
-    model.compile(optimizer="adam", loss=custom_loss, metrics=["accuracy"]) #ask adam to optimize the data. let's hope he's having a good day.
+    custom_loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False) # OLD: loss="categorical_crossentropy"
+    model.compile(optimizer="adam", loss=custom_loss, metrics=["accuracy"]) # ask adam to optimize the data. let's hope he's having a good day. 
     model.fit(x_train, y_train, epochs=EPOCHS, batch_size=8, verbose=0) # Fit model on training data
     
     uncertain_idx, entropy_avg = max_entropy_acquisition(x_test, 100, 20, model)
@@ -84,8 +83,10 @@ def train_ai(mode=0):
 
     if not os.exists("/application/data/ai/"):
         os.makedirs("/application/data/ai/")
-    model.save("/application/data/ai/model")
-    # print(f"Model saved to {filename}.")
+    model.save(os.path.join("/application/data/ai/", model_path))
 
+    #####################
     # classify data here!
-    return "new_data"
+    #####################
+
+    return user_data

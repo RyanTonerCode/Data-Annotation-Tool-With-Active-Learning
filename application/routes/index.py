@@ -9,7 +9,7 @@ from application.imports import apology, session, render_template, os, request, 
 # from tensorflow import keras
 # from tensorflow.keras import layers
 # from sklearn.model_selection import train_test_split
-# from application.routes.train_ai import train_ai
+from application.routes.train_ai import train_ai
 
 
 @app.route("/", methods = ["GET", "POST"]) #standard path url
@@ -168,22 +168,23 @@ def home(alert = None):
 
 
 
-        def ai(user_data, test_sentences, model_path, corrections=False):
+        def ai(user_data, test_sentences, model_path, run_corrections):
 
-                new_user_data = user_data
-                new_user_data["model_path"] = model_path
                 # print("model_path")
-                if not model_path:
-                    #create new model
-                    pass
+                #create new model if none exists, run corrections if true, else run plain AI
+                new_user_data = train_ai(user_data, test_sentences, model_path, 0 if not model_path else 1 if run_corrections else 2)
+                # new_user_data["model_path"] = model_path
 
+                '''
+                THE FOLLOWING IS BEING IMPLEMENTED IN train_ai FUNCTION? MAYBE?
                 #load model here
                 #format new user data for AI
                 #make predictions for tags using model, make threshold
                 #apply predictions to new user data
 
                 #decide how to implement corrections -- are we re-training the model here? ealier? later? never? who knows! where the wind blows...
-                #use train_ai function?
+                #use train_ai function? 
+                '''
                 return new_user_data
 
 
@@ -194,7 +195,7 @@ def home(alert = None):
             if key=="run_corrections" or key=="run_automatic":
                 test_sentences = input #a list of the sentences to do automatic labelling on -- don't modify any other sentences
                 model_path = user_data["model_path"] if "model_path" in user_data else False #may be null
-                user_data = ai(user_data, test_sentences, model_path, True)
+                user_data = ai(user_data, test_sentences, model_path, True if key=="run_corrections" else False)
 
             write_json(user_data)                
 
