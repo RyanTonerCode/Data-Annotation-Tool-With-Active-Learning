@@ -4,3 +4,5 @@ tensorflow
 pandas
 flask
 flask_session
+nltk
+scipy

@@ -665,7 +665,7 @@ div.top
     display: block;
 }
 /* Style the checkmark/indicator */
-/* .checkbox-container .checkbox-checkmark:after 
+.checkbox-container .checkbox-checkmark:after 
 {
     left: 9px;
     top: 5px;
@@ -676,8 +676,8 @@ div.top
     -webkit-transform: rotate(45deg);
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
-} */
-.checkbox-container .checkbox-checkmark:after, .checkbox-container .checkbox-checkmark:before
+}
+/* .checkbox-container .checkbox-checkmark:after, .checkbox-container .checkbox-checkmark:before
 {
     content:'';
     position:absolute;
@@ -699,7 +699,7 @@ div.top
     -webkit-transform:rotate(-45deg);
     -moz-transform:rotate(-45deg);
     transform:rotate(-45deg);
-}
+} */
 
 
 

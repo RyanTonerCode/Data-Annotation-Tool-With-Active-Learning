@@ -9,6 +9,7 @@ $(document).ready(function()
     {
         update_tags(data["tag_data"]);
         update_sentences(data["sentence_data"]);
+        $(".tags-area-overlay, .clear-model, .download-model").toggle(data["ai"]); //show/hide AI-related buttons, disabling tags too (based on whether there is a model path even if empty)
     }
     initialize();
     
@@ -71,8 +72,7 @@ $(document).ready(function()
     $(document).on("click", ".tag-edit-menu-item.delete", function(e) //when we click delete tag
     {
         var tag_index = $(e.target).parent().parent().children(".tag-overlay").data("index");
-        ajax("/", JSON.stringify({"delete_tag": tag_index}));
-        initialize();
+        ajax("/", JSON.stringify({"delete_tag": tag_index}), initialize_return);
     });
 
 
@@ -104,29 +104,29 @@ $(document).ready(function()
     });
     $(document).on("click", ".run-corrections", function() //when we click RUN-CORRECTIONS button
     {
-        are_you_sure(false)
+        are_you_sure_ai(false)
     });
     $(document).on("click", ".run-automatic", function() //when we click RUN-AUTOMATIC button
     {
-        are_you_sure(true)
+        are_you_sure_ai(true)
     });
-    function are_you_sure(query)
+    function are_you_sure_ai(mode)
     {
         //Running the AI means that tags can no longer be modified, because the model will only be trained on those tags
         var content = "Running the AI entails that tags cannot be modified again. Click continue if you are satisfied with your current set of tags. <br><br>";
-        var button = "<button class='form-button' id='ai-continue-button' class='" + query + "'>CONTINUE</button>";
+        var button = "<button class='form-button' id='ai-continue-button' class='" + mode + "'>CONTINUE</button>";
         showAlert(content, button);
 
         $(document).on("click", "#ai-continue-button", function(e)
         {        
-            var query_ = e.target.className;            
-            var exclude_sentences = $(".sentences-area .checkbox-container input:checked").parent().parent().parent().map(function()
+            var test_sentences = $(".sentences-area .checkbox-container input:checked").parent().parent().parent().map(function()
             {
                 return $(this).data('index');
             }).get();
+            var query = mode ? {"run_automatic": test_sentences} : {"run_automatic": test_sentences};            
             
-            ajax("/", JSON.stringify({query_: exclude_sentences}), update_sentences);    
-            $(".tags-area-overlay").show();
+            ajax("/", JSON.stringify(query), update_sentences);    
+            $(".tags-area-overlay, .clear-model, .download-model").show(); //show AI-related buttons, disabling tags too
             $("#alert").css("display", "none");
             $("#alert-stuff").html("");
         });
@@ -297,20 +297,35 @@ $(document).ready(function()
 
     /* CLEAR BUTTONS */
     $(document).on("click", ".clear-all", function() //when we click CLEAR ALL
-    {        
-        ajax("/", JSON.stringify({"clear_all": ""}));
-        initialize();
+    {   
+        are_you_sure_clear("data", {"clear_all": ""})
     });
     $(document).on("click", ".clear-tags", function() //when we click CLEAR TAGS
-    {        
-        ajax("/", JSON.stringify({"clear_tags": ""}));
-        initialize();
+    {       
+        are_you_sure_clear("tags and annotation labels", {"clear_tags": ""})
     });
     $(document).on("click", ".clear-sentences", function() //when we click CLEAR SENTENCES
-    {        
-        ajax("/", JSON.stringify({"clear_sentences": ""}));
-        initialize();
+    {      
+        are_you_sure_clear("sentence text and annotation labels", {"clear_sentences": ""})
     });
+    $(document).on("click", ".clear-model", function() //when we click CLEAR SENTENCES
+    {      
+        are_you_sure_clear("AI model data", {"clear_model": ""})
+    });
+    function are_you_sure_clear(message, query)
+    {
+        var content = `Are you sure you'd like to clear all ${message}? You cannot undo this action. <br><br>`;
+        var button = "<button class='form-button' id='clear-continue-button'>YES</button>";
+        showAlert(content, button);
+
+        $(document).on("click", "#clear-continue-button", function()
+        {        
+            ajax("/", JSON.stringify(query), initialize_return);
+            $("#alert").css("display", "none");
+            $("#alert-stuff").html("");
+        });
+    }
+
 
 
 
@@ -359,7 +374,7 @@ $(document).ready(function()
         choose_filename(1); 
         $(document).on("click", "#download-button.id-1", function() 
         {        
-            request_file({download_all: $("#download-name").val()});
+            request_file({"download_all": $("#download-name").val()});
         });
     });
     $(document).on("click", ".download-csv", function() //when we click DOWNLOAD CSV
@@ -367,7 +382,7 @@ $(document).ready(function()
         choose_filename(4);
         $(document).on("click", "#download-button.id-4", function() 
         {        
-            request_file({download_csv: $("#download-name").val()});
+            request_file({"download_csv": $("#download-name").val()});
         });
     });
     $(document).on("click", ".download-tags", function() //when we click DOWNLOAD TAGS
@@ -375,7 +390,7 @@ $(document).ready(function()
         choose_filename(2);
         $(document).on("click", "#download-button.id-2", function() 
         {        
-            request_file({download_tags: $("#download-name").val()});
+            request_file({"download_tags": $("#download-name").val()});
         });
     });
     $(document).on("click", ".download-sentences", function() //when we click DOWNLOAD SENTENCES
@@ -383,9 +398,18 @@ $(document).ready(function()
         choose_filename(3);
         $(document).on("click", "#download-button.id-3", function() 
         {        
-            request_file({download_sentences: $("#download-name").val()});
+            request_file({"download_sentences": $("#download-name").val()});
         });
     });
+    $(document).on("click", ".download-model", function() //when we click DOWNLOAD MODEL
+    {        
+        choose_filename(5);
+        $(document).on("click", "#download-button.id-5", function() 
+        {        
+            request_file({"download_model": $("#download-name").val()});
+        });
+    });
+
     function choose_filename(id_num) //show a popup giving the user a chance to choose a filename
     {
         $(':focus').blur()
@@ -414,14 +438,19 @@ $(document).ready(function()
             var blob = new Blob([json], {type: "octet/stream"});
             var url = window.URL.createObjectURL(blob); 
         }
-        else if (dict["extension"] == "txt")
+        // else if (dict["extension"] == "txt")
+        // {
+        //     var url = "data:text/plain;charset=utf-8," + encodeURIComponent(data);
+        // }
+        // else if (dict["extension"] == "csv")
+        // {
+        //     var url = "data:text/plain;charset=utf-8," + encodeURIComponent(data);
+        // }
+        else
         {
             var url = "data:text/plain;charset=utf-8," + encodeURIComponent(data);
         }
-        else if (dict["extension"] == "csv")
-        {
-            var url = "data:text/plain;charset=utf-8," + encodeURIComponent(data);
-        }
+        
 
         element.href = url; 
         element.download = fileName; 

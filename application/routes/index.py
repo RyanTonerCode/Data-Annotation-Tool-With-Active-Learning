@@ -1,3 +1,4 @@
+from json import load
 from os import read, truncate
 from application import app
 from application.imports import apology, session, render_template, os, request, json, redirect, secure_filename, time, send_file, after_this_request, send_from_directory, url_for, SharedDataMiddleware
@@ -123,7 +124,7 @@ def home(alert = None):
 
 
         def initialize(user_data):
-            return {"tag_data": create_tag_html(user_data["tag_data"]), "sentence_data": create_sentence_html(user_data)}
+            return {"tag_data": create_tag_html(user_data["tag_data"]), "sentence_data": create_sentence_html(user_data), "ai": True if "model_path" in user_data else False}
     
 
 
@@ -163,14 +164,20 @@ def home(alert = None):
 
 
             write_json(user_data)
-            return create_tag_html(user_data["tag_data"])
+            return initialize(user_data)
 
 
 
-        def ai(user_data, corrections=False):
+        def ai(user_data, test_sentences, model_path, corrections=False):
+
+                new_user_data = user_data
+                new_user_data["model_path"] = model_path
+                # print("model_path")
+                if not model_path:
+                    #create new model
+                    pass
 
                 #load model here
-                new_user_data = user_data
                 #format new user data for AI
                 #make predictions for tags using model, make threshold
                 #apply predictions to new user data
@@ -185,9 +192,9 @@ def home(alert = None):
             #if we did run corrections or automatic, we get list of checked sentences -- don't pass that to user_data!
             user_data = create_sentences(input if key=="run_manual" else "") #if text empty, get user_data, if not empty, get user_data with new text implemented
             if key=="run_corrections" or key=="run_automatic":
-                exclude_sentences = input #a list of the sentences to exclude from automatic labelling
-                model_path = user_data["model_path"] #may be null
-                pass #modify user data here with AI
+                test_sentences = input #a list of the sentences to do automatic labelling on -- don't modify any other sentences
+                model_path = user_data["model_path"] if "model_path" in user_data else False #may be null
+                user_data = ai(user_data, test_sentences, model_path, True)
 
             write_json(user_data)                
 
@@ -217,6 +224,8 @@ def home(alert = None):
             if os.path.isfile(file_path):
                 os.remove(file_path)
 
+            return initialize(read_json())
+
 
 
         if key=="clear_tags": #remove tags from tag bar and all words/data
@@ -228,14 +237,29 @@ def home(alert = None):
                     user_data["sentence_tags"][sentence_index][word_index] = 0
 
             write_json(user_data)
+            return initialize(user_data)
 
 
 
         if key=="clear_sentences": #remove only sentence data
-                user_data = read_json()
-                user_data["sentences"] = [] #make empty data
-                user_data["sentence_tags"] = []
-                write_json(user_data)
+            user_data = read_json()
+            user_data["sentences"] = [] #make empty data
+            user_data["sentence_tags"] = []
+            write_json(user_data)
+            return initialize(user_data)
+
+
+
+        if key=="clear_model": #remove AI model
+            user_data = read_json()
+            if "model_path" in user_data:
+                if user_data["model_path"]:
+                    if os.path.exists(user_data["model_path"]):
+                        os.remove(user_data["model_path"])
+                del user_data["model_path"]
+
+            write_json(user_data)
+            return initialize(user_data)
 
 
 
@@ -277,6 +301,18 @@ def home(alert = None):
 
             file = file[:-1] #remove trailing comma
             return {"file": file, "name": input, "extension": "csv"}
+
+
+
+        if key=="download_model": #download AI model
+            user_data = read_json()
+            file = "No Model Created."
+            model_path = user_data["model_path"]
+            if model_path and model_path != "":
+                with open(model_path) as model_file:
+                    file = load(model_file)
+
+            return {"file": file, "name": input, "extension": "idk"}
 
 
 
