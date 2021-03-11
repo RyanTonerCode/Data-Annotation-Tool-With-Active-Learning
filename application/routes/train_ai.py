@@ -53,10 +53,14 @@ def manage_data(x_train, x_test, y_train, y_test, idx):
 
 def run_model(model, user_data, test_sentences):
     new_user_data = user_data
+    sentence_tags = model.predict(user_data["sentences"])
+    counter = 0
     for i in test_sentences:
-        sentence_tags = model.predict(user_data["sentences"][i])
-        new_user_data["sentence_data"]
+        for j in len(user_data["sentence_tags"][i]):
+            new_user_data["sentence_tags"][i][j] = sentence_tags[counter]
+            counter += 1
 
+    return new_user_data
 
 
 def train_ai(user_data, test_sentences, model_path, mode=0):
@@ -93,6 +97,9 @@ def train_ai(user_data, test_sentences, model_path, mode=0):
 
     if not os.exists("/application/data/ai/"):
         os.makedirs("/application/data/ai/")
+    if not model_path:
+        model_path = "model"
+        user_data["model_path"] = model_path
     model.save(os.path.join("/application/data/ai/", model_path))
     
     return run_model(model, user_data, test_sentences)
