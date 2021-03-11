@@ -174,7 +174,6 @@ $(document).ready(function()
 
         function advance_right() //in a function so it can be called in other places
         {
-            // document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.remove("selected")
             if (selected_word < words_in_sentence - 1) //if there is at least one more word to right
             {
                 selected_word++;
@@ -184,7 +183,6 @@ $(document).ready(function()
                 selected_sentence++;
                 selected_word = 0; //go to first word in next sentence below
             }
-            // document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.add("selected")
         }
 
         if (e.key == "ArrowRight")
@@ -193,7 +191,6 @@ $(document).ready(function()
         }
         else if (e.key == "ArrowLeft")
         {
-            // document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.remove("selected")
             if (selected_word > 0) //if there is at least one more word to left
             {
                 selected_word--;
@@ -204,32 +201,28 @@ $(document).ready(function()
                 words_in_sentence = document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children.length; //get wordcount of sentence above
                 selected_word = words_in_sentence - 1; //go to end of that sentence above
             }
-            // document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.add("selected")
         }
         else if (e.key == "ArrowUp")
         {
             if (selected_sentence > 0) //if there is at least one more sentence to above
             {
-                // document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.remove("selected")
                 selected_sentence--;
                 words_in_sentence = document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children.length; //get wordcount of sentence above
                 words_in_sentence >= selected_word + 1 ? selected_word = selected_word : selected_word = words_in_sentence - 1; //move straight up if possible, otherwise go to end
-                // document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.add("selected")
             }
         }
         else if (e.key == "ArrowDown")
         {
             if (selected_sentence < number_of_sentences - 1) //if there is at least one more sentence to below
             {
-                // document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.remove("selected")
                 selected_sentence++;
                 words_in_sentence = document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children.length; //get wordcount of sentence below
                 words_in_sentence >= selected_word + 1 ? selected_word = selected_word : selected_word = words_in_sentence - 1; //move straight down if possible, otherwise go to end
-                // document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.add("selected")
             }
         }
         else if (["1","2","3","4","5","6","7","8","9"].includes(e.key)) //tag a word when we click a number, that number in line on the tag bar will be what it is
         {
+            advance_right(); //do before collecting selected so it is updated on ajax return
             var sentence_index = selected_sentence;
             var word_index = selected_word;
             var tag_index = parseInt(e.key) - 1; //in what place on the tag bar is the tag we want? nothing to do with its unique ID number
@@ -240,16 +233,15 @@ $(document).ready(function()
                 var tag_id = document.getElementsByClassName("tag-container")[tag_index].children[1].children[1].dataset.index;
                 var tag_word = [sentence_index, word_index, tag_id];
                 ajax("/", JSON.stringify({tag_word}), update_sentences);  
-                setTimeout(function(){advance_right();}, 100);   
             }
         }
         else if (e.key == "x") //when we click x, delete tag from selected word
         {
+            advance_right(); //do before collecting selected so it is updated on ajax return
             var sentence_index = selected_sentence;
             var word_index = selected_word;
             var tag_word = [sentence_index, word_index, 0];
             ajax("/", JSON.stringify({tag_word}), update_sentences); 
-            setTimeout(function(){advance_right();}, 100);   
         }
 
         document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.add("selected")
