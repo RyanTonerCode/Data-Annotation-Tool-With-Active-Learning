@@ -100,7 +100,7 @@ $(document).ready(function()
     {
         var text = $("#text-box-field").val();
         $("#text-box-field").val("");
-        ajax("/", JSON.stringify({"run_manual": text}), update_sentences);
+        ajax("/", JSON.stringify({"run_manual": text}), initialize_return);
     });
     $(document).on("click", ".run-corrections", function() //when we click RUN-CORRECTIONS button
     {

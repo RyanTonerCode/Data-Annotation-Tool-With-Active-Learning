@@ -63,7 +63,7 @@ def run_model(model, user_data, test_sentences):
     return new_user_data
 
 
-def train_ai(user_data, test_sentences, model_path, mode=0):
+def intelligents(user_data, test_sentences, model_path, mode=0):
     EPOCHS = 10
     TEST_SIZE = 0.4
 
