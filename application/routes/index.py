@@ -1,6 +1,4 @@
-from application.routes.intelligents import intelligents
 from json import load
-from os import read, truncate
 from application import app
 from application.imports import apology, session, render_template, os, request, json, redirect, secure_filename, time, send_file, after_this_request, send_from_directory, url_for, SharedDataMiddleware
 # import pandas as pd
@@ -10,7 +8,7 @@ from application.imports import apology, session, render_template, os, request, 
 # from tensorflow import keras
 # from tensorflow.keras import layers
 # from sklearn.model_selection import train_test_split
-from application.routes.intelligents import create_model, run_model
+from application.routes.intelligents import initialize_model, run_model
 
 
 @app.route("/", methods = ["GET", "POST"]) #standard path url
@@ -180,7 +178,7 @@ def home(alert = None):
                 model_path = user_data["model_path"] if "model_path" in user_data else input[1]
                 
                 if key=="run_corrections":
-                    create_model(user_data, model_path)                    
+                    initialize_model(user_data, model_path)                    
                 user_data = run_model(model_path, user_data, test_sentences)
                 
             write_json(user_data)                

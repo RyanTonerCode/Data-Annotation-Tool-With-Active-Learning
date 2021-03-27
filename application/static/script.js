@@ -114,11 +114,11 @@ $(document).ready(function()
     {       
         //Running the AI means that tags can no longer be modified, because the model will only be trained on those tags
         var content = "Running the AI entails that tags cannot be modified again. Click continue if you are satisfied with your current set of tags. <br><br>";
-        if ($(".tags-area-overlay").prop("disabled"))
+        if (!$(".tags-area-overlay").is(":visible"))
         {
-            $(':focus').blur()
+            $(':focus').blur();
             $(".search-box").removeClass("top");
-            content += "And give your new model a filename: <input type='text' name='model-name' placeholder='Filename' id='model-name' class='new-tag-input' autofocus> <br><br>";
+            content += "But first, give your new model a filename: <br><br> <input type='text' name='model-name' placeholder='Filename' id='model-name' class='new-tag-input' autofocus> <br><br>";
         }
         var button = "<button class='form-button' id='ai-continue-button' class='" + mode + "'>CONTINUE</button>";
         showAlert(content, button);
@@ -129,7 +129,7 @@ $(document).ready(function()
             {
                 return $(this).data('index');
             }).get();
-            var filename = $("#model-name").length() > 0? $("#model-name").val() : "model"
+            var filename = $("#model-name").is(":visible") ? $("#model-name").val() : "model"
             var query = mode ? {"run_automatic": [test_sentences, filename]} : {"run_automatic": [test_sentences, filename]};            
             
             ajax("/", JSON.stringify(query), update_sentences);    
