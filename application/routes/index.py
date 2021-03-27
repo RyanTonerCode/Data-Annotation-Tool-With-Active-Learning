@@ -1,3 +1,4 @@
+from application.routes.intelligents import intelligents
 from json import load
 from os import read, truncate
 from application import app
@@ -9,7 +10,7 @@ from application.imports import apology, session, render_template, os, request, 
 # from tensorflow import keras
 # from tensorflow.keras import layers
 # from sklearn.model_selection import train_test_split
-'from application.routes.intelligents import intelligents'
+from application.routes.intelligents import create_model, run_model
 
 
 @app.route("/", methods = ["GET", "POST"]) #standard path url
@@ -167,28 +168,7 @@ def home(alert = None):
 
             write_json(user_data)
             return initialize(user_data)
-
-
-
-        # def ai(user_data, test_sentences, model_path, run_corrections):
-
-        #         # print("model_path")
-        #         #create new model if none exists, run corrections if true, else run plain AI
-        #         new_user_data = train_ai(user_data, test_sentences, model_path, 0 if not model_path else 1 if run_corrections else 2)
-        #         # new_user_data["model_path"] = model_path
-
-        #         '''
-        #         THE FOLLOWING IS BEING IMPLEMENTED IN train_ai FUNCTION? MAYBE?
-        #         #load model here
-        #         #format new user data for AI
-        #         #make predictions for tags using model, make threshold
-        #         #apply predictions to new user data
-
-        #         #decide how to implement corrections -- are we re-training the model here? ealier? later? never? who knows! where the wind blows...
-        #         #use train_ai function? 
-        #         '''
-        #         return new_user_data
-
+            
 
 
         if "run" in key: #if text is submitted, add it to the data, and regardless, return HTML for sentences area
@@ -196,11 +176,13 @@ def home(alert = None):
             print(input)
             user_data = create_sentences(input if key=="run_manual" else "") #if text empty, get user_data, if not empty, get user_data with new text implemented
             if key=="run_corrections" or key=="run_automatic":
-                test_sentences = input #a list of the sentences to do automatic labelling on -- don't modify any other sentences
-                model_path = user_data["model_path"] if "model_path" in user_data else False #may be null
-                # user_data = ai(user_data, test_sentences, model_path, True if key=="run_corrections" else False)
-                '''intelligents(user_data, test_sentences, model_path, 0 if not model_path else 1 if key=="run_corrections" else 2)'''
-
+                test_sentences = input[0] #a list of the sentences to do automatic labelling on -- don't modify any other sentences
+                model_path = user_data["model_path"] if "model_path" in user_data else input[1]
+                
+                if key=="run_corrections":
+                    create_model(user_data, model_path)                    
+                user_data = run_model(model_path, user_data, test_sentences)
+                
             write_json(user_data)                
 
             #initialize or only return sentences

@@ -1,4 +1,4 @@
-#!/Users/harrison/Documents/Programming/Senior-Design-Prototype-1/venv/bin/python3
+#!/Users/harrison/Documents/Programming/Senior-Design-Prototype-1/venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
