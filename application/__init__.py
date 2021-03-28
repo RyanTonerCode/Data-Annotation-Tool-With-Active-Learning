@@ -1,5 +1,6 @@
 from application.imports import Flask, mkdtemp, os, HTTPException, InternalServerError, default_exceptions, apology, Session
 import pathlib
+
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 # Ensure responses aren't cached
@@ -16,6 +17,7 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 #app.config["SECRET_KEY"] = os.environ.get('SECRET_KEY')
 app.config["SECRET_KEY"] = os.urandom(24) #make a new secret key every time the server starts
+app.config["ai_model"] = None
 
 Session(app)
 

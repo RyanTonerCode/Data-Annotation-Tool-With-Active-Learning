@@ -10,8 +10,6 @@ from application.imports import apology, session, render_template, os, request, 
 # from sklearn.model_selection import train_test_split
 from application.routes.intelligents import initialize_model, run_model
 
-model = None
-
 @app.route("/", methods = ["GET", "POST"]) #standard path url
 @app.route("/<alert>", methods = ["GET", "POST"]) #for redirect with alert
 @app.route("/index.html", methods = ["GET", "POST"]) #second standard path url
@@ -179,13 +177,16 @@ def home(alert = None):
                 test_sentences = input[0] #a list of the sentences to do automatic labelling on -- don't modify any other sentences
                 model_folder = user_data["model_path"] if "model_path" in user_data else input[1]
                 
+                if(app.config["ai_model"]==None):
+                    print("No model exists in memory")
+
                 if key=="run_corrections":
                     print("creating model")
-                    model = initialize_model(user_data)      
+                    app.config["ai_model"] = initialize_model(user_data)      
                     print("model created")
               
                 
-                user_data = run_model(model_folder, user_data, test_sentences, model)
+                user_data = run_model(model_folder, user_data, test_sentences, app.config["ai_model"])
                 
             write_json(user_data)                
 

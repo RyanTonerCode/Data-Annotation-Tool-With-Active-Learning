@@ -105,7 +105,7 @@ def initialize_model(user_data):
     model = None
 
     #run active learning by iterating the model, manipulating the training data, and gaming the subsequent model
-    for i in range(3):
+    for i in range(1):
         print('*'*50)
 
         encoder = TextVectorization(max_tokens=VOCAB_SIZE)
@@ -113,7 +113,7 @@ def initialize_model(user_data):
 
         model = create_model(encoder, NUM_CLASSES)
 
-        model.fit(X, y, epochs=2, verbose=1)
+        model.fit(X, y, epochs=1, verbose=1)
         uncertain_idx, entropy_avg = max_entropy_acquisition(model, X_pooled)
         print('Average Entropy: {}'.format(entropy_avg))
         
@@ -136,16 +136,16 @@ def run_model(model_folder, user_data, test_sentences, model=None):
         else: #create the model if none exists
             model = initialize_model(user_data, model_folder)
 
-    new_user_data = user_data
-    sentence_tags = model.predict(user_data["sentences"])
-    counter = 0
-    for i in test_sentences:
-        for j in len(user_data["sentence_tags"][i]):
-            tag_index = np.where(np.array(sentence_tags[counter]) == 1)
-            new_user_data["sentence_tags"][i][j] = tag_index
-            counter += 1
+    #get a prediction for every word in the selected sentences
+    
+    for sentence_index in test_sentences:
+        for word_index, word in enumerate(user_data["sentences"][sentence_index]):
+            prediction = model.predict(word)
+            #get the index of the maximum value
+            predicted_tag_index = np.argmax(prediction, axis=0)
+            user_data["sentence_tags"][word_index] = predicted_tag_index
 
-    return new_user_data
+    return user_data
 
 def save_model(model, model_folder):
     rel_path = os.path.join(getPathToData(), model_folder)
