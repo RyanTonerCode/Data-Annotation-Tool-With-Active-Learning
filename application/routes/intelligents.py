@@ -14,11 +14,10 @@ def create_model(encoder, NUM_CLASSES):
             output_dim=32,
             mask_zero=True),tf.keras.layers.Dropout(.2),
         tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(32)),
-        tf.keras.layers.Flatten(),
         tf.keras.layers.Dense(NUM_CLASSES, activation='softmax')
         ])
         
-    model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
+    model.compile(loss='categorical_crossentropy',
         optimizer=tf.keras.optimizers.Adam(1e-4),
         metrics=['accuracy'])
 
@@ -51,9 +50,9 @@ def get_initial_labelled_dataset(X_Data, Y_Data, num_samples_per_class=10):
         
    
     X_pooled = np.delete(X_Data, labelled_idx, axis=0)
-    y_pooled = np.delete(Y_Data, labelled_idx)
+    y_pooled = np.delete(Y_Data, labelled_idx, axis=0)
 
-    return np.asarray(X), np.asarray(y).reshape(-1,1), X_pooled, y_pooled
+    return np.asarray(X), np.asarray(y), X_pooled, y_pooled
 
 
 def max_entropy_acquisition(model, X_pooled): 
@@ -115,14 +114,14 @@ def initialize_model(user_data, model_path):
 
         model = create_model(encoder, NUM_CLASSES)
 
-        model.fit(X, y, epochs=2, batch_size=2, verbose=1)
-        uncertain_idx, entropy_avg = max_entropy_acquisition(X_pooled)
+        model.fit(X, y, epochs=2, verbose=1)
+        uncertain_idx, entropy_avg = max_entropy_acquisition(model, X_pooled)
         print('Average Entropy: {}'.format(entropy_avg))
         
         X, y, X_pooled, y_pooled = manage_data(X, y, X_pooled, y_pooled, uncertain_idx)
         print('Iteration Done: {}'.format(i+1))
 
-    if not os.exists("/application/data/ai/"):
+    if not os.path.isdir("/application/data/ai/"):
         os.makedirs("/application/data/ai/")
     if not model_path:
         model_path = "model"
