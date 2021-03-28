@@ -375,11 +375,11 @@ $(document).ready(function () {
             request_file({ "download_sentences": $("#download-name").val() });
         });
     });
-    $(document).on("click", ".download-model", function () //when we click DOWNLOAD MODEL
+    $(document).on("click", ".save-model", function () //when we click DOWNLOAD MODEL
     {
         choose_filename(5);
         $(document).on("click", "#download-button.id-5", function () {
-            request_file({ "download_model": $("#download-name").val() });
+            request_file({ "save_model": $("#download-name").val() });
         });
     });
 

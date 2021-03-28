@@ -8,7 +8,7 @@ from application.imports import apology, session, render_template, os, request, 
 # from tensorflow import keras
 # from tensorflow.keras import layers
 # from sklearn.model_selection import train_test_split
-from application.routes.intelligents import initialize_model, run_model
+from application.routes.intelligents import initialize_model, run_model, save_model
 
 @app.route("/", methods = ["GET", "POST"]) #standard path url
 @app.route("/<alert>", methods = ["GET", "POST"]) #for redirect with alert
@@ -296,14 +296,11 @@ def home(alert = None):
 
 
 
-        if key=="download_model": #download AI model
-            user_data = read_json()
-            file = "No Model Created."
-            model_folder = user_data["model_path"]
-            if model_folder and model_folder != "":
-                with open(model_folder) as model_file:
-                    file = load(model_file)
-
+        if key=="save_model": #download AI model
+            user_data = read_json()            
+            save_model(app.config["ai_model"], model_folder)
+            #todo to remove this return....
+            #need to show spinner/ loading dialog when saving the model
             return {"file": file, "name": input, "extension": "idk"}
 
 
