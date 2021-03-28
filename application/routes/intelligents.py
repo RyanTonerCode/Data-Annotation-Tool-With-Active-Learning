@@ -2,8 +2,8 @@ import os
 import math
 import numpy as np
 import scipy as sp
+from scipy import stats
 import tensorflow as tf
-from sklearn.preprocessing import OneHotEncoder
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 
 def create_model(text_encoder, NUM_CLASSES):
@@ -78,29 +78,30 @@ def manage_data(X, y, X_pooled, y_pooled, idx):
 
 
 def initialize_model(user_data):
+    NUM_CLASSES = len(user_data["tag_data"]["tags"])
+
     X_Data, Y_Data = [], [] #here, load the training data
     for sentence_index, sentence in enumerate(user_data["sentences"]):
         for word_index, word in enumerate(sentence.split()):
-            tag_index = str(user_data["sentence_tags"][sentence_index][word_index]) #get tag index ID number from current word
-            if int(tag_index) == 0: #retrieve tag data only if there's a tag
+            tag_index = int(user_data["sentence_tags"][sentence_index][word_index]) #get tag index ID number from current word
+            if tag_index == 0: #retrieve tag data only if there's a tag
                 continue
-            tag_info = user_data["tag_data"]["tags"][tag_index]["name"] 
+            #tag_info = user_data["tag_data"]["tags"][tag_index]["name"] 
+
             X_Data.append(word)
-            Y_Data.append([tag_info])
+            #one hot encode the classes
+            one_hot = [0]*NUM_CLASSES
+            one_hot[tag_index-1]=1
+            Y_Data.append(one_hot)
 
     #convert X_Data to numpy array
     X_Data_np = np.array(X_Data)
-
-    #encode the classes using one-hot encoding
-    enc = OneHotEncoder()
-    Y_Data_encoding = enc.fit_transform(np.array(Y_Data)).toarray()
-
-    NUM_CLASSES = len(user_data["tag_data"]["tags"])
+    Y_Data_np = np.array(Y_Data)
 
     #set the number of values to sqrt of the length of the data
     num_samples_per_class = int(math.sqrt(len(X_Data_np)))
 
-    X, y, X_pooled, y_pooled = get_initial_labelled_dataset(X_Data_np, Y_Data_encoding, num_samples_per_class)
+    X, y, X_pooled, y_pooled = get_initial_labelled_dataset(X_Data_np, Y_Data_np, num_samples_per_class)
 
     VOCAB_SIZE=2000
 
