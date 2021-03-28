@@ -173,20 +173,20 @@ def home(alert = None):
             #if we did run corrections or automatic, we get list of checked sentences -- don't pass that to user_data!
             print(input)
             user_data = create_sentences(input if key=="run_manual" else "") #if text empty, get user_data, if not empty, get user_data with new text implemented
-            if key=="run_corrections" or key=="run_automatic":
+            if key=="run_model" or key=="run_create_model":
                 test_sentences = input[0] #a list of the sentences to do automatic labelling on -- don't modify any other sentences
                 model_folder = user_data["model_path"] if "model_path" in user_data else input[1]
                 
                 if(app.config["ai_model"]==None):
                     print("No model exists in memory")
 
-                if key=="run_corrections":
+                if key=="run_create_model":
                     print("creating model")
                     app.config["ai_model"] = initialize_model(user_data)      
                     print("model created")
               
-                
-                user_data = run_model(model_folder, user_data, test_sentences, app.config["ai_model"])
+                else:
+                    user_data = run_model(model_folder, user_data, test_sentences, app.config["ai_model"])
                 
             write_json(user_data)                
 

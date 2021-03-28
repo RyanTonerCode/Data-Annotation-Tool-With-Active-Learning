@@ -97,15 +97,15 @@ $(document).ready(function () {
         $("#text-box-field").val("");
         ajax("/", JSON.stringify({ "run_manual": text }), initialize_return);
     });
-    $(document).on("click", ".run-corrections", function () //when we click RUN-CORRECTIONS button
+    $(document).on("click", ".create-model", function () //when we click CREATE-MODEL button
     {
         are_you_sure_ai(false)
     });
-    $(document).on("click", ".run-automatic", function () //when we click RUN-AUTOMATIC button
+    $(document).on("click", ".run-model", function () //when we click RUN-MODEL button
     {
         are_you_sure_ai(true)
     });
-    function are_you_sure_ai(mode) {
+    function are_you_sure_ai(model_exists) {
         //Running the AI means that tags can no longer be modified, because the model will only be trained on those tags
         var content = "Running the AI entails that tags cannot be modified again. Click continue if you are satisfied with your current set of tags. <br><br>";
         if (!$(".tags-area-overlay").is(":visible")) {
@@ -113,7 +113,7 @@ $(document).ready(function () {
             $(".search-box").removeClass("top");
             content += "But first, give your new model a filename: <br><br> <input type='text' name='model-name' placeholder='Filename' id='model-name' class='new-tag-input' autofocus> <br><br>";
         }
-        var button = "<button class='form-button' id='ai-continue-button' class='" + mode + "'>CONTINUE</button>";
+        var button = "<button id='ai-continue-button' class='form-button'>CONTINUE</button>";
         showAlert(content, button);
 
         $(document).on("click", "#ai-continue-button", function (e) {
@@ -121,8 +121,9 @@ $(document).ready(function () {
                 return $(this).data('index');
             }).get();
             var filename = $("#model-name").is(":visible") ? $("#model-name").val() : "model"
-            var query = mode ? { "run_automatic": [test_sentences, filename] } : { "run_corrections": [test_sentences, filename] };
+            var query = model_exists ? { "run_model": [test_sentences, filename] } : { "run_create_model": [test_sentences, filename] };
 
+            $("#loading").show();
             ajax("/", JSON.stringify(query), update_sentences);
             $(".tags-area-overlay, .clear-model, .download-model").show(); //show AI-related buttons, disabling tags too
             $("#alert").css("display", "none");
@@ -131,6 +132,7 @@ $(document).ready(function () {
     }
     function update_sentences(data) {
         $(".sentences-area").html(data);
+        $("#loading").hide();
     }
 
 

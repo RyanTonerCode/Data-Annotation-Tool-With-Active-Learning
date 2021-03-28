@@ -6,11 +6,11 @@ import tensorflow as tf
 from sklearn.preprocessing import OneHotEncoder
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 
-def create_model(encoder, NUM_CLASSES):
+def create_model(text_encoder, NUM_CLASSES):
     model = tf.keras.Sequential([
-        encoder,
+        text_encoder,
         tf.keras.layers.Embedding(
-            input_dim=len(encoder.get_vocabulary()),
+            input_dim=len(text_encoder.get_vocabulary()),
             output_dim=32,
             mask_zero=True),tf.keras.layers.Dropout(.2),
         tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(32)),
@@ -82,7 +82,9 @@ def initialize_model(user_data):
     for sentence_index, sentence in enumerate(user_data["sentences"]):
         for word_index, word in enumerate(sentence.split()):
             tag_index = str(user_data["sentence_tags"][sentence_index][word_index]) #get tag index ID number from current word
-            tag_info = user_data["tag_data"]["tags"][tag_index]["name"] if int(tag_index) > 0 else "no_tag" #retrieve tag data only if there's a tag
+            if int(tag_index) == 0: #retrieve tag data only if there's a tag
+                continue
+            tag_info = user_data["tag_data"]["tags"][tag_index]["name"] 
             X_Data.append(word)
             Y_Data.append([tag_info])
 
@@ -93,7 +95,7 @@ def initialize_model(user_data):
     enc = OneHotEncoder()
     Y_Data_encoding = enc.fit_transform(np.array(Y_Data)).toarray()
 
-    NUM_CLASSES = len(user_data["tag_data"]["tags"]) + 1
+    NUM_CLASSES = len(user_data["tag_data"]["tags"])
 
     #set the number of values to sqrt of the length of the data
     num_samples_per_class = int(math.sqrt(len(X_Data_np)))
@@ -108,10 +110,10 @@ def initialize_model(user_data):
     for i in range(1):
         print('*'*50)
 
-        encoder = TextVectorization(max_tokens=VOCAB_SIZE)
-        encoder.adapt(X)
+        text_encoder = TextVectorization(max_tokens=VOCAB_SIZE)
+        text_encoder.adapt(X)
 
-        model = create_model(encoder, NUM_CLASSES)
+        model = create_model(text_encoder, NUM_CLASSES)
 
         model.fit(X, y, epochs=1, verbose=1)
         uncertain_idx, entropy_avg = max_entropy_acquisition(model, X_pooled)
@@ -137,15 +139,17 @@ def run_model(model_folder, user_data, test_sentences, model=None):
             model = initialize_model(user_data, model_folder)
 
     #get a prediction for every word in the selected sentences
-    
+    new_user_data = user_data
     for sentence_index in test_sentences:
-        for word_index, word in enumerate(user_data["sentences"][sentence_index]):
-            prediction = model.predict(word)
+        parsed_sentence = user_data["sentences"][sentence_index].split()
+        for word_index, word in enumerate(parsed_sentence):
+            prediction = model.predict(np.array([word]))
             #get the index of the maximum value
-            predicted_tag_index = np.argmax(prediction, axis=0)
-            user_data["sentence_tags"][word_index] = predicted_tag_index
+            predicted_tag_index = np.argmax(prediction[0]) + 1
+            print(predicted_tag_index)
+            new_user_data["sentence_tags"][sentence_index][word_index] = int(predicted_tag_index)
 
-    return user_data
+    return new_user_data
 
 def save_model(model, model_folder):
     rel_path = os.path.join(getPathToData(), model_folder)
