@@ -177,12 +177,15 @@ def home(alert = None):
             user_data = create_sentences(input if key=="run_manual" else "") #if text empty, get user_data, if not empty, get user_data with new text implemented
             if key=="run_corrections" or key=="run_automatic":
                 test_sentences = input[0] #a list of the sentences to do automatic labelling on -- don't modify any other sentences
-                model_path = user_data["model_path"] if "model_path" in user_data else input[1]
+                model_folder = user_data["model_path"] if "model_path" in user_data else input[1]
                 
                 if key=="run_corrections":
-                    model = initialize_model(user_data, model_path)                    
+                    print("creating model")
+                    model = initialize_model(user_data)      
+                    print("model created")
+              
                 
-                user_data = run_model(model_path, user_data, test_sentences, model)
+                user_data = run_model(model_folder, user_data, test_sentences, model)
                 
             write_json(user_data)                
 
@@ -295,9 +298,9 @@ def home(alert = None):
         if key=="download_model": #download AI model
             user_data = read_json()
             file = "No Model Created."
-            model_path = user_data["model_path"]
-            if model_path and model_path != "":
-                with open(model_path) as model_file:
+            model_folder = user_data["model_path"]
+            if model_folder and model_folder != "":
+                with open(model_folder) as model_file:
                     file = load(model_file)
 
             return {"file": file, "name": input, "extension": "idk"}

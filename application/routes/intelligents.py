@@ -32,8 +32,6 @@ def get_initial_labelled_dataset(X_Data, Y_Data, num_samples_per_class=10):
     labelled_idx = list()
 
     counter_dict = dict()
-
-    print(X_Data)
     
     for idx, target in enumerate(Y_Data):
         #find where the 1 is in each array of Y_Data
@@ -79,7 +77,7 @@ def manage_data(X, y, X_pooled, y_pooled, idx):
     return X, y, X_pooled, y_pooled
 
 
-def initialize_model(user_data, model_name):
+def initialize_model(user_data):
     X_Data, Y_Data = [], [] #here, load the training data
     for sentence_index, sentence in enumerate(user_data["sentences"]):
         for word_index, word in enumerate(sentence.split()):
@@ -122,31 +120,22 @@ def initialize_model(user_data, model_name):
         X, y, X_pooled, y_pooled = manage_data(X, y, X_pooled, y_pooled, uncertain_idx)
         print('Iteration Done: {}'.format(i+1))
 
-    rel_path = os.path.join(os.getcwd(), "application", "data", "ai")
-
-    if not os.path.isdir(rel_path):
-        os.makedirs(rel_path)
-    if not model_name:
-        model_name = "model"
-        user_data["model_path"] = model_name
-    
-    print("Model Saving started")
-    model.save(os.path.join(rel_path, model_name))
-    print("Complete")
-
     #return the model back
     return model
 
+def getPathToData():
+    return os.path.join(os.getcwd(), "application", "data", "ai")
 
-def run_model(model_name, user_data, test_sentences, model=None):
-    if not os.path.isfile(model_name):
-        initialize_model(user_data, model_name)
+def run_model(model_folder, user_data, test_sentences, model=None):
 
-    rel_path = os.path.join(os.getcwd(), "application", "data", "ai")
+    rel_path = os.path.join(getPathToData(), model_folder)
 
     if model == None:
-        model = tf.keras.models.load_model(os.path.join(rel_path, model_name))
-        
+        if os.path.exists(rel_path):#load the model if it exists but is not in memory
+            model = tf.keras.models.load_model(os.path.join(rel_path, model_folder))
+        else: #create the model if none exists
+            model = initialize_model(user_data, model_folder)
+
     new_user_data = user_data
     sentence_tags = model.predict(user_data["sentences"])
     counter = 0
@@ -158,3 +147,16 @@ def run_model(model_name, user_data, test_sentences, model=None):
 
     return new_user_data
 
+def save_model(model, model_folder):
+    rel_path = os.path.join(getPathToData(), model_folder)
+
+    if not os.path.isdir(rel_path):
+        os.makedirs(rel_path)
+    if not model_folder:
+        model_folder = "model"
+        user_data["model_path"] = model_folder
+    
+    print("Model Saving started")
+    model.save(rel_path)
+    print("Complete")
+    
