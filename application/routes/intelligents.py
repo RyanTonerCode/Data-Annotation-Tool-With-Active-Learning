@@ -129,11 +129,10 @@ def initialize_model(user_data):
 def getPathToData():
     return os.path.join(os.getcwd(), "application", "data", "ai")
 
-def run_model(model_folder, user_data, test_sentences, model=None):
+def run_model(user_data, test_sentences, model_folder, model=None):
 
     rel_path = os.path.join(getPathToData(), model_folder)
-
-    if model == None:
+    if not model:
         if os.path.exists(rel_path):#load the model if it exists but is not in memory
             model = tf.keras.models.load_model(os.path.join(rel_path, model_folder))
         else: #create the model if none exists

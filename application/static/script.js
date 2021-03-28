@@ -1,12 +1,14 @@
-$(document).ready(function () {
+$(document).ready(function() {
 
+    // var ai_model = false;
     function initialize() {
         ajax("/", JSON.stringify({ "run_manual": "" }), initialize_return);
     }
     function initialize_return(data) {
         update_tags(data["tag_data"]);
         update_sentences(data["sentence_data"]);
-        $(".tags-area-overlay, .clear-model, .download-model").toggle(data["ai"]); //show/hide AI-related buttons, disabling tags too (based on whether there is a model path even if empty)
+        $(".tags-area-overlay, .clear-model, .save-model-block, .run-model").toggle(data["ai"]); //show/hide AI-related buttons, disabling tags too (based on whether there is a model path even if empty)
+        // ai_model = data["ai"];
     }
     initialize();
 
@@ -14,11 +16,11 @@ $(document).ready(function () {
 
 
     /* TAGS BAR */
-    $(document).on("click", ".new-tag", function () //when we click new tag (+) button
+    $(document).on("click", ".new-tag", function() //when we click new tag (+) button
     {
         $(".create-tag").toggle();
     });
-    $(document).on("click", ".color-selector-button", function () //when we click SELECT COLOR... button
+    $(document).on("click", ".color-selector-button", function() //when we click SELECT COLOR... button
     {
         $(".color-selector-options").toggle();
     });
@@ -36,7 +38,7 @@ $(document).ready(function () {
         $(".color-selector-button").attr("color", color_html); //set color data attribute (not affect appearance) to color we chose for later reference... bg-color uses RGB not text
         $(".color-selector-button").html(color_html); //set text inside button to color we chose
     });
-    $(document).on("click", ".submit-new-tag", function () //when we click DONE (for new tag) button
+    $(document).on("click", ".submit-new-tag", function() //when we click DONE (for new tag) button
     {
         $(".create-tag").hide(); //hide tag creator
         var tag_name = $(".new-tag-input").val();
@@ -83,54 +85,53 @@ $(document).ready(function () {
 
 
     /* RUN BUTTONS & ADD TEXT */
-    $(document).on("click", ".run", function () //when we click RUN... button
+    $(document).on("click", ".run", function() //when we click RUN... button
     {
         $(".run-options").toggle();
     });
-    $(document).on("click", ".run-options button", function () //when we click a RUN... menu button
+    $(document).on("click", ".run-options button", function() //when we click a RUN... menu button
     {
         $(".run-options").hide();
     });
-    $(document).on("click", ".add-text", function () //when we click ADD TEXT button
+    $(document).on("click", ".add-text", function() //when we click ADD TEXT button
     {
         var text = $("#text-box-field").val();
         $("#text-box-field").val("");
         ajax("/", JSON.stringify({ "run_manual": text }), initialize_return);
     });
-    $(document).on("click", ".create-model", function () //when we click CREATE-MODEL button
+    $(document).on("click", ".create-model", function() //when we click CREATE-MODEL button
     {
-        are_you_sure_ai(false)
-    });
-    $(document).on("click", ".run-model", function () //when we click RUN-MODEL button
-    {
-        are_you_sure_ai(true)
-    });
-    function are_you_sure_ai(model_exists) {
         //Running the AI means that tags can no longer be modified, because the model will only be trained on those tags
+        $(':focus').blur();
+        $(".search-box").removeClass("top");
         var content = "Running the AI entails that tags cannot be modified again. Click continue if you are satisfied with your current set of tags. <br><br>";
-        if (!$(".tags-area-overlay").is(":visible")) {
-            $(':focus').blur();
-            $(".search-box").removeClass("top");
-            content += "But first, give your new model a filename: <br><br> <input type='text' name='model-name' placeholder='Filename' id='model-name' class='new-tag-input' autofocus> <br><br>";
-        }
+        content += "But first, give your new model a filename: <br><br> <input type='text' name='model-name' placeholder='Filename' id='model-name' class='new-tag-input' autofocus> <br><br>";
         var button = "<button id='ai-continue-button' class='form-button'>CONTINUE</button>";
         showAlert(content, button);
 
-        $(document).on("click", "#ai-continue-button", function (e) {
-            var test_sentences = $(".sentences-area .checkbox-container input:checked").parent().parent().parent().map(function () {
-                return $(this).data('index');
-            }).get();
-            var filename = $("#model-name").is(":visible") ? $("#model-name").val() : "model"
-            var query = model_exists ? { "run_model": [test_sentences, filename] } : { "run_create_model": [test_sentences, filename] };
-
-            $("#loading").show();
-            ajax("/", JSON.stringify(query), update_sentences);
-            $(".tags-area-overlay, .clear-model, .download-model").show(); //show AI-related buttons, disabling tags too
-            $("#alert").css("display", "none");
-            $("#alert-stuff").html("");
+        $(document).on("click", "#ai-continue-button", function(e) 
+        {
+            start_ai(true)
         });
+    });
+    $(document).on("click", ".run-model", function() //when we click RUN-MODEL button
+    {
+        start_ai(false)
+    });
+    function start_ai(create_model) 
+    {
+        var test_sentences = $(".sentences-area .checkbox-container input:checked").parent().parent().parent().map(function() { return $(this).data('index'); }).get();
+        // var filename = $("#model-name").is(":visible") ? $("#model-name").val() : "model"
+        var query = create_model ? { "run_create_model": [test_sentences,  $("#model-name").val()] } : { "run_model": [test_sentences, ""] };
+
+        $("#loading").show();
+        ajax("/", JSON.stringify(query), update_sentences);
+        $(".tags-area-overlay, .clear-model, .download-model").show(); //show AI-related buttons, disabling tags too
+        $("#alert").css("display", "none");
+        $("#alert-stuff").html("");
     }
-    function update_sentences(data) {
+    function update_sentences(data) 
+    {
         $(".sentences-area").html(data);
         $("#loading").hide();
     }
@@ -256,7 +257,7 @@ $(document).ready(function () {
                 $('.sentence-area .checkbox-container input').slice(start, end).filter(':not(:disabled)').prop('checked', lastChecked.checked);
             }
             else if (e.altKey) {
-                $('.sentence-area .checkbox-container input').each(function () {
+                $('.sentence-area .checkbox-container input').each(function() {
                     this.checked = !this.checked;
                 });
                 e.target.checked = !e.target.checked;
@@ -276,19 +277,19 @@ $(document).ready(function () {
 
 
     /* CLEAR BUTTONS */
-    $(document).on("click", ".clear-all", function () //when we click CLEAR ALL
+    $(document).on("click", ".clear-all", function() //when we click CLEAR ALL
     {
         are_you_sure_clear("data", { "clear_all": "" })
     });
-    $(document).on("click", ".clear-tags", function () //when we click CLEAR TAGS
+    $(document).on("click", ".clear-tags", function() //when we click CLEAR TAGS
     {
         are_you_sure_clear("tags and annotation labels", { "clear_tags": "" })
     });
-    $(document).on("click", ".clear-sentences", function () //when we click CLEAR SENTENCES
+    $(document).on("click", ".clear-sentences", function() //when we click CLEAR SENTENCES
     {
         are_you_sure_clear("sentence text and annotation labels", { "clear_sentences": "" })
     });
-    $(document).on("click", ".clear-model", function () //when we click CLEAR SENTENCES
+    $(document).on("click", ".clear-model", function() //when we click CLEAR SENTENCES
     {
         are_you_sure_clear("AI model data", { "clear_model": "" })
     });
@@ -297,7 +298,7 @@ $(document).ready(function () {
         var button = "<button class='form-button' id='clear-continue-button'>YES</button>";
         showAlert(content, button);
 
-        $(document).on("click", "#clear-continue-button", function () {
+        $(document).on("click", "#clear-continue-button", function() {
             ajax("/", JSON.stringify(query), initialize_return);
             $("#alert").css("display", "none");
             $("#alert-stuff").html("");
@@ -310,7 +311,7 @@ $(document).ready(function () {
     var upload_after_download = false; //set as flag, so that upload form is submitted after download is requested
 
     /* UPLOAD BUTTONS */
-    document.getElementById("file-upload").onchange = function () //when a file is chosen to upload
+    document.getElementById("file-upload").onchange = function() //when a file is chosen to upload
     {
         filename = $("#file-upload").val();
         const lastDot = filename.lastIndexOf('.');
@@ -328,7 +329,7 @@ $(document).ready(function () {
         var button = "<button class='form-button' id='upload-continue-button'>CONTINUE</button>";
         showAlert(content, button);
 
-        $(document).on("click", "#upload-continue-button", async function () //need async?
+        $(document).on("click", "#upload-continue-button", async function() //need async?
         {
             if ($("#download-name").val() != "") //if they would like to download...
             {
@@ -347,41 +348,42 @@ $(document).ready(function () {
 
 
     /* DOWNLOAD BUTTONS */
-    $(document).on("click", ".download-all", function () //when we click DOWNLOAD JSON
+    $(document).on("click", ".download-all", function() //when we click save ALL DATA (JSON)
     {
         choose_filename(1);
-        $(document).on("click", "#download-button.id-1", function () {
+        $(document).on("click", "#download-button.id-1", function() {
             request_file({ "download_all": $("#download-name").val() });
         });
     });
-    $(document).on("click", ".download-csv", function () //when we click DOWNLOAD CSV
-    {
-        choose_filename(4);
-        $(document).on("click", "#download-button.id-4", function () {
-            request_file({ "download_csv": $("#download-name").val() });
-        });
-    });
-    $(document).on("click", ".download-tags", function () //when we click DOWNLOAD TAGS
+    $(document).on("click", ".download-tags", function() //when we click save TAGS
     {
         choose_filename(2);
-        $(document).on("click", "#download-button.id-2", function () {
+        $(document).on("click", "#download-button.id-2", function() {
             request_file({ "download_tags": $("#download-name").val() });
         });
     });
-    $(document).on("click", ".download-sentences", function () //when we click DOWNLOAD SENTENCES
+    $(document).on("click", ".download-sentences", function() //when we click export TEXT
     {
         choose_filename(3);
-        $(document).on("click", "#download-button.id-3", function () {
+        $(document).on("click", "#download-button.id-3", function() {
             request_file({ "download_sentences": $("#download-name").val() });
         });
     });
-    $(document).on("click", ".save-model", function () //when we click DOWNLOAD MODEL
+    $(document).on("click", ".download-csv", function() //when we click export CSV
     {
-        choose_filename(5);
-        $(document).on("click", "#download-button.id-5", function () {
-            request_file({ "save_model": $("#download-name").val() });
+        choose_filename(4);
+        $(document).on("click", "#download-button.id-4", function() {
+            request_file({ "download_csv": $("#download-name").val() });
         });
     });
+    $(document).on("click", ".save-model", function() //when we click SAVE MODEL
+    {
+        ajax("/", JSON.stringify({ "save_model": "" }), done_loading);
+    });
+    function done_loading()
+    {
+        $("#loading").hide();
+    }
 
     function choose_filename(id_num) //show a popup giving the user a chance to choose a filename
     {
@@ -429,7 +431,7 @@ $(document).ready(function () {
 
         if (upload_after_download) //if there is something waiting to upload
         {
-            setTimeout(function () //wait 100ms to give enough time to download (is this reliable?)
+            setTimeout(function() //wait 100ms to give enough time to download (is this reliable?)
             {
                 upload_after_download = false; //reset flag
                 document.getElementById("file-upload-form").submit(); //submit file upload form
@@ -441,7 +443,7 @@ $(document).ready(function () {
 
 
     /* MENU BUTTON (MOBILE) */
-    $(document).on("click", "#menu-dropdown-button", function () //when we click menu
+    $(document).on("click", "#menu-dropdown-button", function() //when we click menu
     {
         if (document.getElementsByClassName("menu-items")[0].style.height > "0px") {
             $("#menu-items").animate({ 'height': "0" });
@@ -471,7 +473,7 @@ $(document).ready(function () {
         $("#alert-stuff").html(stuff);
         $("#alert").css("display", "block");
     }
-    $(document).on("click", ".alert-close, #okay-button", function () //when we click the alert x button OR alert okay button
+    $(document).on("click", ".alert-close, #okay-button", function() //when we click the alert x button OR alert okay button
     {
         $("#alert").css("display", "none");
         $("#alert-stuff").html("");
@@ -503,10 +505,10 @@ $(document).ready(function () {
     /* for delaying things to avoid conundrums */
     function debounce(fn, delay) {
         var timer = null;
-        return function () {
+        return function() {
             var context = this, args = arguments;
             clearTimeout(timer);
-            timer = setTimeout(function () {
+            timer = setTimeout(function() {
                 fn.apply(context, args);
             }, delay);
         };
