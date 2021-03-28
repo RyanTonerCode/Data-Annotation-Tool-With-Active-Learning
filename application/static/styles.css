@@ -29,7 +29,7 @@
 .header-title
 {
     font-family: 'futura';
-    font-size: 28px;
+    font-size: 24px;
     z-index: 6;
     overflow: visible;
     padding-top: 10px;
@@ -848,6 +848,8 @@ input[type="file"]
 {
     padding-top: calc(50vh - 150px);
     background-color: rgba(0,0,0,0.7); /* Black w/ opacity */
+    overflow: hidden;
+    scrollbar-width: 0;
 }
 .alert-content 
 {

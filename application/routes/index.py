@@ -125,7 +125,7 @@ def home(alert = None):
 
 
         def initialize(user_data):
-            return {"tag_data": create_tag_html(user_data["tag_data"]), "sentence_data": create_sentence_html(user_data), "ai": True if "model_path" in user_data else False}
+            return {"tag_data": create_tag_html(user_data["tag_data"]), "sentence_data": create_sentence_html(user_data), "ai": True if "model_name" in user_data else False}
     
 
 
@@ -170,21 +170,21 @@ def home(alert = None):
 
 
         if "run" in key: #if text is submitted, add it to the data, and regardless, return HTML for sentences area
-            #if we did run corrections or automatic, we get list of checked sentences -- don't pass that to user_data!
-            print(input)
+            #if we did create model or run model, we get list of checked sentences -- don't pass that to user_data!
             user_data = create_sentences(input if key=="run_manual" else "") #if text empty, get user_data, if not empty, get user_data with new text implemented
             if key=="run_model" or key=="run_create_model":
                 test_sentences = input[0] #a list of the sentences to do automatic labelling on -- don't modify any other sentences
-                model_folder = user_data["model_path"] if "model_path" in user_data else input[1]
+                model_folder = user_data["model_name"] if "model_name" in user_data else input[1]
                 
-                if(app.config["ai_model"]==None):
+                if not app.config["ai_model"]:
                     print("No model exists in memory")
+                    if not os.path.isdir(model_folder):
+                    # if key=="run_create_model":
+                        print("creating model")
+                        app.config["ai_model"] = initialize_model(user_data)      
+                        print("model created")
 
-                if key=="run_create_model":
-                    print("creating model")
-                    app.config["ai_model"] = initialize_model(user_data)      
-                    print("model created")
-              
+
                 else:
                     user_data = run_model(model_folder, user_data, test_sentences, app.config["ai_model"])
                 
@@ -297,12 +297,8 @@ def home(alert = None):
 
 
         if key=="save_model": #download AI model
-            user_data = read_json()            
             save_model(app.config["ai_model"], model_folder)
-            #todo to remove this return....
-            #need to show spinner/ loading dialog when saving the model
-            return {"file": file, "name": input, "extension": "idk"}
-
+            
 
 
         if request.files: #if there are files to upload from request
@@ -396,76 +392,6 @@ def home(alert = None):
     return render_template("index.html", alert=alert) #if request method is GET or POST function does not return
    
 
-
-
-
-
-
-######## DEPRECATED ########
-
-# @app.route("/upload", methods=["GET", "POST"])
-# def upload_file():
-#     if request.method == "POST":
-#         pass
-   
-# UPLOAD_FOLDER = "application/data"
-# app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-# app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
-# @app.route('/success', methods = ['GET','POST'])
-# def uploaded_file():
-#     if request.method == 'POST':  
-#         print(request.files)
-#         if request.files:
-#             f = request.files['file']  
-#             f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))
-#             path = [x for x in os.walk(app.config['UPLOAD_FOLDER'])]
-#             subpath = path[0][2][0]
-#             dataset = pd.read_csv(os.path.join(app.config['UPLOAD_FOLDER'],subpath))
-#             data = dataset.iloc[:,0]
-
-#             if str(data) == "Series([], Name: Unnamed: 0, dtype: object)":
-#                 print("INVALID FILE")
-#                 # return render_template("index.html") 
-#                 return apology("Invalid File Type", 10, "index")
-
-#             data = data[0]
-
-#             sentence_data = {"sentences": [], "sentence_tags": []}
-#             sentences = []
-#             sentence_tags = []
-#             d = ".!?"
-#             sentence = ""
-#             leading_space = False
-#             for char in data:
-#                 if not leading_space:
-#                     sentence += char
-#                 leading_space = False
-#                 if char == "." or char =="?" or char == "!":
-#                     sentences.append(sentence)
-#                     sentence = ""
-#                     leading_space = True
-
-#             for sentence in sentences:
-#                 tags = []
-#                 for word in sentence.split():
-#                     tag = 0
-#                     tags.append(tag)
-#                 sentence_tags.append(tags)
-
-#             file_path = "application/data/sentence_data.json"
-#             if os.path.isfile(file_path):
-#                 with open(file_path) as json_file:
-#                     sentence_data = json.load(json_file)
-
-#             sentence_data = {"sentences": sentences, "sentence_tags": sentence_tags}
-#             out_file = open("application/data/sentence_data.json", "w")
-#             json.dump(sentence_data, out_file, indent=6)
-#             out_file.close()  
-#             # os.remove(os.path.join(app.config['UPLOAD_FOLDER'], subpath))
-       
-#             # return render_template("index.html", name = f.filename) 
-#             return render_template("index.html") 
-    
 
 
 
