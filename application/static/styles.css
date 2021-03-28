@@ -21,8 +21,8 @@
     cursor: pointer;
     border: 0px solid black;
     top: 10px;
-    left: 20px;
-    transform: translate(0%, 0%);
+    left: 50%;
+    transform: translate(-50%, 0%);
     white-space: nowrap;  
     overflow: visible;
 }
@@ -39,7 +39,6 @@
     font-family: 'lulo';
     color: black;
     font-size: 10px;
-    transform: translate(115px, -2px);
 }
 .menu-strip .left
 {
@@ -150,7 +149,7 @@ div.top
 .text-box
 {
     width: 80%;
-    margin-top: 30px;
+    margin-top: 15px;
     margin-left: 10%;
     margin-right: 10%;
     position: relative;

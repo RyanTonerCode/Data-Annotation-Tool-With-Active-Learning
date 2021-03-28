@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -7,25 +8,25 @@
     <link href="/static/resize.css" rel="stylesheet">
     <script src="/static/jquery.min.js"></script>
     <script src="/static/script.js"></script>
-    {% block header %}{% endblock %}  
+    {% block header %}{% endblock %}
     <title>{% block title %}{% endblock %} | sentence tagger</title>
 </head>
 
 <body class="body" {% block page_name %}{% endblock %}>
     <div class="header">
-        <button class="header-name" onclick="window.location.href = '/';"><div class="header-title">Sentence tagger</div><div class="by-who">by US</div></button>
+        <button class="header-name" onclick="window.location.href = '/';">
+            <div class="header-title">Human-In-The-Loop Data Annotation Tool</div>
+            <div class="by-who">Created by Ryan Toner, Kyle Riccardi, Harrison Gordon, Hailey Spinella, Nadav Zarmi
+            </div>
+        </button>
         <div class="menu-strip">
             <div class="left">
-                <button class="home-button" onclick="window.location.href = '/';">HOME</button>
+                <!--<button class="home-button" onclick="window.location.href = '/';">HOME</button>-->
             </div>
-            <!-- <div class="right">
-                <button class="register-button" onclick="window.location.href = '/register';">BUTTON 1</button>
-                <button class="login-button" onclick="window.location.href = '/login';">BUTTON 2</button>
-            </div> -->
             <button id="menu-dropdown-button" class="menu-dropdown-button">MENU</button>
         </div>
     </div>
-    
+
     <div class="menu-strip">
         <div id="menu-items" class="menu-items">
             <button class="home-button" onclick="window.location.href = '/';">HOME</button>
@@ -33,15 +34,17 @@
             <button class="login-button" onclick="window.location.href = '/login';">BUTTON 2</button> -->
         </div>
     </div>
-    
+
     <div id="alert" class="alert" {% if not alert %} style="display: none;" {% endif %}>
         <div class="alert-content">
             <div class="alert-box">
                 <div class="alert-close"> &times; </div>
                 <div id="alert-stuff">
                     <!-- {% if alert %} -->
-                    <div class='form'><div class='alert-desc'> {{ alert }} </div>
-                    <button class='form-button' id='okay-button'>OKAY</button></div> 
+                    <div class='form'>
+                        <div class='alert-desc'> {{ alert }} </div>
+                        <button class='form-button' id='okay-button'>OKAY</button>
+                    </div>
                     <!-- {% endif %} -->
                 </div>
             </div>

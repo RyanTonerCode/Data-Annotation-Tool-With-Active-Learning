@@ -2,77 +2,81 @@
 {% block header %}
 {% endblock %}
 {% block title %}
-    Home
+Home
 {% endblock %}
 {% block page_name %} id="home-page" {% endblock %}
 {% block main %}
-    <div class="message head">
-        <div class="message-label">Welcome, Human!</div>
+<!--
+<div class="message head">
+    <div class="message-label">Welcome!</div>
+</div>
+-->
+
+<div class="text-box">
+    <textarea id="text-box-field" class="text-box-field boxshadow" autocomplete="off" name="text-box-field"
+        placeholder="Input text to parse" type="text"></textarea>
+    <button class="btn1 add-text">add text</button>
+
+</div>
+
+<div class="tags-area">
+    <div class="tags-area-overlay" style="display: none;"></div>
+
+    <button class="btn1 new-tag">+</button>
+
+    <input type="text" class="create-tag new-tag-input" placeholder="Label" style="display: none;">
+
+    <div class="create-tag color-selector-custom" style="display: none;">
+        <button class="btn1 create-tag color-selector-button" style="display: none;">Select Color...</button>
+        <div class="color-selector-options boxshadow" style="display: none;">
+
+            <button class="color-selector-option">
+                <div class="tag-color red" data-color="red"></div>
+                <div class="color-selector-text">&nbsp red</div>
+            </button>
+
+            <button class="color-selector-option">
+                <div class="tag-color green"></div>
+                <div class="colors-selector-text">&nbsp green</div>
+            </button>
+
+            <button class="color-selector-option">
+                <div class="tag-color blue"></div>
+                <div class="color-selector-text">&nbsp blue</div>
+            </button>
+
+            <button class="color-selector-option">
+                <div class="tag-color yellow"></div>
+                <div class="color-selector-text">&nbsp yellow</div>
+            </button>
+
+            <button class="color-selector-option">
+                <div class="tag-color purple"></div>
+                <div class="color-selector-text">&nbsp purple</div>
+            </button>
+
+            <button class="color-selector-option">
+                <div class="tag-color orange"></div>
+                <div class="color-selector-text">&nbsp orange</div>
+            </button>
+
+            <button class="color-selector-option">
+                <div class="tag-color gray"></div>
+                <div class="color-selector-text">&nbsp gray</div>
+            </button>
+
+        </div>
     </div>
 
-    <div class="text-box">
-        <textarea id="text-box-field" class="text-box-field boxshadow" autocomplete="off" name="text-box-field" placeholder="Input text to parse" type="text"></textarea>
-        <button class="btn1 add-text">add text</button>
+    <button class="btn1 create-tag submit-new-tag" id="submit-new-tag" data-index="0"
+        style="display: none;">DONE</button>
 
-    </div>
-
-    <div class="tags-area">
-        <div class="tags-area-overlay" style="display: none;"></div>
-        
-        <button class="btn1 new-tag">+</button>
-        
-        <input type="text" class="create-tag new-tag-input" placeholder="Label" style="display: none;">
-
-        <div class="create-tag color-selector-custom" style="display: none;">
-            <button class="btn1 create-tag color-selector-button" style="display: none;">Select Color...</button>
-            <div class="color-selector-options boxshadow" style="display: none;">
-
-                <button class="color-selector-option">
-                    <div class="tag-color red" data-color="red"></div>
-                    <div class="color-selector-text">&nbsp red</div>
-                </button>
-
-                <button class="color-selector-option">
-                    <div class="tag-color green"></div>
-                    <div class="colors-selector-text">&nbsp green</div>
-                </button>
-
-                <button class="color-selector-option">
-                    <div class="tag-color blue"></div>
-                    <div class="color-selector-text">&nbsp blue</div>
-                </button>
-
-                <button class="color-selector-option">
-                    <div class="tag-color yellow"></div>
-                    <div class="color-selector-text">&nbsp yellow</div>
-                </button>
-
-                <button class="color-selector-option">
-                    <div class="tag-color purple"></div>
-                    <div class="color-selector-text">&nbsp purple</div>
-                </button>
-
-                <button class="color-selector-option">
-                    <div class="tag-color orange"></div>
-                    <div class="color-selector-text">&nbsp orange</div>
-                </button>
-
-                <button class="color-selector-option">
-                    <div class="tag-color gray"></div>
-                    <div class="color-selector-text">&nbsp gray</div>
-                </button>
-
-            </div>    
+    <div class="tags">
+        <div class="tag no-tags">
+            <div class="tag-name">No Tags</div>
         </div>
 
-        <button class="btn1 create-tag submit-new-tag" id="submit-new-tag" data-index="0" style="display: none;">DONE</button>
-
-        <div class="tags">
-            <div class="tag no-tags">
-                <div class="tag-name">No Tags</div>
-            </div>
-
-            <!-- <div class="tag-container">
+        <!-- <div class="tag-container">
                 <label class="radio-container">
                     <input type="radio" checked="checked" name="radio"value="1">
                     <span class="checkmark red "></span>
@@ -87,69 +91,69 @@
                 </div>
             </div> -->
 
-        </div>
+    </div>
 
-        <!-- <div class="run-buttons">
+    <!-- <div class="run-buttons">
             loop:
             <div class='checkbox'><label class='checkbox-container'><input type='checkbox'><span class='checkbox-checkmark'></span></label></div>
             <button class="btn1 run">RUN AI</button>
         </div> -->
 
-        <div class="run-buttons">
-            <button class="btn1 run">RUN AI...</button>
-            <div class="run-options boxshadow" style="display: none;">
-                <!-- <button class="btn1 run-manual">MANUAL</button> -->
-                <button class="btn1 run-corrections">CORRECTIONS</button>
-                <button class="btn1 run-automatic">AUTOMATIC</button>
-            </div>
+    <div class="run-buttons">
+        <button class="btn1 run">RUN AI...</button>
+        <div class="run-options boxshadow" style="display: none;">
+            <!-- <button class="btn1 run-manual">MANUAL</button> -->
+            <button class="btn1 run-corrections">CORRECTIONS</button>
+            <button class="btn1 run-automatic">AUTOMATIC</button>
         </div>
-
     </div>
 
+</div>
 
-    <div class="sentences-area"></div>
 
-    <div class="footer-buttons">
+<div class="sentences-area"></div>
 
-        <div class="footer-block">
-            <span>clear:</span>
-            <div class="footer-sub-block">
-                <button class="btn1 clear-all">ALL DATA</button>
-                <button class="btn1 clear-tags">TAGS</button>
-                <button class="btn1 clear-sentences">TEXT</button>
-                <button class="btn1 clear-model" style="display: none;">MODEL</button>
-            </div>
+<div class="footer-buttons">
+
+    <div class="footer-block">
+        <span>clear:</span>
+        <div class="footer-sub-block">
+            <button class="btn1 clear-all">ALL DATA</button>
+            <button class="btn1 clear-tags">TAGS</button>
+            <button class="btn1 clear-sentences">TEXT</button>
+            <button class="btn1 clear-model" style="display: none;">MODEL</button>
         </div>
-
-        <div class="footer-block">
-            <span>upload:</span>
-            <div class="footer-sub-block">
-                <button class="btn1 upload" type='file'>
-                    <form id="file-upload-form" action="/" method="post" enctype="multipart/form-data">  
-                        <label for="file-upload" class="footer-inner-button">JSON, TXT, CSV</label>
-                        <input id="file-upload" type="file" name="file" accept=".json, .txt, .csv"/> 
-                    </form>
-                </button>
-            </div>
-        </div>
-
-        <div class="footer-block">
-            <span>save json:</span>
-            <div class="footer-sub-block">
-                <button class="btn1 download-all">ALL DATA</button>
-                <button class="btn1 download-tags">TAGS</button>
-            </div>
-        </div>
-
-        <div class="footer-block">
-            <span>export:</span>
-            <div class="footer-sub-block">
-                <button class="btn1 download-csv">ALL CSV</button>
-                <button class="btn1 download-sentences">TEXT</button>
-                <button class="btn1 download-model" style="display: none;">MODEL</button>
-            </div>
-        </div>  
-        
     </div>
-   
+
+    <div class="footer-block">
+        <span>upload:</span>
+        <div class="footer-sub-block">
+            <button class="btn1 upload" type='file'>
+                <form id="file-upload-form" action="/" method="post" enctype="multipart/form-data">
+                    <label for="file-upload" class="footer-inner-button">JSON, TXT, CSV</label>
+                    <input id="file-upload" type="file" name="file" accept=".json, .txt, .csv" />
+                </form>
+            </button>
+        </div>
+    </div>
+
+    <div class="footer-block">
+        <span>save json:</span>
+        <div class="footer-sub-block">
+            <button class="btn1 download-all">ALL DATA</button>
+            <button class="btn1 download-tags">TAGS</button>
+        </div>
+    </div>
+
+    <div class="footer-block">
+        <span>export:</span>
+        <div class="footer-sub-block">
+            <button class="btn1 download-csv">ALL CSV</button>
+            <button class="btn1 download-sentences">TEXT</button>
+            <button class="btn1 download-model" style="display: none;">MODEL</button>
+        </div>
+    </div>
+
+</div>
+
 {% endblock %}

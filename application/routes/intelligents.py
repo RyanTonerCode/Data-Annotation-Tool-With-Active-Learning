@@ -79,7 +79,7 @@ def manage_data(X, y, X_pooled, y_pooled, idx):
     return X, y, X_pooled, y_pooled
 
 
-def initialize_model(user_data, model_path):
+def initialize_model(user_data, model_name):
     X_Data, Y_Data = [], [] #here, load the training data
     for sentence_index, sentence in enumerate(user_data["sentences"]):
         for word_index, word in enumerate(sentence.split()):
@@ -102,9 +102,10 @@ def initialize_model(user_data, model_path):
 
     X, y, X_pooled, y_pooled = get_initial_labelled_dataset(X_Data_np, Y_Data_encoding, num_samples_per_class)
 
-    VOCAB_SIZE=10000
+    VOCAB_SIZE=2000
 
     model = None
+
     #run active learning by iterating the model, manipulating the training data, and gaming the subsequent model
     for i in range(3):
         print('*'*50)
@@ -121,19 +122,30 @@ def initialize_model(user_data, model_path):
         X, y, X_pooled, y_pooled = manage_data(X, y, X_pooled, y_pooled, uncertain_idx)
         print('Iteration Done: {}'.format(i+1))
 
-    if not os.path.isdir("/application/data/ai/"):
-        os.makedirs("/application/data/ai/")
-    if not model_path:
-        model_path = "model"
-        user_data["model_path"] = model_path
-    model.save(os.path.join("/application/data/ai/", model_path))
+    rel_path = os.path.join(os.getcwd(), "application", "data", "ai")
+
+    if not os.path.isdir(rel_path):
+        os.makedirs(rel_path)
+    if not model_name:
+        model_name = "model"
+        user_data["model_path"] = model_name
+    
+    print("Model Saving started")
+    model.save(os.path.join(rel_path, model_name))
+    print("Complete")
+
+    #return the model back
+    return model
 
 
-def run_model(model_path, user_data, test_sentences):
-    if not os.path.isfile(model_path):
-        initialize_model(user_data, model_path)
+def run_model(model_name, user_data, test_sentences, model=None):
+    if not os.path.isfile(model_name):
+        initialize_model(user_data, model_name)
 
-    model = tf.keras.models.load_model(os.path.join("/application/data/ai/", model_path))
+    rel_path = os.path.join(os.getcwd(), "application", "data", "ai")
+
+    if model == None:
+        model = tf.keras.models.load_model(os.path.join(rel_path, model_name))
         
     new_user_data = user_data
     sentence_tags = model.predict(user_data["sentences"])
