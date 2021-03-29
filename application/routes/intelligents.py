@@ -7,8 +7,6 @@ import tensorflow as tf
 from application import app
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 
-
-
 def create_model(text_encoder, NUM_CLASSES):
     model = tf.keras.Sequential([
         text_encoder,
@@ -26,8 +24,6 @@ def create_model(text_encoder, NUM_CLASSES):
         metrics=['accuracy'])
 
     return model
-
-
 
 def get_initial_labelled_dataset(X_Data, Y_Data, num_samples_per_class=10):
     X, Y, X_pooled, Y_pooled = [], [], [], []
@@ -52,7 +48,6 @@ def get_initial_labelled_dataset(X_Data, Y_Data, num_samples_per_class=10):
 
     return np.asarray(X), np.asarray(Y), X_pooled, Y_pooled
 
-
 def max_entropy_acquisition(model, X_pooled): 
     probas = model.predict(X_pooled, verbose=1)
     probas=np.array(probas, dtype=float)
@@ -60,8 +55,6 @@ def max_entropy_acquisition(model, X_pooled):
     query_num=round(len(X_pooled)*.1)
     uncertain_idx = entropy_avg.argsort()[-query_num:][::-1]
     return uncertain_idx, entropy_avg.mean()
-
-
 
 def manage_data(X, Y, X_pooled, Y_pooled, idx):
     pool_mask = np.ones(len(X_pooled), dtype=bool)
@@ -76,8 +69,9 @@ def manage_data(X, Y, X_pooled, Y_pooled, idx):
     Y = np.concatenate([Y, new_label])
     return X, Y, X_pooled, Y_pooled
 
-
 def extractUserData(user_data):
+    NUM_CLASSES = len(user_data["tag_data"]["tags"])
+
     X_Data, Y_Data = [], [] #here, load the training data
     for sentence_index, sentence in enumerate(user_data["sentences"]):
         for word_index, word in enumerate(sentence.split()):
@@ -93,7 +87,6 @@ def extractUserData(user_data):
 
     #convert X_Data to numpy array
     return (np.array(X_Data), np.array(Y_Data))
-
 
 def initialize_model(user_data):
     NUM_CLASSES = len(user_data["tag_data"]["tags"])
@@ -127,7 +120,6 @@ def initialize_model(user_data):
     #return the model back
     return model
 
-
 def train_existing_model(user_data):
     X_Data, Y_Data = extractUserData(user_data)
 
@@ -147,8 +139,6 @@ def train_existing_model(user_data):
 def get_path(sub):
     return os.path.join(os.getcwd(), "application", "data", "ai", sub)
 
-
-
 def load_model(user_data, model_name=None):
     if app.config["ai_model"]:
         return app.config["ai_model"]
@@ -159,8 +149,6 @@ def load_model(user_data, model_name=None):
         else: 
             # return user_data # ERROR no model how did this happen!
             return initialize_model(model_name if model_name else user_data["model_name"])
-
-
 
 def run_model(user_data, test_sentences):
 
@@ -178,8 +166,6 @@ def run_model(user_data, test_sentences):
 
     return new_user_data
         
-
-
 def save_model(model, model_name):
     model = load_model(None, model_name) if not model else model
     model_path = get_path(model_name)
