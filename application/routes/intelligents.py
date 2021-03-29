@@ -89,12 +89,15 @@ def extractUserData(user_data):
     #convert X_Data to numpy array
     return (np.array(X_Data), np.array(Y_Data))
 
+#get a batch size for the given number of training samples
 def calc_batch_size(training_length):
     if training_length <= 2:
         return training_length
+    if training_length <= 8:
+        return 2
     if training_length <= 128:
-        #3 -> 2^(2-2)=2^0=1
-        #128 -> 2^(7-5)=2^5=32
+        #9 -> 2^(4-2)=2^2=4
+        #128 -> 2^(7-2)=2^5=32
         power = int(math.ceil(math.log2(training_length)))
         return 2**(power-2)
     return 32
@@ -178,7 +181,6 @@ def run_model(user_data, test_sentences):
             prediction = model.predict(np.array([word]))
             #get the index of the maximum value (the prediction), and add 1 to reverse the predicted index to a tag index
             predicted_tag_index = int(np.argmax(prediction[0])) + 1
-            print(predicted_tag_index)
             new_user_data["sentence_tags"][sentence_index][word_index] = predicted_tag_index
 
     return new_user_data
