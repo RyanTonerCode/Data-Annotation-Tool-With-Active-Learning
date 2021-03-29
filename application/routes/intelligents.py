@@ -140,15 +140,14 @@ def get_path(sub):
     return os.path.join(os.getcwd(), "application", "data", "ai", sub)
 
 def load_model(user_data, model_name=None):
-    if app.config["ai_model"]:
-        return app.config["ai_model"]
-    else: 
+    if not app.config["ai_model"]: #if the model is not in memory, load it first
         model_path = get_path(model_name if model_name else user_data["model_name"])
         if os.path.exists(model_path):#load the model if it exists but is not in memory
-            return tf.keras.models.load_model(model_path)
+            app.config["ai_model"] = tf.keras.models.load_model(model_path)
         else: 
             # return user_data # ERROR no model how did this happen!
-            return initialize_model(model_name if model_name else user_data["model_name"])
+            app.config["ai_model"] = initialize_model(model_name if model_name else user_data["model_name"])
+    return app.config["ai_model"]
 
 def run_model(user_data, test_sentences):
 
