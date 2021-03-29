@@ -1,10 +1,12 @@
 $(document).ready(function() {
 
     // var ai_model = false;
-    function initialize() {
+    function initialize() 
+    {
         ajax("/", JSON.stringify({ "run_manual": "" }), initialize_return);
     }
-    function initialize_return(data) {
+    function initialize_return(data) 
+    {
         update_tags(data["tag_data"]);
         update_sentences(data["sentence_data"]);
         $(".tags-area-overlay, .clear-model, .save-model-block, .run-model").toggle(data["ai"]); //show/hide AI-related buttons, disabling tags too (based on whether there is a model path even if empty)
@@ -24,7 +26,7 @@ $(document).ready(function() {
     {
         $(".color-selector-options").toggle();
     });
-    $(document).on("click", ".color-selector-option", function (e) //when we click a color option button
+    $(document).on("click", ".color-selector-option", function(e) //when we click a color option button
     {
         $(".color-selector-options").toggle(); //hide the menu
         var color_html = e.target;
@@ -50,15 +52,15 @@ $(document).ready(function() {
         $(".submit-new-tag").data("index", 0); //reset index so we dont replace other tags next time by accident
         ajax("/", JSON.stringify({ new_tag }), initialize_return);
     });
-    $(document).on("click", ".tag-overlay", function (e) //when we click edit button on a tag
+    $(document).on("click", ".tag-overlay", function(e) //when we click edit button on a tag
     {
         $(e.target).next().toggle();
     });
-    $(document).on("click", ".tag-edit-menu-item", function (e) //when we click a menu item for a tag after clicking edit
+    $(document).on("click", ".tag-edit-menu-item", function(e) //when we click a menu item for a tag after clicking edit
     {
         $(e.target).parent().hide();
     });
-    $(document).on("click", ".tag-edit-menu-item.modify", function (e) //when we click modify tag
+    $(document).on("click", ".tag-edit-menu-item.modify", function(e) //when we click modify tag
     {
         var tag_name = $(e.target).parent().parent().children(".tag-name").html();
         var tag_color = $(e.target).parent().parent().parent().children("label").children("span").attr("class").split(" ")[1]; //get color from class name of tag icon color
@@ -68,16 +70,16 @@ $(document).ready(function() {
         $(".submit-new-tag").data("index", tag_index); //set the tag index so it knows which to replace, and 0 means new tag
         $(".create-tag").show(); //show to tag creator that we just set up
     });
-    $(document).on("click", ".tag-edit-menu-item.delete", function (e) //when we click delete tag
+    $(document).on("click", ".tag-edit-menu-item.delete", function(e) //when we click delete tag
     {
         var tag_index = $(e.target).parent().parent().children(".tag-overlay").data("index");
         ajax("/", JSON.stringify({ "delete_tag": tag_index }), initialize_return);
     });
 
-
-
-    function update_tags(data) {
-        if (data != "") {
+    function update_tags(data) 
+    {
+        if (data != "") 
+        {
             $(".tags-area .tags").html(data);
         }
     }
@@ -85,11 +87,11 @@ $(document).ready(function() {
 
 
     /* RUN BUTTONS & ADD TEXT */
-    $(document).on("click", ".run", function() //when we click RUN... button
+    $(document).on("click", ".run", function() //when we click RUN AI... button
     {
         $(".run-options").toggle();
     });
-    $(document).on("click", ".run-options button", function() //when we click a RUN... menu button
+    $(document).on("click", ".run-options button", function() //when we click a RUN AI... menu button
     {
         $(".run-options").hide();
     });
@@ -139,7 +141,7 @@ $(document).ready(function() {
 
 
     /* ADD OR REMOVE TAG FROM WORD */
-    $(document).on("click", ".select-tag-button", function (e) //when we click TAG button below a word
+    $(document).on("click", ".select-tag-button", function(e) //when we click TAG button below a word
     {
         var sentence_index = $(this).closest(".sentence-area").data("index");
         var word_index = $(this).closest(".word").data("index");
@@ -149,7 +151,7 @@ $(document).ready(function() {
         selected_word = word_index;
         ajax("/", JSON.stringify({ tag_word }), update_sentences);
     });
-    $(document).on("click", ".sentences-area .delete", function (e) //when we click delete tag word
+    $(document).on("click", ".sentences-area .delete", function(e) //when we click delete tag word
     {
         var sentence_index = $(this).closest(".sentence-area").data("index");
         var word_index = $(this).closest(".word").data("index");
@@ -238,7 +240,7 @@ $(document).ready(function() {
         }
         else if (e.key == "x") //when we click x, delete tag from selected word
         {
-            advance_right(); //do before collecting selected so it is updated on ajax return
+            // advance_right(); //do before collecting selected so it is updated on ajax return
             var sentence_index = selected_sentence;
             var word_index = selected_word;
             var tag_word = [sentence_index, word_index, 0];
@@ -253,7 +255,7 @@ $(document).ready(function() {
 
     /* CHECKBOXES */
     var lastChecked = null;
-    $(document).on("click", ".sentence-area input[type=checkbox]", function (e) {
+    $(document).on("click", ".sentence-area input[type=checkbox]", function(e) {
         if (lastChecked) {
             if (e.shiftKey) {
                 var from = $('.sentence-area .checkbox-container input').index(e.target);
@@ -289,7 +291,7 @@ $(document).ready(function() {
     });
     $(document).on("click", ".clear-tags", function() //when we click CLEAR TAGS
     {
-        are_you_sure_clear("tags and annotation labels", { "clear_tags": "" })
+        are_you_sure_clear("tags, annotation labels, and model data", { "clear_tags": "" })
     });
     $(document).on("click", ".clear-sentences", function() //when we click CLEAR SENTENCES
     {
@@ -299,12 +301,14 @@ $(document).ready(function() {
     {
         are_you_sure_clear("AI model data", { "clear_model": "" })
     });
-    function are_you_sure_clear(message, query) {
+    function are_you_sure_clear(message, query) 
+    {
         var content = `Are you sure you'd like to clear all ${message}? You cannot undo this action. <br><br>`;
         var button = "<button class='form-button' id='clear-continue-button'>YES</button>";
         showAlert(content, button);
 
-        $(document).on("click", "#clear-continue-button", function() {
+        $(document).on("click", "#clear-continue-button", function() 
+        {
             ajax("/", JSON.stringify(query), initialize_return);
             $("#alert").css("display", "none");
             $("#alert-stuff").html("");
@@ -382,6 +386,7 @@ $(document).ready(function() {
             request_file({ "download_csv": $("#download-name").val() });
         });
     });
+
     $(document).on("click", ".save-model", function() //when we click SAVE MODEL
     {
         $("#loading").show();
@@ -461,7 +466,7 @@ $(document).ready(function() {
             $("body").animate({ 'margin-top': "150" });
         }
     });
-    $(document).click(function (e) //click out of menu
+    $(document).click(function(e) //click out of menu
     {
         if (!e.target.className.includes("menu-dropdown-button") && document.getElementsByClassName("menu-items")[0].style.height == "50px") {
             $("#menu-items").animate({ 'height': "-=50" });
@@ -489,7 +494,8 @@ $(document).ready(function() {
 
 
     /* AJAX function with optional callback function parameter */
-    function ajax(url_, data_, function_) {
+    function ajax(url_, data_, function_) 
+    {
         var params =
         {
             url: url_,
@@ -498,13 +504,15 @@ $(document).ready(function() {
             data: data_,
         };
         $.ajax(params).done
-            (
-                function (data) {
-                    if (function_) {
-                        function_(data);
-                    }
+        (
+            function (data) 
+            {
+                if (function_) 
+                {
+                    function_(data);
                 }
-            );
+            }
+        );
     }
 
 

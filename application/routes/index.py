@@ -171,7 +171,7 @@ def home(alert = None):
 
         if "run" in key: #if text is submitted, add it to the data, and regardless, return HTML for sentences area
             #if we did create model or run model, we get list of checked sentences -- don't pass that to user_data!            
-            user_data = create_sentences(input if key=="run_manual" else "") #if text empty, get user_data, if not empty, get user_data with new text implemented
+            user_data = create_sentences(input) if key == "run_manual" else read_json() #if text empty, get user_data, if not empty, get user_data with new text implemented
             
             if key == "run_create_model":
                 user_data["model_name"] = input
@@ -203,6 +203,7 @@ def home(alert = None):
 
 
         if key=="clear_all": #delete all data. new empty file will be created after requests from client
+            app.config.pop("ai_model", None)
             file_path = "application/data/data.json"
             if os.path.isfile(file_path):
                 os.remove(file_path)
@@ -214,6 +215,8 @@ def home(alert = None):
         if key=="clear_tags": #remove tags from tag bar and all words/data
             user_data = read_json()
             user_data["tag_data"] = {"index": 0, "tags": {}} #create index counter and empty dict for tags
+            user_data.pop("model_path", None)
+            app.config.pop("ai_model", None)
 
             for sentence_index, sentence in enumerate(user_data["sentence_tags"]): #remove tags from all words in data
                 for word_index, word in enumerate(sentence):
@@ -235,13 +238,10 @@ def home(alert = None):
 
         if key=="clear_model": #remove AI model
             user_data = read_json()
-            if "model_path" in user_data:
-                if user_data["model_path"]:
-                    if os.path.isdir(user_data["model_path"]):
-                        os.remove(user_data["model_path"])
-                del user_data["model_path"]
+            user_data.pop("model_name", None)
+            print("YAY")
+            print(user_data)
             app.config["ai_model"] = None
-
             write_json(user_data)
             return initialize(user_data)
 

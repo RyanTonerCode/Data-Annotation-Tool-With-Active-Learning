@@ -1,9 +1,9 @@
-opencv-python
-scikit-learn
+# opencv-python
+# scikit-learn
 tensorflow
-pandas
+# pandas
 flask
 flask_session
-nltk
+# nltk
 scipy
 python-dotenv

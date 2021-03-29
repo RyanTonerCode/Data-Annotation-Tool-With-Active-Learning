@@ -7,13 +7,16 @@ import tensorflow as tf
 from application import app
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 
+
+
 def create_model(text_encoder, NUM_CLASSES):
     model = tf.keras.Sequential([
         text_encoder,
         tf.keras.layers.Embedding(
             input_dim=len(text_encoder.get_vocabulary()),
             output_dim=32,
-            mask_zero=True),tf.keras.layers.Dropout(.2),
+            mask_zero=True),
+        tf.keras.layers.Dropout(.2),
         tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(32)),
         tf.keras.layers.Dense(NUM_CLASSES, activation='softmax')
         ])
@@ -25,15 +28,15 @@ def create_model(text_encoder, NUM_CLASSES):
     return model
 
 
-def get_initial_labelled_dataset(X_Data, Y_Data, num_samples_per_class=10):
-    X = list()
-    y = list()
-    X_pooled = list()
-    y_pooled = list()
-    labelled_idx = list()
 
-    counter_dict = dict()
-    
+def get_initial_labelled_dataset(X_Data, Y_Data, num_samples_per_class=10):
+    X = []
+    y = []
+    X_pooled = []
+    y_pooled = []
+    labelled_idx = []
+    counter_dict = {}
+
     for idx, target in enumerate(Y_Data):
         #find where the 1 is in each array of Y_Data
         index = np.where(target==1)[0][0]
@@ -47,20 +50,21 @@ def get_initial_labelled_dataset(X_Data, Y_Data, num_samples_per_class=10):
         y.append(target)
         labelled_idx.append(idx)
         
-   
     X_pooled = np.delete(X_Data, labelled_idx, axis=0)
     y_pooled = np.delete(Y_Data, labelled_idx, axis=0)
 
     return np.asarray(X), np.asarray(y), X_pooled, y_pooled
 
 
+
 def max_entropy_acquisition(model, X_pooled): 
-    probas = model.predict(X_pooled,verbose=1)
-    probas=np.array(probas,dtype = float)
+    probas = model.predict(X_pooled, verbose=1)
+    probas=np.array(probas, dtype=float)
     entropy_avg = sp.stats.entropy(probas, base=10, axis=1)
     query_num=round(len(X_pooled)*.1)
     uncertain_idx = entropy_avg.argsort()[-query_num:][::-1]
     return uncertain_idx, entropy_avg.mean()
+
 
 
 def manage_data(X, y, X_pooled, y_pooled, idx):
@@ -74,10 +78,11 @@ def manage_data(X, y, X_pooled, y_pooled, idx):
     y_pooled = y_pooled[pool_mask]
     X = np.concatenate([X, new_training])
     y = np.concatenate([y, new_label])
-
     return X, y, X_pooled, y_pooled
 
 
+
+######## WHEN DOES OLD MODEL GET PASSED TO NEW?
 def initialize_model(user_data):
     NUM_CLASSES = len(user_data["tag_data"]["tags"])
 
@@ -85,15 +90,15 @@ def initialize_model(user_data):
     for sentence_index, sentence in enumerate(user_data["sentences"]):
         for word_index, word in enumerate(sentence.split()):
             tag_index = int(user_data["sentence_tags"][sentence_index][word_index]) #get tag index ID number from current word
-            if tag_index == 0: #retrieve tag data only if there's a tag
-                continue
-            #tag_info = user_data["tag_data"]["tags"][tag_index]["name"] 
-
-            X_Data.append(word)
-            #one hot encode the classes
-            one_hot = [0]*NUM_CLASSES
-            one_hot[tag_index-1]=1
-            Y_Data.append(one_hot)
+            if tag_index != 0: #retrieve tag data only if there's a tag
+                print("TAG INDEX: ", tag_index)
+                # continue
+                #tag_info = user_data["tag_data"]["tags"][tag_index]["name"] 
+                X_Data.append(word)
+                #one hot encode the classes
+                one_hot = [0] * NUM_CLASSES
+                one_hot[tag_index-1] = 1
+                Y_Data.append(one_hot)
 
     #convert X_Data to numpy array
     X_Data_np = np.array(X_Data)
@@ -104,19 +109,18 @@ def initialize_model(user_data):
 
     X, y, X_pooled, y_pooled = get_initial_labelled_dataset(X_Data_np, Y_Data_np, num_samples_per_class)
 
-    VOCAB_SIZE=2000
+    VOCAB_SIZE = 2000
 
     model = None
 
     #run active learning by iterating the model, manipulating the training data, and gaming the subsequent model
     for i in range(1):
-        print('*'*50)
+        print('*' * 50)
 
         text_encoder = TextVectorization(max_tokens=VOCAB_SIZE)
         text_encoder.adapt(X)
 
         model = create_model(text_encoder, NUM_CLASSES)
-
         model.fit(X, y, epochs=1, verbose=1)
         uncertain_idx, entropy_avg = max_entropy_acquisition(model, X_pooled)
         print('Average Entropy: {}'.format(entropy_avg))
@@ -134,19 +138,32 @@ def get_path(sub):
 
 
 
-def run_model(user_data, test_sentences):
-
-    # model = app.config["ai_model"] if app.config["ai_model"] else tf.keras.models.load_model(get_path(model_name)) if os.path.exists(get_path(model_name)) else None
-    model = None
+def load_model(user_data, model_name=None):
     if app.config["ai_model"]:
-        model = app.config["ai_model"]
+        return app.config["ai_model"]
     else: 
-        model_path = get_path(user_data["model_name"])
+        model_path = get_path(model_name if model_name else user_data["model_name"])
         if os.path.exists(model_path):#load the model if it exists but is not in memory
-            model = tf.keras.models.load_model(model_path)
+            return tf.keras.models.load_model(model_path)
         else: 
             # return user_data # ERROR no model how did this happen!
-            return initialize_model(user_data["model_name"])
+            return initialize_model(model_name if model_name else user_data["model_name"])
+
+
+
+def run_model(user_data, test_sentences):
+
+    model = load_model(user_data)
+    # model = app.config["ai_model"] if app.config["ai_model"] else tf.keras.models.load_model(get_path(model_name)) if os.path.exists(get_path(model_name)) else None
+    # if app.config["ai_model"]:
+    #     model = app.config["ai_model"]
+    # else: 
+    #     model_path = get_path(user_data["model_name"])
+    #     if os.path.exists(model_path):#load the model if it exists but is not in memory
+    #         model = tf.keras.models.load_model(model_path)
+    #     else: 
+    #         # return user_data # ERROR no model how did this happen!
+    #         return initialize_model(user_data["model_name"])
 
     #get a prediction for every word in the selected sentences
     new_user_data = user_data
@@ -154,28 +171,16 @@ def run_model(user_data, test_sentences):
         parsed_sentence = user_data["sentences"][sentence_index].split()
         for word_index, word in enumerate(parsed_sentence):
             prediction = model.predict(np.array([word]))
-            #get the index of the maximum value
-            predicted_tag_index = np.argmax(prediction[0]) + 1
+            predicted_tag_index = np.argmax(prediction[0]) + 1 #get the index of the maximum value
             print(predicted_tag_index)
             new_user_data["sentence_tags"][sentence_index][word_index] = int(predicted_tag_index)
 
     return new_user_data
-
-
-
-# def load_model(model_name):
-#     if app.config["ai_model"]:
-#         return app.config["ai_model"]
-#     else: 
-#         model_path = get_path(model_name)
-#         if os.path.exists(model_path):#load the model if it exists but is not in memory
-#             return tf.keras.models.load_model(model_path)
-#         else: #create the model if none exists
-#             return None
         
 
 
 def save_model(model, model_name):
+    model = load_model(None, model_name) if not model else model
     model_path = get_path(model_name)
     if not os.path.isdir(model_path):
         os.makedirs(model_path)
@@ -185,4 +190,3 @@ def save_model(model, model_name):
     print("Model Saving started")
     model.save(model_path)
     print("Complete")
-    
