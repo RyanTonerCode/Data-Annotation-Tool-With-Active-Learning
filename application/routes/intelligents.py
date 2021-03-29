@@ -69,12 +69,8 @@ def manage_data(X, Y, X_pooled, Y_pooled, idx):
     Y = np.concatenate([Y, new_label])
     return X, Y, X_pooled, Y_pooled
 
-<<<<<<< HEAD
-def initialize_model(user_data):
-=======
 #extracts the features and one-hot encoded classes from the user data
 def extractUserData(user_data):
->>>>>>> 17fa79d3d35bbbbf7ff506bafe791928ed058a05
     NUM_CLASSES = len(user_data["tag_data"]["tags"])
 
     X_Data, Y_Data = [], [] #here, load the training data
