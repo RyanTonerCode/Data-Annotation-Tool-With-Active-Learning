@@ -174,10 +174,10 @@ def home(alert = None):
             user_data = create_sentences(input if key=="run_manual" else "") #if text empty, get user_data, if not empty, get user_data with new text implemented
             
             if key == "run_create_model":
-                user_data["model_name"] = input[1]
+                user_data["model_name"] = input
                 app.config["ai_model"] = initialize_model(user_data)
             elif key == "run_model":
-                test_sentences = input[0]
+                test_sentences = input
                 user_data = run_model(user_data, test_sentences)
 
             write_json(user_data)                
@@ -237,9 +237,10 @@ def home(alert = None):
             user_data = read_json()
             if "model_path" in user_data:
                 if user_data["model_path"]:
-                    if os.path.exists(user_data["model_path"]):
+                    if os.path.isdir(user_data["model_path"]):
                         os.remove(user_data["model_path"])
                 del user_data["model_path"]
+            app.config["ai_model"] = None
 
             write_json(user_data)
             return initialize(user_data)

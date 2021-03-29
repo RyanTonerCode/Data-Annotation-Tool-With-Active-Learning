@@ -122,11 +122,11 @@ $(document).ready(function() {
     {
         var test_sentences = $(".sentences-area .checkbox-container input:checked").parent().parent().parent().map(function() { return $(this).data('index'); }).get();
         // var filename = $("#model-name").is(":visible") ? $("#model-name").val() : "model"
-        var query = create_model ? { "run_create_model": [test_sentences,  $("#model-name").val()] } : { "run_model": [test_sentences, ""] };
+        var query = create_model ? { "run_create_model": $("#model-name").val() } : { "run_model": test_sentences };
 
         $("#loading").show();
         ajax("/", JSON.stringify(query), update_sentences);
-        $(".tags-area-overlay, .clear-model, .download-model").show(); //show AI-related buttons, disabling tags too
+        $(".tags-area-overlay, .clear-model, .save-model-block, .run-model").show(); //show AI-related buttons, disabling tags too
         $("#alert").css("display", "none");
         $("#alert-stuff").html("");
     }
@@ -164,7 +164,8 @@ $(document).ready(function() {
     /* KEYDOWN - SENTENCE NAV, TAGGING */
     var selected_sentence = 0;
     var selected_word = 0;
-    $(document).keydown(function (e) {
+    $(document).keydown(function(e) 
+    {
         var number_of_sentences = document.getElementsByClassName("sentence-area").length;
         if ($("input").is(":focus") || $("textarea").is(":focus") || number_of_sentences == 0) { return; }
         //dont do stuff from keys if typing somewhere (text field) or if there arent any sentences yet
@@ -184,10 +185,12 @@ $(document).ready(function() {
             }
         }
 
-        if (e.key == "ArrowRight") {
+        if (e.key == "ArrowRight") 
+        {
             advance_right();
         }
-        else if (e.key == "ArrowLeft") {
+        else if (e.key == "ArrowLeft") 
+        {
             if (selected_word > 0) //if there is at least one more word to left
             {
                 selected_word--;
@@ -199,7 +202,8 @@ $(document).ready(function() {
                 selected_word = words_in_sentence - 1; //go to end of that sentence above
             }
         }
-        else if (e.key == "ArrowUp") {
+        else if (e.key == "ArrowUp") 
+        {
             if (selected_sentence > 0) //if there is at least one more sentence to above
             {
                 selected_sentence--;
@@ -207,7 +211,8 @@ $(document).ready(function() {
                 words_in_sentence >= selected_word + 1 ? selected_word = selected_word : selected_word = words_in_sentence - 1; //move straight up if possible, otherwise go to end
             }
         }
-        else if (e.key == "ArrowDown") {
+        else if (e.key == "ArrowDown") 
+        {
             if (selected_sentence < number_of_sentences - 1) //if there is at least one more sentence to below
             {
                 selected_sentence++;
@@ -217,17 +222,18 @@ $(document).ready(function() {
         }
         else if (["1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(e.key)) //tag a word when we click a number, that number in line on the tag bar will be what it is
         {
-            advance_right(); //do before collecting selected so it is updated on ajax return
-            var sentence_index = selected_sentence;
-            var word_index = selected_word;
             var tag_index = parseInt(e.key) - 1; //in what place on the tag bar is the tag we want? nothing to do with its unique ID number
             var number_of_tags = document.getElementsByClassName("tag-container").length;
-
+            
             if (tag_index <= number_of_tags - 1) //if we are within the number of tags
             {
+                var sentence_index = selected_sentence;
+                var word_index = selected_word;    
                 var tag_id = document.getElementsByClassName("tag-container")[tag_index].children[1].children[1].dataset.index;
                 var tag_word = [sentence_index, word_index, tag_id];
                 ajax("/", JSON.stringify({ tag_word }), update_sentences);
+                // advance_right(); //do before collecting selected so it is updated on ajax return
+                // document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.remove("selected")
             }
         }
         else if (e.key == "x") //when we click x, delete tag from selected word
@@ -378,6 +384,7 @@ $(document).ready(function() {
     });
     $(document).on("click", ".save-model", function() //when we click SAVE MODEL
     {
+        $("#loading").show();
         ajax("/", JSON.stringify({ "save_model": "" }), done_loading);
     });
     function done_loading()
