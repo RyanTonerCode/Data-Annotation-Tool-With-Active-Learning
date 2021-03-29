@@ -1,9 +1,6 @@
-# opencv-python
-# scikit-learn
 tensorflow
-# pandas
 flask
 flask_session
-# nltk
 scipy
 python-dotenv
+numpy
