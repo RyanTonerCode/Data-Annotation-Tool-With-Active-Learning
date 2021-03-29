@@ -69,6 +69,7 @@ def manage_data(X, Y, X_pooled, Y_pooled, idx):
     Y = np.concatenate([Y, new_label])
     return X, Y, X_pooled, Y_pooled
 
+#extracts the features and one-hot encoded classes from the user data
 def extractUserData(user_data):
     NUM_CLASSES = len(user_data["tag_data"]["tags"])
 
@@ -88,6 +89,7 @@ def extractUserData(user_data):
     #convert X_Data to numpy array
     return (np.array(X_Data), np.array(Y_Data))
 
+#create an active learning model for the user data
 def initialize_model(user_data):
     NUM_CLASSES = len(user_data["tag_data"]["tags"])
 
@@ -120,6 +122,7 @@ def initialize_model(user_data):
     #return the model back
     return model
 
+#train the current model with the user data
 def train_existing_model(user_data):
     X_Data, Y_Data = extractUserData(user_data)
 
@@ -136,9 +139,11 @@ def train_existing_model(user_data):
     #return the model back
     return model
 
-def get_path(sub):
-    return os.path.join(os.getcwd(), "application", "data", "ai", sub)
+#get the path to the model on the disk
+def get_path(model_name):
+    return os.path.join(os.getcwd(), "application", "data", "ai", model_name)
 
+#try to load the model from memory, then from the disk, or lastly creates a model if none exists.
 def load_model(user_data, model_name=None):
     if not app.config["ai_model"]: #if the model is not in memory, load it first
         model_path = get_path(model_name if model_name else user_data["model_name"])
@@ -149,6 +154,8 @@ def load_model(user_data, model_name=None):
             app.config["ai_model"] = initialize_model(model_name if model_name else user_data["model_name"])
     return app.config["ai_model"]
 
+#run the model on the user data for the given sentence indices
+#return the new user data with new labels
 def run_model(user_data, test_sentences):
 
     model = load_model(user_data)
@@ -159,19 +166,24 @@ def run_model(user_data, test_sentences):
         parsed_sentence = user_data["sentences"][sentence_index].split()
         for word_index, word in enumerate(parsed_sentence):
             prediction = model.predict(np.array([word]))
-            predicted_tag_index = np.argmax(prediction[0]) + 1 #get the index of the maximum value
+            #get the index of the maximum value (the prediction), and add 1 to reverse the predicted index to a tag index
+            predicted_tag_index = int(np.argmax(prediction[0])) + 1
             print(predicted_tag_index)
-            new_user_data["sentence_tags"][sentence_index][word_index] = int(predicted_tag_index)
+            new_user_data["sentence_tags"][sentence_index][word_index] = predicted_tag_index
 
     return new_user_data
-        
+
+#user must pass a model that is in memory        
 def save_model(model, model_name):
-    model = load_model(None, model_name) if not model else model
+    if not model or model == None:
+        print("No model currently in memory")
+        return
+
     model_path = get_path(model_name)
     if not os.path.isdir(model_path):
         os.makedirs(model_path)
-    # if not model_name:
-    #     user_data["model_name"] = "model"
+    if not model_name:
+        user_data["model_name"] = "model"
     
     print("Model Saving started")
     model.save(model_path)
