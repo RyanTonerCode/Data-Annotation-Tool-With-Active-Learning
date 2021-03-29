@@ -82,7 +82,6 @@ def manage_data(X, y, X_pooled, y_pooled, idx):
 
 
 
-######## WHEN DOES OLD MODEL GET PASSED TO NEW?
 def initialize_model(user_data):
     NUM_CLASSES = len(user_data["tag_data"]["tags"])
 
@@ -128,7 +127,6 @@ def initialize_model(user_data):
         X, y, X_pooled, y_pooled = manage_data(X, y, X_pooled, y_pooled, uncertain_idx)
         print('Iteration Done: {}'.format(i+1))
 
-    #return the model back
     return model
 
 
@@ -154,16 +152,6 @@ def load_model(user_data, model_name=None):
 def run_model(user_data, test_sentences):
 
     model = load_model(user_data)
-    # model = app.config["ai_model"] if app.config["ai_model"] else tf.keras.models.load_model(get_path(model_name)) if os.path.exists(get_path(model_name)) else None
-    # if app.config["ai_model"]:
-    #     model = app.config["ai_model"]
-    # else: 
-    #     model_path = get_path(user_data["model_name"])
-    #     if os.path.exists(model_path):#load the model if it exists but is not in memory
-    #         model = tf.keras.models.load_model(model_path)
-    #     else: 
-    #         # return user_data # ERROR no model how did this happen!
-    #         return initialize_model(user_data["model_name"])
 
     #get a prediction for every word in the selected sentences
     new_user_data = user_data

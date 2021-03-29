@@ -1,13 +1,6 @@
 from json import load
 from application import app
 from application.imports import apology, session, render_template, os, request, json, redirect, secure_filename, time, send_file, after_this_request, send_from_directory, url_for, SharedDataMiddleware
-# import pandas as pd
-# import cv2
-# import numpy as np
-# import tensorflow as tf
-# from tensorflow import keras
-# from tensorflow.keras import layers
-# from sklearn.model_selection import train_test_split
 from application.routes.intelligents import initialize_model, run_model, save_model
 
 @app.route("/", methods = ["GET", "POST"]) #standard path url
@@ -192,13 +185,15 @@ def home(alert = None):
             sentence_index = int(indices[0])
             word_index = int(indices[1])
             tag_index = int(indices[2])
+            new_sentence_index = int(indices[3]) if len(indices) > 3 else sentence_index #when using keyboard, move to next word but not using mouse
+            new_word_index = int(indices[4]) if len(indices) > 3 else word_index # ^
             user_data = None
 
             user_data = read_json()                    
             user_data["sentence_tags"][sentence_index][word_index] = tag_index #set tag by index
             write_json(user_data)
 
-            return create_sentence_html(user_data, sentence_index, word_index)
+            return create_sentence_html(user_data, new_sentence_index, new_word_index)
 
 
 

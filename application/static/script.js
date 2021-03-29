@@ -1,4 +1,5 @@
-$(document).ready(function() {
+$(document).ready(function() 
+{
 
     // var ai_model = false;
     function initialize() 
@@ -232,18 +233,21 @@ $(document).ready(function() {
                 var sentence_index = selected_sentence;
                 var word_index = selected_word;    
                 var tag_id = document.getElementsByClassName("tag-container")[tag_index].children[1].children[1].dataset.index;
-                var tag_word = [sentence_index, word_index, tag_id];
+                advance_right(); //get coordinates of next word to select and pass to backend to be put in html
+                var new_sentence_index = selected_sentence;
+                var new_word_index = selected_word;    
+                var tag_word = [sentence_index, word_index, tag_id, new_sentence_index, new_word_index];
                 ajax("/", JSON.stringify({ tag_word }), update_sentences);
-                // advance_right(); //do before collecting selected so it is updated on ajax return
-                // document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.remove("selected")
             }
         }
-        else if (e.key == "x") //when we click x, delete tag from selected word
+        else if (e.key == "x" || e.key == "0") //when we click x, delete tag from selected word
         {
-            // advance_right(); //do before collecting selected so it is updated on ajax return
             var sentence_index = selected_sentence;
             var word_index = selected_word;
-            var tag_word = [sentence_index, word_index, 0];
+            advance_right(); //get coordinates of next word to select and pass to backend to be put in html
+            var new_sentence_index = selected_sentence;
+            var new_word_index = selected_word;    
+            var tag_word = [sentence_index, word_index, 0, new_sentence_index, new_word_index];
             ajax("/", JSON.stringify({ tag_word }), update_sentences);
         }
 
@@ -255,24 +259,30 @@ $(document).ready(function() {
 
     /* CHECKBOXES */
     var lastChecked = null;
-    $(document).on("click", ".sentence-area input[type=checkbox]", function(e) {
-        if (lastChecked) {
-            if (e.shiftKey) {
+    $(document).on("click", ".sentence-area input[type=checkbox]", function(e) 
+    {
+        if (lastChecked) 
+        {
+            if (e.shiftKey) 
+            {
                 var from = $('.sentence-area .checkbox-container input').index(e.target);
                 var to = $('.sentence-area .checkbox-container input').index(lastChecked);
                 var start = Math.min(from, to);
                 var end = Math.max(from, to) + 1;
                 $('.sentence-area .checkbox-container input').slice(start, end).filter(':not(:disabled)').prop('checked', lastChecked.checked);
             }
-            else if (e.altKey) {
-                $('.sentence-area .checkbox-container input').each(function() {
+            else if (e.altKey) 
+            {
+                $('.sentence-area .checkbox-container input').each(function() 
+                {
                     this.checked = !this.checked;
                 });
                 e.target.checked = !e.target.checked;
             }
         }
 
-        if (e.metaKey || e.key == "Control") {
+        if (e.metaKey || e.key == "Control") 
+        {
             var checkboxes = $('.sentence-area .checkbox-container input').length;
             var number_checked = $('.sentence-area .checkbox-container input:checked').length;
             var check_uncheck = !(checkboxes == number_checked + 1)
@@ -361,28 +371,32 @@ $(document).ready(function() {
     $(document).on("click", ".download-all", function() //when we click save ALL DATA (JSON)
     {
         choose_filename(1);
-        $(document).on("click", "#download-button.id-1", function() {
+        $(document).on("click", "#download-button.id-1", function() 
+        {
             request_file({ "download_all": $("#download-name").val() });
         });
     });
     $(document).on("click", ".download-tags", function() //when we click save TAGS
     {
         choose_filename(2);
-        $(document).on("click", "#download-button.id-2", function() {
+        $(document).on("click", "#download-button.id-2", function() 
+        {
             request_file({ "download_tags": $("#download-name").val() });
         });
     });
     $(document).on("click", ".download-sentences", function() //when we click export TEXT
     {
         choose_filename(3);
-        $(document).on("click", "#download-button.id-3", function() {
+        $(document).on("click", "#download-button.id-3", function() 
+        {
             request_file({ "download_sentences": $("#download-name").val() });
         });
     });
     $(document).on("click", ".download-csv", function() //when we click export CSV
     {
         choose_filename(4);
-        $(document).on("click", "#download-button.id-4", function() {
+        $(document).on("click", "#download-button.id-4", function() 
+        {
             request_file({ "download_csv": $("#download-name").val() });
         });
     });
@@ -411,14 +425,16 @@ $(document).ready(function() {
         $("#alert").css("display", "none");
         $("#alert-stuff").html("");
     }
-    function download(dict) {
+    function download(dict) 
+    {
         var fileName = dict["name"] + "." + dict["extension"]; //create filename
         var data = dict["file"]; //retrieve file data
         var element = document.createElement("a"); //create invisible link to click to download
         element.style = "display: none";
         document.body.appendChild(element);
 
-        if (dict["extension"] == "json") {
+        if (dict["extension"] == "json") 
+        {
             var json = JSON.stringify(data);
             var blob = new Blob([json], { type: "octet/stream" });
             var url = window.URL.createObjectURL(blob);
@@ -431,7 +447,8 @@ $(document).ready(function() {
         // {
         //     var url = "data:text/plain;charset=utf-8," + encodeURIComponent(data);
         // }
-        else {
+        else 
+        {
             var url = "data:text/plain;charset=utf-8," + encodeURIComponent(data);
         }
 
@@ -457,18 +474,21 @@ $(document).ready(function() {
     /* MENU BUTTON (MOBILE) */
     $(document).on("click", "#menu-dropdown-button", function() //when we click menu
     {
-        if (document.getElementsByClassName("menu-items")[0].style.height > "0px") {
+        if (document.getElementsByClassName("menu-items")[0].style.height > "0px") 
+        {
             $("#menu-items").animate({ 'height': "0" });
             $("body").animate({ 'margin-top': "100" });
         }
-        else {
+        else 
+        {
             $("#menu-items").animate({ 'height': "50" });
             $("body").animate({ 'margin-top': "150" });
         }
     });
     $(document).click(function(e) //click out of menu
     {
-        if (!e.target.className.includes("menu-dropdown-button") && document.getElementsByClassName("menu-items")[0].style.height == "50px") {
+        if (!e.target.className.includes("menu-dropdown-button") && document.getElementsByClassName("menu-items")[0].style.height == "50px") 
+        {
             $("#menu-items").animate({ 'height': "-=50" });
             $("body").animate({ 'margin-top': "-=50" });
         }
@@ -477,7 +497,8 @@ $(document).ready(function() {
 
 
     /* ALERT POPUP */
-    function showAlert(content, buttons) {
+    function showAlert(content, buttons) 
+    {
         $(".search-box").removeClass("top");
         var stuff = "<div class='form'><div class='alert-desc'>" + content + "</div>";
         buttons ? stuff += buttons : stuff += "<button class='form-button' id='okay-button'>OKAY</button>";
