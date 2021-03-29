@@ -1,7 +1,7 @@
 from json import load
 from application import app
 from application.imports import apology, session, render_template, os, request, json, redirect, secure_filename, time, send_file, after_this_request, send_from_directory, url_for, SharedDataMiddleware
-from application.routes.intelligents import initialize_model, run_model, save_model
+from application.routes.intelligents import initialize_model, run_model, save_model, train_existing_model
 
 @app.route("/", methods = ["GET", "POST"]) #standard path url
 @app.route("/<alert>", methods = ["GET", "POST"]) #for redirect with alert
@@ -169,6 +169,8 @@ def home(alert = None):
             if key == "run_create_model":
                 user_data["model_name"] = input
                 app.config["ai_model"] = initialize_model(user_data)
+            elif key == "run_update_model":
+                train_existing_model(user_data)
             elif key == "run_model":
                 test_sentences = input
                 user_data = run_model(user_data, test_sentences)

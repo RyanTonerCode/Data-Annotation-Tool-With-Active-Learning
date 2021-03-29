@@ -10,7 +10,7 @@ $(document).ready(function()
     {
         update_tags(data["tag_data"]);
         update_sentences(data["sentence_data"]);
-        $(".tags-area-overlay, .clear-model, .save-model-block, .run-model").toggle(data["ai"]); //show/hide AI-related buttons, disabling tags too (based on whether there is a model path even if empty)
+        $(".tags-area-overlay, .clear-model, .save-model-block, .run-create-model, .run-model").toggle(data["ai"]); //show/hide AI-related buttons, disabling tags too (based on whether there is a model path even if empty)
         // ai_model = data["ai"];
     }
     initialize();
@@ -114,22 +114,26 @@ $(document).ready(function()
 
         $(document).on("click", "#ai-continue-button", function(e) 
         {
-            start_ai(true)
+            start_ai(0)
         });
+    });
+    $(document).on("click", ".run-update-model", function() //when we click RUN-MODEL button
+    {
+        start_ai(1)
     });
     $(document).on("click", ".run-model", function() //when we click RUN-MODEL button
     {
-        start_ai(false)
+        start_ai(2)
     });
     function start_ai(create_model) 
     {
         var test_sentences = $(".sentences-area .checkbox-container input:checked").parent().parent().parent().map(function() { return $(this).data('index'); }).get();
         // var filename = $("#model-name").is(":visible") ? $("#model-name").val() : "model"
-        var query = create_model ? { "run_create_model": $("#model-name").val() } : { "run_model": test_sentences };
+        var query = create_model == 0 ? { "run_create_model": $("#model-name").val() } : create_model == 1 ? { "run_update_model": "" } : { "run_model": test_sentences };
 
         $("#loading").show();
         ajax("/", JSON.stringify(query), update_sentences);
-        $(".tags-area-overlay, .clear-model, .save-model-block, .run-model").show(); //show AI-related buttons, disabling tags too
+        $(".tags-area-overlay, .clear-model, .save-model-block, .run-create-model, .run-model").show(); //show AI-related buttons, disabling tags too
         $("#alert").css("display", "none");
         $("#alert-stuff").html("");
     }
