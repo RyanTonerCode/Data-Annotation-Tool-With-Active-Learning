@@ -170,29 +170,20 @@ def home(alert = None):
 
 
         if "run" in key: #if text is submitted, add it to the data, and regardless, return HTML for sentences area
-            #if we did create model or run model, we get list of checked sentences -- don't pass that to user_data!
+            #if we did create model or run model, we get list of checked sentences -- don't pass that to user_data!            
             user_data = create_sentences(input if key=="run_manual" else "") #if text empty, get user_data, if not empty, get user_data with new text implemented
-            if key=="run_model" or key=="run_create_model":
-                test_sentences = input[0] #a list of the sentences to do automatic labelling on -- don't modify any other sentences
-                model_folder = user_data["model_name"] if "model_name" in user_data else input[1]
-                
-                if not app.config["ai_model"]:
-                    print("No model exists in memory")
-                    if not os.path.isdir(model_folder):
-                    # if key=="run_create_model":
-                        print("creating model")
-                        app.config["ai_model"] = initialize_model(user_data)      
-                        print("model created")
+            
+            if key == "run_create_model":
+                user_data["model_name"] = input[1]
+                app.config["ai_model"] = initialize_model(user_data)
+            elif key == "run_model":
+                test_sentences = input[0]
+                user_data = run_model(user_data, test_sentences)
 
-
-                else:
-                    user_data = run_model(model_folder, user_data, test_sentences, app.config["ai_model"])
-                
             write_json(user_data)                
 
             #initialize or only return sentences
             return initialize(user_data) if key=="run_manual" else create_sentence_html(user_data) 
-            #for corrections: add param, change fn so that AI learns of any changes made to tags
 
 
 
@@ -297,7 +288,7 @@ def home(alert = None):
 
 
         if key=="save_model": #download AI model
-            save_model(app.config["ai_model"], model_folder)
+            save_model(app.config["ai_model"], read_json()["model_name"])
             
 
 

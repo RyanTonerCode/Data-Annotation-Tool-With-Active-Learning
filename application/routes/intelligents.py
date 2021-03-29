@@ -4,6 +4,7 @@ import numpy as np
 import scipy as sp
 from scipy import stats
 import tensorflow as tf
+from application import app
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 
 def create_model(text_encoder, NUM_CLASSES):
@@ -126,17 +127,26 @@ def initialize_model(user_data):
     #return the model back
     return model
 
-def getPathToData():
-    return os.path.join(os.getcwd(), "application", "data", "ai")
 
-def run_model(user_data, test_sentences, model_folder, model=None):
 
-    rel_path = os.path.join(getPathToData(), model_folder)
-    if not model:
-        if os.path.exists(rel_path):#load the model if it exists but is not in memory
-            model = tf.keras.models.load_model(os.path.join(rel_path, model_folder))
-        else: #create the model if none exists
-            model = initialize_model(user_data, model_folder)
+def get_path(sub):
+    return os.path.join(os.getcwd(), "application", "data", "ai", sub)
+
+
+
+def run_model(user_data, test_sentences):
+
+    # model = app.config["ai_model"] if app.config["ai_model"] else tf.keras.models.load_model(get_path(model_name)) if os.path.exists(get_path(model_name)) else None
+    model = None
+    if app.config["ai_model"]:
+        model = app.config["ai_model"]
+    else: 
+        model_path = get_path(user_data["model_name"])
+        if os.path.exists(model_path):#load the model if it exists but is not in memory
+            model = tf.keras.models.load_model(model_path)
+        else: 
+            # return user_data # ERROR no model how did this happen!
+            return initialize_model(user_data["model_name"])
 
     #get a prediction for every word in the selected sentences
     new_user_data = user_data
@@ -151,16 +161,28 @@ def run_model(user_data, test_sentences, model_folder, model=None):
 
     return new_user_data
 
-def save_model(model, model_folder):
-    rel_path = os.path.join(getPathToData(), model_folder)
 
-    if not os.path.isdir(rel_path):
-        os.makedirs(rel_path)
-    if not model_folder:
-        model_folder = "model"
-        user_data["model_path"] = model_folder
+
+# def load_model(model_name):
+#     if app.config["ai_model"]:
+#         return app.config["ai_model"]
+#     else: 
+#         model_path = get_path(model_name)
+#         if os.path.exists(model_path):#load the model if it exists but is not in memory
+#             return tf.keras.models.load_model(model_path)
+#         else: #create the model if none exists
+#             return None
+        
+
+
+def save_model(model, model_name):
+    model_path = get_path(model_name)
+    if not os.path.isdir(model_path):
+        os.makedirs(model_path)
+    # if not model_name:
+    #     user_data["model_name"] = "model"
     
     print("Model Saving started")
-    model.save(rel_path)
+    model.save(model_path)
     print("Complete")
     
