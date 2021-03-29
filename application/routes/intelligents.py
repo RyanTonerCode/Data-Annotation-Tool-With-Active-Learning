@@ -89,6 +89,16 @@ def extractUserData(user_data):
     #convert X_Data to numpy array
     return (np.array(X_Data), np.array(Y_Data))
 
+def calc_batch_size(training_length):
+    if training_length <= 2:
+        return training_length
+    if training_length <= 128:
+        #3 -> 2^(2-2)=2^0=1
+        #128 -> 2^(7-5)=2^5=32
+        power = int(math.ceil(math.log2(training_length)))
+        return 2**(power-2)
+    return 32
+
 #create an active learning model for the user data
 def initialize_model(user_data):
     NUM_CLASSES = len(user_data["tag_data"]["tags"])
@@ -112,7 +122,7 @@ def initialize_model(user_data):
         text_encoder.adapt(X)
 
         model = create_model(text_encoder, NUM_CLASSES)
-        model.fit(X, Y, epochs=1, verbose=1)
+        model.fit(X, Y, epochs=1, batch_size=calc_batch_size(len(X)), verbose=1)
         uncertain_idx, entropy_avg = max_entropy_acquisition(model, X_pooled)
         print('Average Entropy: {}'.format(entropy_avg))
         
@@ -134,7 +144,7 @@ def train_existing_model(user_data):
     #load the existing model
     model = load_model(user_data)
 
-    model.fit(X, Y, epochs=3, verbose=1)
+    model.fit(X, Y, epochs=3, batch_size=calc_batch_size(len(X)), verbose=1)
 
     #return the model back
     return model
