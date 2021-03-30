@@ -278,7 +278,8 @@ def home(alert = None):
             for sentence_index, sentence in enumerate(user_data["sentences"]):
                 for word_index, word in enumerate(sentence.split()):
                     tag_index = str(user_data["sentence_tags"][sentence_index][word_index]) #get tag index ID number from current word
-                    tag_name, tag_color = (user_data["tag_data"]["tags"][tag_index]["name"], user_data["tag_data"]["tags"][tag_index]["color"]) if int(tag_index) > 0 else ("no_tag", "no_tag")
+                    cur_tag = user_data["tag_data"]["tags"][tag_index]
+                    tag_name, tag_color = (cur_tag["name"], cur_tag["color"]) if int(tag_index) > 0 else ("no_tag", "no_tag")
                     #put word in quotes if it has a comma, to avoid csv issues
                     word_ = ('"' + word + '"') if "," in word else word
                     #create a row in the csv
@@ -336,8 +337,7 @@ def home(alert = None):
                     elif file_extension == "csv":
                         csv_file = open(upload_save_location, "r")
                         csv_reader = csv.reader(csv_file)
-                        #skip the header
-                        next(csv_reader)
+                        next(csv_reader) #skip the header
 
                         sentences = []
                         sentence_tags = []
