@@ -2,7 +2,7 @@ import csv
 from json import load
 from application import app
 from application.imports import apology, session, render_template, os, request, json, redirect, secure_filename, time, send_file, after_this_request, send_from_directory, url_for, SharedDataMiddleware
-from application.routes.intelligents import initialize_model, run_model, save_model, train_existing_model
+from application.routes.intelligence import initialize_model, run_model, save_model, train_existing_model
 
 @app.route("/", methods = ["GET", "POST"]) #standard path url
 @app.route("/<alert>", methods = ["GET", "POST"]) #for redirect with alert
