@@ -255,25 +255,25 @@ def home(alert = None):
 
         if key=="download_tags": #download tags as a JSON, as if the sentence data were deleted, prserving the title
             user_data = read_json()
-            file_str = {"tag_data": user_data["tag_data"]}
-            return {"file": file_str, "name": input, "extension": "json"}
+            uploaded_file = {"tag_data": user_data["tag_data"]}
+            return {"file": uploaded_file, "name": input, "extension": "json"}
 
         
 
         if key=="download_sentences": #download all sentence data as TXT, essentially original format
             user_data = read_json()
-            file_str = ""
+            uploaded_file = ""
 
             for sentence in user_data["sentences"]:
-                file_str += sentence + " "
+                uploaded_file += sentence + " "
 
-            return {"file": file_str, "name": input, "extension": "txt"}
+            return {"file": uploaded_file, "name": input, "extension": "txt"}
 
 
 
         if key=="download_csv": #download a CSV of all data (both words and their tags), in format: word░{"name":"tag_name"+"color":"tag_color"},
             user_data = read_json()
-            file_str = ",".join(["Word", "Tag Name", "Tag Color", "Tag Index"]) + "\n"
+            uploaded_file = ",".join(["Word", "Tag Name", "Tag Color", "Tag Index"]) + "\n"
 
             for sentence_index, sentence in enumerate(user_data["sentences"]):
                 for word_index, word in enumerate(sentence.split()):
@@ -283,9 +283,9 @@ def home(alert = None):
                     word_ = ('"' + word + '"') if "," in word else word
                     #create a row in the csv
                     row =  ",".join([word_, tag_name, tag_color, tag_index])               
-                    file_str += row + "\n" #add new line
+                    uploaded_file += row + "\n" #add new line
 
-            return {"file": file_str, "name": input, "extension": "csv"}
+            return {"file": uploaded_file, "name": input, "extension": "csv"}
 
 
         if key=="save_model": #download AI model
@@ -299,15 +299,18 @@ def home(alert = None):
                 os.makedirs(upload_folder)
 
             allowed_extensions = {'txt', 'json', 'csv'}
-            file_str = request.files["file"]
-            filename = secure_filename(file_str.filename) #convert filename to secure form for some reason
+            uploaded_file = request.files["file"]
+            filename = secure_filename(uploaded_file.filename) #convert filename to secure form for some reason
             if filename != "": #ensure file is real
                 file_extension = filename.rsplit('.', 1)[1].lower()
                 if '.' in filename and file_extension in allowed_extensions:
-                    file_str.save(os.path.join(upload_folder, filename)) #save uploaded file on server
+
+                    upload_save_location = os.path.join(upload_folder, filename)
+
+                    uploaded_file.save(upload_save_location) #save uploaded file on server
 
                     if file_extension == "json": #replace all data or replace all tag data
-                        new_data = read_json(os.path.join(upload_folder, filename))
+                        new_data = read_json(upload_save_location)
                         keys = new_data.keys()
                         user_data = read_json()
 
@@ -325,13 +328,13 @@ def home(alert = None):
 
                     elif file_extension == "txt": #if uploaded txt file, treat similar to text entered in textarea and run_manual
                         text = ""
-                        with open(os.path.join(upload_folder, filename)) as txt_file:
+                        with open(upload_save_location) as txt_file:
                             text = txt_file.read()
                         user_data = create_sentences(text)
                         write_json(user_data)
 
                     elif file_extension == "csv":
-                        csv_file = open(os.path.join(upload_folder, filename), "r")
+                        csv_file = open(upload_save_location, "r")
                         csv_reader = csv.reader(csv_file)
                         #skip the header
                         next(csv_reader)
