@@ -265,6 +265,7 @@ div.top
 {
     width: 150px;
     position: relative;
+    z-index: 4;
 }
 .color-selector-custom button.btn1
 {
@@ -431,6 +432,7 @@ div.top
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    z-index: 3;
 }
 /* Hide the browser's default radio button */
 .radio-container input 
@@ -543,15 +545,18 @@ div.top
 {
     position: relative;
     display: block;
-    margin-right: 15px;
+    margin-right: 6px;
     /* min-width: 60px; */
     /* margin-top: 10px; */
+    padding: 2px;
+    padding-left: 4px;
+    margin-bottom: 4px;
 }
 .sentence-area .word.selected
 {
     background-color: rgb(154, 197, 243);
-    padding: 5px;
-    padding-left: 10px;
+    /* padding: 5px;
+    padding-left: 10px; */
     border-radius: 7px;
 }
 .sentence-area .word-text
@@ -593,7 +598,7 @@ div.top
 }
 .sentence-area .tag .delete
 {
-    transform: translateX(-5px);
+    transform: translate(-3.5px, 1px);
     font-size: 16px;
     font-family: avenir;
     padding-bottom: 3px;

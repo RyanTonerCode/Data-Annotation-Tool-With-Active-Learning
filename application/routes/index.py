@@ -74,6 +74,7 @@ def home(alert = None):
                             word_tag_name = tag_data["tags"][str(word_tag_index)]["name"]
                             word_tag_color = tag_data["tags"][str(word_tag_index)]["color"]
                             tag_html = "<div class='sentence-tag tag'><div class='tag-color " + word_tag_color + "'></div><div class='tag-name'>" + word_tag_name + "</div><div class='delete'>X</div></div>"
+                            # tag_html = "<div class='sentence-tag tag'><div class='tag-name' style='border-radius: 3px; padding: 3px; color: white; background-color: " + word_tag_color + "'>" + word_tag_name + "</div><div class='delete'>X</div></div>"
                         
                         #if the word we're on should be selected per fn params, add selected class (otherwise keep it at word class)
                         word_class = "word selected" if sentence_index == selected_sentece and word_index == selected_word else "word"
@@ -276,11 +277,19 @@ def home(alert = None):
             for sentence_index, sentence in enumerate(user_data["sentences"]):
                 for word_index, word in enumerate(sentence.split()):
                     tag_index = str(user_data["sentence_tags"][sentence_index][word_index]) #get tag index ID number from current word
-                    tag_info = user_data["tag_data"]["tags"][tag_index] if int(tag_index) > 0 else "no_tag" #retrieve tag data only if there's a tag
-                    tag_info = json.dumps(tag_info).replace(",", "+") #replace commas inside the tag data with this
-                    word_ = word.replace(",", "¬") #replace commas inside the word with this
-                    new_item =  word_ + "░" + tag_info #separate word and tag data with special char                      
-                    file += new_item + "," #add comma between values
+                    tag_name, tag_color = (user_data["tag_data"]["tags"][tag_index]["name"], user_data["tag_data"]["tags"][tag_index]["color"]) if int(tag_index) > 0 else ("no_tag", "no_tag")
+                    word_ = ('"' + word + '"') if "," in word else word
+                    new_item =  word_ + "," + tag_name + "," + tag_color + "," + tag_index #separate word and tag data with special char                      
+                    file += new_item + "\n" #add comma between values
+
+            # for sentence_index, sentence in enumerate(user_data["sentences"]):
+            #     for word_index, word in enumerate(sentence.split()):
+            #         tag_index = str(user_data["sentence_tags"][sentence_index][word_index]) #get tag index ID number from current word
+            #         tag_info = user_data["tag_data"]["tags"][tag_index] if int(tag_index) > 0 else "no_tag" #retrieve tag data only if there's a tag
+            #         tag_info = json.dumps(tag_info).replace(",", "+") #replace commas inside the tag data with this
+            #         word_ = word.replace(",", "¬") #replace commas inside the word with this
+            #         new_item =  word_ + "░" + tag_info #separate word and tag data with special char                      
+            #         file += new_item + "," #add comma between values
 
             file = file[:-1] #remove trailing comma
             return {"file": file, "name": input, "extension": "csv"}
@@ -331,7 +340,7 @@ def home(alert = None):
                         with open(os.path.join(upload_folder, filename)) as csv_file:
                             csv = csv_file.read() #read in csv file
 
-                        words = [x for x in csv.split(",")] #separate each value into word-tag pairs by the commas
+                        rows = [x for x in csv.split("\n")] #separate each value into word-tag pairs by the commas
                         sentences = []
                         sentence_tags = []
                         tag_data = {"index": 0, "tags": {}} #create index counter and empty dict for tags
@@ -340,22 +349,40 @@ def home(alert = None):
 
                         sentence = "" #current sentence
                         word_tags = [] #current sentence's tags
-                        for pair in words: #for each word-tag pair
-                            pair_ = pair.split("░") #split by the special delimeter
-                            word = pair_[0]
-                            tag = pair_[1]
+                        for row in rows: #for each word-tag pair
+                            # print(row)
+                            last_double_quote = row.rfind('"')
+                            found_comma = False
+                            data, word = [], ""
+                            if last_double_quote != -1 and row[0] == '"' and row[last_double_quote+1] == ",":
+                                word = row[1:last_double_quote]
+                                found_comma = "," in word
 
-                            word = word.replace("¬",",") #replace special char with comma from conversion
-                            tag = tag.replace("+",",")
+                            offset = 0
+
+                            if found_comma:
+                                data = row[last_double_quote+2:].split(",")
+                                offset = -1
+                            else:
+                                data = row.split(",")
+                                word = data[0]
+                            
+                            tag_name = data[1 + offset]
+                            tag_color = data[2 + offset]
+                            tag_index = data[3 + offset]
+
+                            if word[0] == '"' and word[-1] == '"' and "," in word:
+                                word = word[1:-1]
                             sentence += word #add the word to the sentence
 
-                            if tag != '"no_tag"': #bc it was jsonified on conversion, the quotes are included in the string
-                                tag = json.loads(tag) #convert string to json object
-                                if tag not in tag_data["tags"].values():
+                            if tag_name != '"no_tag"': #bc it was jsonified on conversion, the quotes are included in the string
+                                tag = {"tag_name": tag_name, "tag_color": tag_color} #convert string to json object
+                                if str(tag_index) not in tag_data["tags"].keys():
                                     tag_data["index"] += 1 #increment tag index with each new one we see
-                                    tag_data["tags"][tag_data["index"]] = tag #and create the data entry
+                                    tag_data["tags"][tag_index] = tag #and create the data entry
 
-                                word_tags.append(int(list(tag_data["tags"].keys())[int(list(tag_data["tags"].values()).index(tag))])) #get tag ID from tag value we have
+                                # word_tags.append(int(list(tag_data["tags"].keys())[int(list(tag_data["tags"].values()).index(tag))])) #get tag ID from tag value we have
+                                word_tags.append(tag_index)
                             else:
                                 word_tags.append(0) #value is 0 for no tag
 
@@ -366,6 +393,42 @@ def home(alert = None):
                                 word_tags = []
                             else:
                                 sentence += " " #add spaces between words but not between sentences
+
+                        # words = [x for x in csv.split(",")] #separate each value into word-tag pairs by the commas
+                        # sentences = []
+                        # sentence_tags = []
+                        # tag_data = {"index": 0, "tags": {}} #create index counter and empty dict for tags
+                        # user_data = {"sentences": [], "sentence_tags": [], "tag_data": tag_data}
+                        # delimiters = ".!?" #sentence-ending delimeters
+
+                        # sentence = "" #current sentence
+                        # word_tags = [] #current sentence's tags
+                        # for pair in words: #for each word-tag pair
+                        #     pair_ = pair.split("░") #split by the special delimeter
+                        #     word = pair_[0]
+                        #     tag = pair_[1]
+
+                        #     word = word.replace("¬",",") #replace special char with comma from conversion
+                        #     tag = tag.replace("+",",")
+                        #     sentence += word #add the word to the sentence
+
+                        #     if tag != '"no_tag"': #bc it was jsonified on conversion, the quotes are included in the string
+                        #         tag = json.loads(tag) #convert string to json object
+                        #         if tag not in tag_data["tags"].values():
+                        #             tag_data["index"] += 1 #increment tag index with each new one we see
+                        #             tag_data["tags"][tag_data["index"]] = tag #and create the data entry
+
+                        #         word_tags.append(int(list(tag_data["tags"].keys())[int(list(tag_data["tags"].values()).index(tag))])) #get tag ID from tag value we have
+                        #     else:
+                        #         word_tags.append(0) #value is 0 for no tag
+
+                        #     if word[-1] in delimiters: #if end of sentence, add and clear for next sentence
+                        #         sentences.append(sentence) 
+                        #         sentence_tags.append(word_tags)
+                        #         sentence = ""
+                        #         word_tags = []
+                        #     else:
+                        #         sentence += " " #add spaces between words but not between sentences
 
                         user_data["sentences"] = sentences
                         user_data["sentence_tags"] = sentence_tags

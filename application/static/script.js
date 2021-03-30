@@ -43,9 +43,14 @@ $(document).ready(function()
     });
     $(document).on("click", ".submit-new-tag", function() //when we click DONE (for new tag) button
     {
-        $(".create-tag").hide(); //hide tag creator
         var tag_name = $(".new-tag-input").val();
         var tag_color = $(".color-selector-button").attr("color");
+        if (tag_name == "" || !tag_color)
+        {
+            showAlert("You need to both input a tag name and select a tag color.");
+            return;
+        }
+        $(".create-tag").hide(); //hide tag creator
         var tag_index = $(".submit-new-tag").data("index");
         var new_tag = [tag_name, tag_color, tag_index];
         $(".new-tag-input").val(""); //clear tag creator textbox
@@ -55,10 +60,16 @@ $(document).ready(function()
     });
     $(document).on("click", ".tag-overlay", function(e) //when we click edit button on a tag
     {
-        $(e.target).next().toggle();
+        var shown = $(e.target).next().is(":visible");
+        $(".tag-edit-menu").hide();
+        if (!shown)
+        {
+            $(e.target).next().toggle();
+        }
     });
     $(document).on("click", ".tag-edit-menu-item", function(e) //when we click a menu item for a tag after clicking edit
     {
+        $(".tag-edit-menu").hide();
         $(e.target).parent().hide();
     });
     $(document).on("click", ".tag-edit-menu-item.modify", function(e) //when we click modify tag
@@ -159,6 +170,7 @@ $(document).ready(function()
     {
         var sentence_index = $(e.target).closest(".sentence-area").data("index");
         var word_index = $(e.target).closest(".word").data("index");
+        entire_sentence_selected = document.getElementsByClassName("selected").length > 1;
         if (selected_sentence != sentence_index)
         {
             entire_sentence_selected = false;
@@ -174,7 +186,6 @@ $(document).ready(function()
     /* KEYDOWN - SENTENCE NAV, TAGGING */
     var selected_sentence = 0;
     var selected_word = 0;
-    var entire_sentence_selected = false; 
 
     $(document).keydown(function(e) 
     {
@@ -188,32 +199,14 @@ $(document).ready(function()
         var bow_and_arrow = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"].includes(e.key);
         if (bow_and_arrow || shifty_mc_shift_face)
         {
+            var entire_sentence_selected = document.getElementsByClassName("selected").length > 1;
             var children = document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children;
             for (var i = 0; i < children.length; i++) 
             {
                 children[i].classList.toggle("selected", (!entire_sentence_selected && shifty_mc_shift_face));
             }
-            entire_sentence_selected = bow_and_arrow ? false : !entire_sentence_selected;
+            // entire_sentence_selected = bow_and_arrow ? false : !entire_sentence_selected;
         }
-
-        // if (bow_and_arrow || shifty_mc_shift_face)
-        // {
-        //     get_selected_sentence = document.getElementsByClassName("sentence-area")[selected_sentence];
-        //     Array.from(get_selected_sentence.children[1].children).forEach(
-        //         (x) => 
-        //         {
-        //             if (!entire_sentence_selected && shifty_mc_shift_face)
-        //             {
-        //                 x.classList.add("selected");
-        //             }
-        //             else
-        //             {
-        //                 x.classList.remove("selected");
-        //             }
-        //         }
-        //     );
-        //     entire_sentence_selected = bow_and_arrow ? false : !entire_sentence_selected;
-        // }
 
         function advance_right() //in a function so it can be called in other places
         {
@@ -276,6 +269,7 @@ $(document).ready(function()
                 advance_right(); //get coordinates of next word to select and pass to backend to be put in html
                 var new_sentence_index = selected_sentence;
                 var new_word_index = selected_word;    
+                var entire_sentence_selected = document.getElementsByClassName("selected").length > 1;
                 var tag_word = [sentence_index, word_index, entire_sentence_selected, tag_id, new_sentence_index, new_word_index];
                 ajax("/", JSON.stringify({ tag_word }), update_sentences);
             }
@@ -286,7 +280,8 @@ $(document).ready(function()
             var word_index = selected_word;
             advance_right(); //get coordinates of next word to select and pass to backend to be put in html
             var new_sentence_index = selected_sentence;
-            var new_word_index = selected_word;    
+            var new_word_index = selected_word;  
+            var entire_sentence_selected = document.getElementsByClassName("selected").length > 1;  
             var tag_word = [sentence_index, word_index, entire_sentence_selected, 0, new_sentence_index, new_word_index];
             ajax("/", JSON.stringify({ tag_word }), update_sentences);
         }
