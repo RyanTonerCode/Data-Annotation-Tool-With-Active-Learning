@@ -2,7 +2,7 @@ import csv
 from json import load
 from application import app
 from application.imports import apology, session, render_template, os, request, json, redirect, secure_filename, time, send_file, after_this_request, send_from_directory, url_for, SharedDataMiddleware
-from application.routes.intelligents import initialize_model, run_model, save_model, train_existing_model
+from application.routes.intelligence import initialize_model, run_model, save_model, train_existing_model
 
 @app.route("/", methods = ["GET", "POST"]) #standard path url
 @app.route("/<alert>", methods = ["GET", "POST"]) #for redirect with alert
@@ -240,9 +240,9 @@ def home(alert = None):
         if key=="clear_model": #remove AI model
             user_data = read_json()
             user_data.pop("model_name", None)
-            print("YAY")
-            print(user_data)
+            print("Model path removed")
             app.config["ai_model"] = None
+            print("Model data cleared from memory")
             write_json(user_data)
             return initialize(user_data)
 
@@ -255,37 +255,37 @@ def home(alert = None):
 
         if key=="download_tags": #download tags as a JSON, as if the sentence data were deleted, prserving the title
             user_data = read_json()
-            file = {"tag_data": user_data["tag_data"]}
-            return {"file": file, "name": input, "extension": "json"}
+            file_str = {"tag_data": user_data["tag_data"]}
+            return {"file": file_str, "name": input, "extension": "json"}
 
         
 
         if key=="download_sentences": #download all sentence data as TXT, essentially original format
             user_data = read_json()
-            file = ""
+            file_str = ""
 
             for sentence in user_data["sentences"]:
-                file += sentence + " "
+                file_str += sentence + " "
 
-            return {"file": file, "name": input, "extension": "txt"}
+            return {"file": file_str, "name": input, "extension": "txt"}
 
 
 
         if key=="download_csv": #download a CSV of all data (both words and their tags), in format: word░{"name":"tag_name"+"color":"tag_color"},
             user_data = read_json()
-            file = ""
+            file_str = ",".join(["Word", "Tag Name", "Tag Color", "Tag Index"]) + "\n"
 
             for sentence_index, sentence in enumerate(user_data["sentences"]):
                 for word_index, word in enumerate(sentence.split()):
                     tag_index = str(user_data["sentence_tags"][sentence_index][word_index]) #get tag index ID number from current word
                     tag_name, tag_color = (user_data["tag_data"]["tags"][tag_index]["name"], user_data["tag_data"]["tags"][tag_index]["color"]) if int(tag_index) > 0 else ("no_tag", "no_tag")
+                    #put word in quotes if it has a comma, to avoid csv issues
                     word_ = ('"' + word + '"') if "," in word else word
-                    new_item =  word_ + "," + tag_name + "," + tag_color + "," + tag_index #separate word and tag data with special char                      
-                    file += new_item + "\n" #add comma between values
+                    #create a row in the csv
+                    row =  ",".join([word_, tag_name, tag_color, tag_index])               
+                    file_str += row + "\n" #add new line
 
-            file = file[:-1] #remove trailing comma
-            return {"file": file, "name": input, "extension": "csv"}
-
+            return {"file": file_str, "name": input, "extension": "csv"}
 
 
         if key=="save_model": #download AI model
@@ -294,17 +294,23 @@ def home(alert = None):
 
 
         if request.files: #if there are files to upload from request
-            upload_folder = "application/data/upload"
+            upload_folder = os.path.join(os.getcwd(), "application", "data", "upload")
+            if not os.path.isdir(upload_folder):
+                os.makedirs(upload_folder)
+
             allowed_extensions = {'txt', 'json', 'csv'}
-            file = request.files["file"]
-            filename = secure_filename(file.filename) #convert filename to secure form for some reason
+            uploaded_file = request.files["file"]
+            filename = secure_filename(uploaded_file.filename) #convert filename to secure form for some reason
             if filename != "": #ensure file is real
                 file_extension = filename.rsplit('.', 1)[1].lower()
                 if '.' in filename and file_extension in allowed_extensions:
-                    file.save(os.path.join(upload_folder, filename)) #save uploaded file on server
+
+                    upload_save_location = os.path.join(upload_folder, filename)
+
+                    uploaded_file.save(upload_save_location) #save uploaded file on server
 
                     if file_extension == "json": #replace all data or replace all tag data
-                        new_data = read_json(os.path.join(upload_folder, filename))
+                        new_data = read_json(upload_save_location)
                         keys = new_data.keys()
                         user_data = read_json()
 
@@ -322,13 +328,17 @@ def home(alert = None):
 
                     elif file_extension == "txt": #if uploaded txt file, treat similar to text entered in textarea and run_manual
                         text = ""
-                        with open(os.path.join(upload_folder, filename)) as txt_file:
+                        with open(upload_save_location) as txt_file:
                             text = txt_file.read()
                         user_data = create_sentences(text)
                         write_json(user_data)
 
                     elif file_extension == "csv":
-                        csv_file = csv.reader(open(os.path.join(upload_folder, filename), "r"))
+                        csv_file = open(upload_save_location, "r")
+                        csv_reader = csv.reader(csv_file)
+                        #skip the header
+                        next(csv_reader)
+
                         sentences = []
                         sentence_tags = []
                         tag_data = {"index": 0, "tags": {}} #create index counter and empty dict for tags
@@ -337,7 +347,7 @@ def home(alert = None):
 
                         sentence = "" #current sentence
                         word_tags = [] #current sentence's tags
-                        for row in csv_file:
+                        for row in csv_reader:
                             word = row[0]
                             tag_name = row[1]
                             tag_color = row[2]
@@ -362,6 +372,8 @@ def home(alert = None):
                                 word_tags = []
                             else:
                                 sentence += " " #add spaces between words but not between sentences
+
+                        csv_file.close()
 
                         user_data["sentences"] = sentences
                         user_data["sentence_tags"] = sentence_tags

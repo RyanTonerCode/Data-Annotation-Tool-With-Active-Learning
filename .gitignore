@@ -3,9 +3,11 @@ __pycache__/
 #*.py[cod]
 #*$py.class
 
-#/venv/*
+/venv/*
+.vscode/*
 
 /application/data/ai/*
+/application/data/upload/*
 
 # C extensions
 *.so
@@ -140,3 +142,6 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+#mac junk
+.DS_Store
