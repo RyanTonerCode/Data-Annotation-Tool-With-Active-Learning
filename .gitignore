@@ -4,6 +4,7 @@ __pycache__/
 #*$py.class
 
 /venv/*
+.vscode/*
 
 /application/data/ai/*
 
