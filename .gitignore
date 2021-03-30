@@ -3,7 +3,7 @@ __pycache__/
 #*.py[cod]
 #*$py.class
 
-#/venv/*
+/venv/*
 
 /application/data/ai/*
 
@@ -140,3 +140,6 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+#mac junk
+.DS_Store
