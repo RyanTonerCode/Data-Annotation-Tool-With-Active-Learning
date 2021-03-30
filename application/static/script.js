@@ -191,14 +191,13 @@ $(document).ready(function()
             var children = document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children;
             for (var i = 0; i < children.length; i++) 
             {
-                var child = children[i];
                 if (!entire_sentence_selected && shifty_mc_shift_face)
                 {
-                    child.classList.add("selected");
+                    children[i].classList.add("selected");
                 }
                 else
                 {
-                    child.classList.remove("selected");
+                    children[i].classList.remove("selected");
                 }
             }
             entire_sentence_selected = bow_and_arrow ? false : !entire_sentence_selected;
