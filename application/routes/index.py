@@ -283,15 +283,6 @@ def home(alert = None):
                     new_item =  word_ + "," + tag_name + "," + tag_color + "," + tag_index #separate word and tag data with special char                      
                     file += new_item + "\n" #add comma between values
 
-            # for sentence_index, sentence in enumerate(user_data["sentences"]):
-            #     for word_index, word in enumerate(sentence.split()):
-            #         tag_index = str(user_data["sentence_tags"][sentence_index][word_index]) #get tag index ID number from current word
-            #         tag_info = user_data["tag_data"]["tags"][tag_index] if int(tag_index) > 0 else "no_tag" #retrieve tag data only if there's a tag
-            #         tag_info = json.dumps(tag_info).replace(",", "+") #replace commas inside the tag data with this
-            #         word_ = word.replace(",", "¬") #replace commas inside the word with this
-            #         new_item =  word_ + "░" + tag_info #separate word and tag data with special char                      
-            #         file += new_item + "," #add comma between values
-
             file = file[:-1] #remove trailing comma
             return {"file": file, "name": input, "extension": "csv"}
 
@@ -347,7 +338,6 @@ def home(alert = None):
                         sentence = "" #current sentence
                         word_tags = [] #current sentence's tags
                         for row in csv_file:
-                            print(row)
                             word = row[0]
                             tag_name = row[1]
                             tag_color = row[2]
