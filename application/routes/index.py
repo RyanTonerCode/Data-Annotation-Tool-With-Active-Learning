@@ -186,13 +186,15 @@ def home(alert = None):
             indices = input
             sentence_index = int(indices[0])
             word_index = int(indices[1])
-            tag_index = int(indices[2])
-            new_sentence_index = int(indices[3]) if len(indices) > 3 else sentence_index #when using keyboard, move to next word but not using mouse
-            new_word_index = int(indices[4]) if len(indices) > 3 else word_index # ^
+            entire_sentence_selected = indices[2]
+            tag_index = int(indices[3])
+            new_sentence_index = int(indices[4]) if len(indices) > 4 else sentence_index #when using keyboard, move to next word but not using mouse
+            new_word_index = int(indices[5]) if len(indices) > 4 else word_index # ^
             user_data = None
 
-            user_data = read_json()                    
-            user_data["sentence_tags"][sentence_index][word_index] = tag_index #set tag by index
+            user_data = read_json()
+            for index in range(len(user_data["sentence_tags"][sentence_index])) if entire_sentence_selected else [word_index]:
+                user_data["sentence_tags"][sentence_index][index] = tag_index #iterate through the entire sentence if selected, else only the one word's index
             write_json(user_data)
 
             return create_sentence_html(user_data, new_sentence_index, new_word_index)

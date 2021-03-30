@@ -163,7 +163,7 @@ def load_model(user_data, model_name=None):
             app.config["ai_model"] = tf.keras.models.load_model(model_path)
         else: 
             # return user_data # ERROR no model how did this happen!
-            app.config["ai_model"] = initialize_model(model_name if model_name else user_data["model_name"])
+            app.config["ai_model"] = initialize_model(user_data)
     return app.config["ai_model"]
 
 #run the model on the user data for the given sentence indices

@@ -10,7 +10,7 @@ $(document).ready(function()
     {
         update_tags(data["tag_data"]);
         update_sentences(data["sentence_data"]);
-        $(".tags-area-overlay, .clear-model, .save-model-block, .run-create-model, .run-model").toggle(data["ai"]); //show/hide AI-related buttons, disabling tags too (based on whether there is a model path even if empty)
+        $(".tags-area-overlay, .clear-model, .save-model-block, .run-update-model, .run-model").toggle(data["ai"]); //show/hide AI-related buttons, disabling tags too (based on whether there is a model path even if empty)
         // ai_model = data["ai"];
     }
     initialize();
@@ -133,7 +133,7 @@ $(document).ready(function()
 
         $("#loading").show();
         ajax("/", JSON.stringify(query), update_sentences);
-        $(".tags-area-overlay, .clear-model, .save-model-block, .run-create-model, .run-model").show(); //show AI-related buttons, disabling tags too
+        $(".tags-area-overlay, .clear-model, .save-model-block, .run-update-model, .run-model").show(); //show AI-related buttons, disabling tags too
         $("#alert").css("display", "none");
         $("#alert-stuff").html("");
     }
@@ -148,29 +148,34 @@ $(document).ready(function()
     /* ADD OR REMOVE TAG FROM WORD */
     $(document).on("click", ".select-tag-button", function(e) //when we click TAG button below a word
     {
-        var sentence_index = $(this).closest(".sentence-area").data("index");
-        var word_index = $(this).closest(".word").data("index");
         var tag_index = $("input[name=radio]:checked").val();
-        var tag_word = [sentence_index, word_index, tag_index];
-        selected_sentence = sentence_index;
-        selected_word = word_index;
-        ajax("/", JSON.stringify({ tag_word }), update_sentences);
+        change_tag(e, tag_index);
     });
     $(document).on("click", ".sentences-area .delete", function(e) //when we click delete tag word
     {
-        var sentence_index = $(this).closest(".sentence-area").data("index");
-        var word_index = $(this).closest(".word").data("index");
-        var tag_word = [sentence_index, word_index, 0];
+        change_tag(e, 0);
+    });
+    function change_tag(e, tag_index)
+    {
+        var sentence_index = $(e.target).closest(".sentence-area").data("index");
+        var word_index = $(e.target).closest(".word").data("index");
+        if (selected_sentence != sentence_index)
+        {
+            entire_sentence_selected = false;
+        }
+        var tag_word = [sentence_index, word_index, entire_sentence_selected, tag_index];
         selected_sentence = sentence_index;
         selected_word = word_index;
         ajax("/", JSON.stringify({ tag_word }), update_sentences);
-    });
+    }
 
 
 
     /* KEYDOWN - SENTENCE NAV, TAGGING */
     var selected_sentence = 0;
     var selected_word = 0;
+    var entire_sentence_selected = false; 
+
     $(document).keydown(function(e) 
     {
         var number_of_sentences = document.getElementsByClassName("sentence-area").length;
@@ -178,6 +183,27 @@ $(document).ready(function()
         //dont do stuff from keys if typing somewhere (text field) or if there arent any sentences yet
         var words_in_sentence = document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children.length;
         document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.remove("selected")
+        
+        var shifty_mc_shift_face = e.shiftKey && e.code == "KeyA"
+        var bow_and_arrow = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"].includes(e.key);
+        if (bow_and_arrow || shifty_mc_shift_face)
+        {
+            get_selected_sentence = document.getElementsByClassName("sentence-area")[selected_sentence];
+            Array.from(get_selected_sentence.children[1].children).forEach(
+                (x) => 
+                {
+                    if (!entire_sentence_selected && shifty_mc_shift_face)
+                    {
+                        x.classList.add("selected");
+                    }
+                    else
+                    {
+                        x.classList.remove("selected");
+                    }
+                }
+            );
+            entire_sentence_selected = bow_and_arrow ? false : !entire_sentence_selected;
+        }
 
         function advance_right() //in a function so it can be called in other places
         {
@@ -240,7 +266,7 @@ $(document).ready(function()
                 advance_right(); //get coordinates of next word to select and pass to backend to be put in html
                 var new_sentence_index = selected_sentence;
                 var new_word_index = selected_word;    
-                var tag_word = [sentence_index, word_index, tag_id, new_sentence_index, new_word_index];
+                var tag_word = [sentence_index, word_index, entire_sentence_selected, tag_id, new_sentence_index, new_word_index];
                 ajax("/", JSON.stringify({ tag_word }), update_sentences);
             }
         }
@@ -251,15 +277,12 @@ $(document).ready(function()
             advance_right(); //get coordinates of next word to select and pass to backend to be put in html
             var new_sentence_index = selected_sentence;
             var new_word_index = selected_word;    
-            var tag_word = [sentence_index, word_index, 0, new_sentence_index, new_word_index];
+            var tag_word = [sentence_index, word_index, entire_sentence_selected, 0, new_sentence_index, new_word_index];
             ajax("/", JSON.stringify({ tag_word }), update_sentences);
         }
 
-        document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.add("selected")
-
+        document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children[selected_word].classList.add("selected");
     });
-
-
 
     /* CHECKBOXES */
     var lastChecked = null;
