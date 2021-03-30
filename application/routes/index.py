@@ -255,25 +255,25 @@ def home(alert = None):
 
         if key=="download_tags": #download tags as a JSON, as if the sentence data were deleted, prserving the title
             user_data = read_json()
-            uploaded_file = {"tag_data": user_data["tag_data"]}
-            return {"file": uploaded_file, "name": input, "extension": "json"}
+            file_str = {"tag_data": user_data["tag_data"]}
+            return {"file": file_str, "name": input, "extension": "json"}
 
         
 
         if key=="download_sentences": #download all sentence data as TXT, essentially original format
             user_data = read_json()
-            uploaded_file = ""
+            file_str = ""
 
             for sentence in user_data["sentences"]:
-                uploaded_file += sentence + " "
+                file_str += sentence + " "
 
-            return {"file": uploaded_file, "name": input, "extension": "txt"}
+            return {"file": file_str, "name": input, "extension": "txt"}
 
 
 
         if key=="download_csv": #download a CSV of all data (both words and their tags), in format: word░{"name":"tag_name"+"color":"tag_color"},
             user_data = read_json()
-            uploaded_file = ",".join(["Word", "Tag Name", "Tag Color", "Tag Index"]) + "\n"
+            file_str = ",".join(["Word", "Tag Name", "Tag Color", "Tag Index"]) + "\n"
 
             for sentence_index, sentence in enumerate(user_data["sentences"]):
                 for word_index, word in enumerate(sentence.split()):
@@ -283,9 +283,9 @@ def home(alert = None):
                     word_ = ('"' + word + '"') if "," in word else word
                     #create a row in the csv
                     row =  ",".join([word_, tag_name, tag_color, tag_index])               
-                    uploaded_file += row + "\n" #add new line
+                    file_str += row + "\n" #add new line
 
-            return {"file": uploaded_file, "name": input, "extension": "csv"}
+            return {"file": file_str, "name": input, "extension": "csv"}
 
 
         if key=="save_model": #download AI model
