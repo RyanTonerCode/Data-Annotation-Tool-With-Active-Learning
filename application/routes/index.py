@@ -240,9 +240,9 @@ def home(alert = None):
         if key=="clear_model": #remove AI model
             user_data = read_json()
             user_data.pop("model_name", None)
-            print("YAY")
-            print(user_data)
+            print("Model path removed")
             app.config["ai_model"] = None
+            print("Model data cleared from memory")
             write_json(user_data)
             return initialize(user_data)
 
