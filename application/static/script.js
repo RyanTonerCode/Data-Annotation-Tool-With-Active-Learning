@@ -188,22 +188,40 @@ $(document).ready(function()
         var bow_and_arrow = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"].includes(e.key);
         if (bow_and_arrow || shifty_mc_shift_face)
         {
-            get_selected_sentence = document.getElementsByClassName("sentence-area")[selected_sentence];
-            Array.from(get_selected_sentence.children[1].children).forEach(
-                (x) => 
+            var children = document.getElementsByClassName("sentence-area")[selected_sentence].children[1].children;
+            for (var i = 0; i < children.length; i++) 
+            {
+                var child = children[i];
+                if (!entire_sentence_selected && shifty_mc_shift_face)
                 {
-                    if (!entire_sentence_selected && shifty_mc_shift_face)
-                    {
-                        x.classList.add("selected");
-                    }
-                    else
-                    {
-                        x.classList.remove("selected");
-                    }
+                    child.classList.add("selected");
                 }
-            );
+                else
+                {
+                    child.classList.remove("selected");
+                }
+            }
             entire_sentence_selected = bow_and_arrow ? false : !entire_sentence_selected;
         }
+
+        // if (bow_and_arrow || shifty_mc_shift_face)
+        // {
+        //     get_selected_sentence = document.getElementsByClassName("sentence-area")[selected_sentence];
+        //     Array.from(get_selected_sentence.children[1].children).forEach(
+        //         (x) => 
+        //         {
+        //             if (!entire_sentence_selected && shifty_mc_shift_face)
+        //             {
+        //                 x.classList.add("selected");
+        //             }
+        //             else
+        //             {
+        //                 x.classList.remove("selected");
+        //             }
+        //         }
+        //     );
+        //     entire_sentence_selected = bow_and_arrow ? false : !entire_sentence_selected;
+        // }
 
         function advance_right() //in a function so it can be called in other places
         {
