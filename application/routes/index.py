@@ -1,3 +1,4 @@
+import csv
 from json import load
 from application import app
 from application.imports import apology, session, render_template, os, request, json, redirect, secure_filename, time, send_file, after_this_request, send_from_directory, url_for, SharedDataMiddleware
@@ -336,11 +337,7 @@ def home(alert = None):
                         write_json(user_data)
 
                     elif file_extension == "csv":
-                        csv = ""
-                        with open(os.path.join(upload_folder, filename)) as csv_file:
-                            csv = csv_file.read() #read in csv file
-
-                        rows = [x for x in csv.split("\n")] #separate each value into word-tag pairs by the commas
+                        csv_file = csv.reader(open(os.path.join(upload_folder, filename), "r"))
                         sentences = []
                         sentence_tags = []
                         tag_data = {"index": 0, "tags": {}} #create index counter and empty dict for tags
@@ -349,39 +346,21 @@ def home(alert = None):
 
                         sentence = "" #current sentence
                         word_tags = [] #current sentence's tags
-                        for row in rows: #for each word-tag pair
-                            # print(row)
-                            last_double_quote = row.rfind('"')
-                            found_comma = False
-                            data, word = [], ""
-                            if last_double_quote != -1 and row[0] == '"' and row[last_double_quote+1] == ",":
-                                word = row[1:last_double_quote]
-                                found_comma = "," in word
+                        for row in csv_file:
+                            print(row)
+                            word = row[0]
+                            tag_name = row[1]
+                            tag_color = row[2]
+                            tag_index = row[3]
 
-                            offset = 0
+                            sentence += word
 
-                            if found_comma:
-                                data = row[last_double_quote+2:].split(",")
-                                offset = -1
-                            else:
-                                data = row.split(",")
-                                word = data[0]
-                            
-                            tag_name = data[1 + offset]
-                            tag_color = data[2 + offset]
-                            tag_index = data[3 + offset]
-
-                            if word[0] == '"' and word[-1] == '"' and "," in word:
-                                word = word[1:-1]
-                            sentence += word #add the word to the sentence
-
-                            if tag_name != '"no_tag"': #bc it was jsonified on conversion, the quotes are included in the string
-                                tag = {"tag_name": tag_name, "tag_color": tag_color} #convert string to json object
+                            if int(tag_index) != 0: 
+                                tag = {"name": tag_name, "color": tag_color}
                                 if str(tag_index) not in tag_data["tags"].keys():
                                     tag_data["index"] += 1 #increment tag index with each new one we see
                                     tag_data["tags"][tag_index] = tag #and create the data entry
 
-                                # word_tags.append(int(list(tag_data["tags"].keys())[int(list(tag_data["tags"].values()).index(tag))])) #get tag ID from tag value we have
                                 word_tags.append(tag_index)
                             else:
                                 word_tags.append(0) #value is 0 for no tag
@@ -393,42 +372,6 @@ def home(alert = None):
                                 word_tags = []
                             else:
                                 sentence += " " #add spaces between words but not between sentences
-
-                        # words = [x for x in csv.split(",")] #separate each value into word-tag pairs by the commas
-                        # sentences = []
-                        # sentence_tags = []
-                        # tag_data = {"index": 0, "tags": {}} #create index counter and empty dict for tags
-                        # user_data = {"sentences": [], "sentence_tags": [], "tag_data": tag_data}
-                        # delimiters = ".!?" #sentence-ending delimeters
-
-                        # sentence = "" #current sentence
-                        # word_tags = [] #current sentence's tags
-                        # for pair in words: #for each word-tag pair
-                        #     pair_ = pair.split("░") #split by the special delimeter
-                        #     word = pair_[0]
-                        #     tag = pair_[1]
-
-                        #     word = word.replace("¬",",") #replace special char with comma from conversion
-                        #     tag = tag.replace("+",",")
-                        #     sentence += word #add the word to the sentence
-
-                        #     if tag != '"no_tag"': #bc it was jsonified on conversion, the quotes are included in the string
-                        #         tag = json.loads(tag) #convert string to json object
-                        #         if tag not in tag_data["tags"].values():
-                        #             tag_data["index"] += 1 #increment tag index with each new one we see
-                        #             tag_data["tags"][tag_data["index"]] = tag #and create the data entry
-
-                        #         word_tags.append(int(list(tag_data["tags"].keys())[int(list(tag_data["tags"].values()).index(tag))])) #get tag ID from tag value we have
-                        #     else:
-                        #         word_tags.append(0) #value is 0 for no tag
-
-                        #     if word[-1] in delimiters: #if end of sentence, add and clear for next sentence
-                        #         sentences.append(sentence) 
-                        #         sentence_tags.append(word_tags)
-                        #         sentence = ""
-                        #         word_tags = []
-                        #     else:
-                        #         sentence += " " #add spaces between words but not between sentences
 
                         user_data["sentences"] = sentences
                         user_data["sentence_tags"] = sentence_tags
