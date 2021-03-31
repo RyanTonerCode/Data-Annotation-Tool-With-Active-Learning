@@ -265,7 +265,6 @@ div.top
 {
     width: 150px;
     position: relative;
-    z-index: 4;
 }
 .color-selector-custom button.btn1
 {
@@ -273,7 +272,7 @@ div.top
 }
 .color-selector-options, .run-options
 {
-    z-index: 2;
+    z-index: 4;
     position: absolute;
     left: 0;
     top: 35px;
@@ -306,6 +305,7 @@ div.top
 #submit-new-tag
 {
     background-color: green;
+    /* z-index: 4; WHY NOT WORK! */
 }
 #submit-new-tag:hover
 {
