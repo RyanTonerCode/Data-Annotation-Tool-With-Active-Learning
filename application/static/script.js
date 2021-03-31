@@ -7,7 +7,7 @@ $(document).ready(function () {
     function initialize_return(data) {
         update_tags(data["tag_data"]);
         update_sentences(data["sentence_data"]);
-        $(".tags-area-overlay, .clear-model, .save-model, .run-update-model, .run-model").toggle(data["ai"]); //show/hide AI-related buttons, disabling tags too (based on whether there is a model path even if empty)
+        $(".tags-area-overlay, .clear-model, .save-model-block, .run-update-model, .run-model").toggle(data["ai"]); //show/hide AI-related buttons, disabling tags too (based on whether there is a model path even if empty)
         // ai_model = data["ai"];
     }
     initialize();
@@ -135,7 +135,7 @@ $(document).ready(function () {
 
         $("#loading").show();
         ajax("/", JSON.stringify(query), update_sentences);
-        $(".tags-area-overlay, .clear-model, .save-model, .run-update-model, .run-model").show(); //show AI-related buttons, disabling tags too
+        $(".tags-area-overlay, .clear-model, .save-model-block, .run-update-model, .run-model").show(); //show AI-related buttons, disabling tags too
         $("#alert").css("display", "none");
         $("#alert-stuff").html("");
     }
