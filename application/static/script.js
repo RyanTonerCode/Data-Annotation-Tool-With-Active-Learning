@@ -7,7 +7,7 @@ $(document).ready(function () {
     function initialize_return(data) {
         update_tags(data["tag_data"]);
         update_sentences(data["sentence_data"]);
-        $(".run").toggle($(".sentences-area").html() != "");
+        $(".run").toggle($(".sentence-tag").length > 0);
         $(".tags-area-overlay, .clear-model, .save-model-block, .run-update-model, .run-model").toggle(data["ai"]); //show/hide AI-related buttons, disabling tags too (based on whether there is a model path even if empty)
         // ai_model = data["ai"];
     }
@@ -117,7 +117,9 @@ $(document).ready(function () {
         var button = "<button id='ai-continue-button' class='form-button'>CONTINUE</button>";
         showAlert(content, button);
 
-        $(document).on("click", "#ai-continue-button", function (e) {
+        // $(document).on("click", "#ai-continue-button", function (e) 
+        $("#ai-continue-button").off("click").click(function (e) 
+        {
             var model_name = $("#model-name").val();
             if (model_name.replace(/\s+/g, '') == "")
             {
@@ -138,7 +140,9 @@ $(document).ready(function () {
         var button = " ";
         showAlert(content, button);
 
-        $(document).on("click", ".load-model-name", function (e) {
+        // $(document).on("click", ".load-model-name", function (e) 
+        $(".load-model-name").off("click").click(function (e) 
+        {
             var model_name = $(e.target).html();
             start_ai({ "run_load_model": model_name });
         });
@@ -349,7 +353,8 @@ $(document).ready(function () {
         var button = "<button class='form-button' id='clear-continue-button'>CONTINUE</button>";
         showAlert(content, button);
 
-        $(document).on("click", "#clear-continue-button", function () 
+        // $(document).off("click", "#clear-continue-button").on("click", "#clear-continue-button", function () 
+        $("#clear-continue-button").off("click").click(function () 
         {
             if ($("#download-name").val() != "" && download_query) //if they would like to download...
             {
@@ -359,6 +364,7 @@ $(document).ready(function () {
             }
             else
             {
+                console.log(query);
                 ajax("/", JSON.stringify(query), initialize_return);
             }
             $("#alert").css("display", "none");
@@ -390,7 +396,8 @@ $(document).ready(function () {
         var button = "<button class='form-button' id='upload-continue-button'>CONTINUE</button>";
         showAlert(content, button);
 
-        $(document).on("click", "#upload-continue-button", async function () //need async?
+        // $(document).on("click", "#upload-continue-button", async function () //need async?
+        $("#upload-continue-button").off("click").click(function () 
         {
             if ($("#download-name").val() != "") //if they would like to download...
             {
@@ -412,28 +419,36 @@ $(document).ready(function () {
     $(document).on("click", ".download-all", function () //when we click save ALL DATA (JSON)
     {
         choose_filename(1);
-        $(document).on("click", "#download-button.id-1", function () {
+        // $(document).on("click", "#download-button.id-1", function () 
+        $("#download-button.id-1").off("click").click(function () 
+        {
             request_file({ "download_all": $("#download-name").val() });
         });
     });
     $(document).on("click", ".download-tags", function () //when we click save TAGS
     {
         choose_filename(2);
-        $(document).on("click", "#download-button.id-2", function () {
+        // $(document).on("click", "#download-button.id-2", function () 
+        $("#download-button.id-2").off("click").click(function () 
+        {
             request_file({ "download_tags": $("#download-name").val() });
         });
     });
     $(document).on("click", ".download-sentences", function () //when we click export TEXT
     {
         choose_filename(3);
-        $(document).on("click", "#download-button.id-3", function () {
+        // $(document).on("click", "#download-button.id-3", function () 
+        $("#download-button.id-3").off("click").click(function () 
+        {
             request_file({ "download_sentences": $("#download-name").val() });
         });
     });
     $(document).on("click", ".download-csv", function () //when we click export CSV
     {
         choose_filename(4);
-        $(document).on("click", "#download-button.id-4", function () {
+        // $(document).on("click", "#download-button.id-4", function () 
+        $("#download-button.id-4").off("click").click(function () 
+        {
             request_file({ "download_csv": $("#download-name").val() });
         });
     });
@@ -536,6 +551,7 @@ $(document).ready(function () {
     {
         $("#alert").css("display", "none");
         $("#alert-stuff").html("");
+        // $(document).off("click", ".form-button");
     });
 
 

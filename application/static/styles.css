@@ -202,8 +202,8 @@ div.top
     border-radius: 10px;
     background-color: #ebebeb;
     padding: 10px;
-    box-sizing: border-box;
     padding-bottom: 0;
+    box-sizing: border-box;
     font-family: 'avenir';
 }
 .tags-area div:not(.tags-area-overlay)
@@ -231,6 +231,10 @@ div.top
     transition: 0.4s;
     border-radius: 5px;
     font-family: 'avenir';
+    /* margin-bottom: 10px; */
+}
+.tags-area .run-buttons, .tags-area .tags, .tags-area .create-tag, .tags-area .new-tag
+{
     margin-bottom: 10px;
 }
 .tags-area button.btn1:hover, .btn1:hover /* SWITCH */
@@ -243,10 +247,6 @@ div.top
 {
     float: left;
     margin-right: 5px;
-}
-.new-tag
-{
-    /* z-index: 5; WHY NO WORK! */
 }
 
 
