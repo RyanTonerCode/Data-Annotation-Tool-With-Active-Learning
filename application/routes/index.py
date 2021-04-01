@@ -16,6 +16,7 @@ def home(alert = None):
         input = ""
         if not request.files: #get JSON object key and value if not an upload, otherwise skip to bottom in upload section
             # print(request.get_json())
+            print(request.get_json())
             key = next(iter(request.get_json().keys()))
             input = request.get_json()[key]
 
@@ -195,18 +196,20 @@ def home(alert = None):
             user_data = read_json()
             models = []
             for item in os.listdir(app.config["ai_path"]):
-                if os.path.isdir(os.path.join(app.config["ai_path"], item)):
-                    models.append(item)
-
-            # html = '<div class="create-tag color-selector-custom" style="position: relative; display: block;"><button class="btn1 create-tag color-selector-button">Select Model...</button><div class="color-selector-options boxshadow" style="display: none; position: relative;">'
-            # for model in models:
-            #     html += '<button class="color-selector-option"><div class="tag-color red" data-color="' + model + '"></div><div class="color-selector-text">&nbsp ' + model + '</div></button>'
+                item_path = os.path.join(app.config["ai_path"], item)
+                if os.path.isdir(item_path):
+                    tags_path = os.path.join(item_path, "tags.json")
+                    if os.path.exists(tags_path):
+                        model_tags = read_json(tags_path)
+                        if model_tags["tag_data"] == user_data["tag_data"]:
+                            models.append(item)
 
             html = '<div class="alert-list">'
+            if len(models) == 0:
+                html += '<button class="alert-list-item">No Models Availible</button>'
             for model in models:
                 html += '<button class="alert-list-item load-model-name">' + model + '</button>'
             html += '</div>'
-            # html += '</div></div><br><br>'
             return html
 
 
@@ -317,7 +320,7 @@ def home(alert = None):
 
 
         if key=="save_model": #download AI model
-            save_model(app.config["ai_model"], read_json()["model_name"])
+            save_model(app.config["ai_model"], read_json())
             
 
 

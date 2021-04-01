@@ -117,8 +117,13 @@ $(document).ready(function () {
         showAlert(content, button);
 
         $(document).on("click", "#ai-continue-button", function (e) {
-            // start_ai(0)
-            start_ai({ "run_create_model": $("#model-name").val() })
+            var model_name = $("#model-name").val();
+            if (model_name.replace(/\s+/g, '') == "")
+            {
+                showAlert("You must input a name for your model. Please try again.");
+                return;
+            }
+            start_ai({ "run_create_model": model_name })
         });
     });
     $(document).on("click", ".load-model", function () //when we click CREATE-MODEL button
@@ -127,54 +132,30 @@ $(document).ready(function () {
     });
     function load_model(html)
     {
-        //Running the AI means that tags can no longer be modified, because the model will only be trained on those tags
-        var content = "Running the AI entails that tags cannot be modified again. Click continue if you are satisfied with your current set of tags. <br><br>";
+        var content = "Choose a model to load below. It must have been created on this dataset or have the exact same set of tags. <br><br>";
         content += html;
         var button = " ";
         showAlert(content, button);
 
         $(document).on("click", ".load-model-name", function (e) {
             var model_name = $(e.target).html();
-            // start_ai(3, name);
             start_ai({ "run_load_model": model_name });
         });
     }
     $(document).on("click", ".run-update-model", function () //when we click RUN-MODEL button
     {
-        // start_ai(1);
         start_ai({ "run_update_model": "" });
     });
     $(document).on("click", ".run-model", function () //when we click RUN-MODEL button
     {
-        // start_ai(2);
-        // var test_sentences = $(".sentences-area .checkbox-container input:checked").parent().parent().parent().map(function () { return $(this).data('index'); }).get();
         var sentence_objects = $(".sentences-area .checkbox-container input:checked").closest(".sentence-area");
         var test_sentences = sentence_objects.map(function () { return $(this).data('index'); }).get();
         start_ai({ "run_model": test_sentences });
     });
     function start_ai(query) {
-        // var test_sentences = $(".sentences-area .checkbox-container input:checked").parent().parent().parent().map(function () { return $(this).data('index'); }).get();
-        // var filename = $("#model-name").is(":visible") ? $("#model-name").val() : "model"
-        // var query = create_model == 0 ? { "run_create_model": $("#model-name").val() } : create_model == 1 ? { "run_update_model": "" } : create_model == 2 ? { "run_model": test_sentences } : { "load_model": model_name };
-        // if (create_model == 0)
-        // {
-        //     query == { "run_create_model": $("#model-name").val() }
-        // }
-        // else if (create_model == 1)
-        // {
-        //     query == { "run_update_model": "" }
-        // }        
-        // else if (create_model == 2)
-        // {
-        //     query == { "run_model": test_sentences }
-        // }
-        // else if (create_model == 3)
-        // {
-        //     query == { "load_model": model_name }
-        // }
-
         $("#loading").show();
         ajax("/", JSON.stringify(query), update_sentences);
+        $(".create-tag").hide();
         $(".tags-area-overlay, .clear-model, .save-model-block, .run-update-model, .run-model").show(); //show AI-related buttons, disabling tags too
         $("#alert").css("display", "none");
         $("#alert-stuff").html("");
@@ -341,31 +322,40 @@ $(document).ready(function () {
     });
 
 
+    var clear_after_download = false;
 
     /* CLEAR BUTTONS */
     $(document).on("click", ".clear-all", function () //when we click CLEAR ALL
     {
-        are_you_sure_clear("data", { "clear_all": "" })
+        are_you_sure_clear("data", { "clear_all": "" }, { "download_all": null } )
     });
     $(document).on("click", ".clear-tags", function () //when we click CLEAR TAGS
     {
-        are_you_sure_clear("tags, annotation labels, and model data", { "clear_tags": "" })
+        are_you_sure_clear("tags, annotation labels, and model data", { "clear_tags": "" }, { "download_tags": null } )
     });
     $(document).on("click", ".clear-sentences", function () //when we click CLEAR SENTENCES
     {
-        are_you_sure_clear("sentence text and annotation labels", { "clear_sentences": "" })
+        are_you_sure_clear("sentence text and annotation labels", { "clear_sentences": "" }, { "download_all": null } )
     });
     $(document).on("click", ".clear-model", function () //when we click CLEAR SENTENCES
     {
         are_you_sure_clear("AI model data", { "clear_model": "" })
     });
-    function are_you_sure_clear(message, query) {
-        var content = `Are you sure you'd like to clear all ${message}? You cannot undo this action. <br><br>`;
-        var button = "<button class='form-button' id='clear-continue-button'>YES</button>";
+    function are_you_sure_clear(message, query, download_query=null)
+    {
+        var content = `If you would like to download a copy before permanently deleting all ${message}, enter a name below. Either way, click continue. <br><br>`;
+        content += "<input type='text' name='download-name' placeholder='Filename' id='download-name' class='new-tag-input' autofocus>";
+        var button = "<button class='form-button' id='clear-continue-button'>CONTINUE</button>";
         showAlert(content, button);
 
-        $(document).on("click", "#clear-continue-button", function () {
-            ajax("/", JSON.stringify(query), initialize_return);
+        $(document).on("click", "#clear-continue-button", function () 
+        {
+            if ($("#download-name").val() != "" && download_query) //if they would like to download...
+            {
+                clear_after_download = query;
+                download_query[Object.keys(download_query)[0]] = $("#download-name").val()
+                request_file(download_query); //request download
+            }
             $("#alert").css("display", "none");
             $("#alert-stuff").html("");
         });
@@ -401,7 +391,7 @@ $(document).ready(function () {
             {
                 // console.log("Requesting download...");
                 upload_after_download = true; //set flag for later
-                request_file({ download_all: $("#download-name").val() }); //request download, and later it will do the upload (in download function)
+                request_file({ "download_all": $("#download-name").val() }); //request download, and later it will do the upload (in download function)
             }
             else //only submit if there's nothing to download first
             {
@@ -478,14 +468,6 @@ $(document).ready(function () {
             var blob = new Blob([json], { type: "octet/stream" });
             var url = window.URL.createObjectURL(blob);
         }
-        // else if (dict["extension"] == "txt")
-        // {
-        //     var url = "data:text/plain;charset=utf-8," + encodeURIComponent(data);
-        // }
-        // else if (dict["extension"] == "csv")
-        // {
-        //     var url = "data:text/plain;charset=utf-8," + encodeURIComponent(data);
-        // }
         else {
             var url = "data:text/plain;charset=utf-8," + encodeURIComponent(data);
         }
@@ -503,6 +485,14 @@ $(document).ready(function () {
                 upload_after_download = false; //reset flag
                 document.getElementById("file-upload-form").submit(); //submit file upload form
                 initialize();
+            }, 100);
+        }
+        else if (clear_after_download)
+        {
+            setTimeout(function () //wait 100ms to give enough time to download (is this reliable?)
+            {
+                ajax("/", JSON.stringify(clear_after_download), initialize_return);
+                clear_after_download = false;
             }, 100);
         }
     }

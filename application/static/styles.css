@@ -857,7 +857,6 @@ input[type="file"]
     padding-top: calc(50vh - 150px);
     background-color: rgba(0,0,0,0.7); /* Black w/ opacity */
     overflow: hidden;
-    scrollbar-width: 0;
 }
 .alert-content 
 {

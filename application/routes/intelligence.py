@@ -1,5 +1,6 @@
 import os
 import math
+import json
 import numpy as np
 import scipy as sp
 from scipy import stats
@@ -185,7 +186,8 @@ def run_model(user_data, test_sentences):
     return new_user_data
 
 #user must pass a model that is in memory        
-def save_model(model, model_name):
+def save_model(model, user_data):
+    model_name = user_data["model_name"]
     if not model or model == None:
         print("No model currently in memory")
         return
@@ -193,10 +195,13 @@ def save_model(model, model_name):
     model_path = get_model_path(model_name)
     if not os.path.isdir(model_path):
         os.makedirs(model_path)
-    if not model_name:
-        user_data["model_name"] = "model"
     
     print("Model Saving started")
     model.save(model_path)
+    file_str = {"tag_data": user_data["tag_data"]}
+    file_path = os.path.join(model_path, "tags.json")
+    with open(file_path, 'w') as outfile:
+        json.dump(file_str, outfile)
+
     print("Complete")
     
