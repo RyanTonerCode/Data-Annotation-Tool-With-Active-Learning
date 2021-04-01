@@ -119,8 +119,7 @@ $(document).ready(function () {
 
         $(document).on("click", "#ai-continue-button", function (e) {
             var model_name = $("#model-name").val();
-            if (model_name.replace(/\s+/g, '') == "")
-            {
+            if (model_name.replace(/\s+/g, '') == "") {
                 showAlert("You must input a name for your model. Please try again.");
                 return;
             }
@@ -129,10 +128,9 @@ $(document).ready(function () {
     });
     $(document).on("click", ".load-model", function () //when we click CREATE-MODEL button
     {
-        ajax("/", JSON.stringify({"model_names": ""}), load_model);
+        ajax("/", JSON.stringify({ "model_names": "" }), load_model);
     });
-    function load_model(html)
-    {
+    function load_model(html) {
         var content = "Choose a model to load below. It must have been created on this dataset or have the exact same set of tags. <br><br>";
         content += html;
         var button = " ";
@@ -328,37 +326,34 @@ $(document).ready(function () {
     /* CLEAR BUTTONS */
     $(document).on("click", ".clear-all", function () //when we click CLEAR ALL
     {
-        are_you_sure_clear("data", { "clear_all": "" }, { "download_all": null } )
+        are_you_sure_clear("data", { "clear_all": "" }, { "download_all": null })
     });
     $(document).on("click", ".clear-tags", function () //when we click CLEAR TAGS
     {
-        are_you_sure_clear("tags, annotation labels, and model data", { "clear_tags": "" }, { "download_tags": null } )
+        are_you_sure_clear("tags, annotation labels, and model data", { "clear_tags": "" }, { "download_tags": null })
     });
     $(document).on("click", ".clear-sentences", function () //when we click CLEAR SENTENCES
     {
-        are_you_sure_clear("sentence text and annotation labels", { "clear_sentences": "" }, { "download_all": null } )
+        are_you_sure_clear("sentence text and annotation labels", { "clear_sentences": "" }, { "download_all": null })
     });
     $(document).on("click", ".clear-model", function () //when we click CLEAR SENTENCES
     {
         are_you_sure_clear("AI model data", { "clear_model": "" })
     });
-    function are_you_sure_clear(message, query, download_query=null)
-    {
+    function are_you_sure_clear(message, query, download_query = null) {
         var content = `If you would like to download a copy before permanently deleting all ${message}, enter a name below. Either way, click continue. <br><br>`;
         content += "<input type='text' name='download-name' placeholder='Filename' id='download-name' class='new-tag-input' autofocus>";
         var button = "<button class='form-button' id='clear-continue-button'>CONTINUE</button>";
         showAlert(content, button);
 
-        $(document).on("click", "#clear-continue-button", function () 
-        {
+        $(document).on("click", "#clear-continue-button", function () {
             if ($("#download-name").val() != "" && download_query) //if they would like to download...
             {
                 clear_after_download = query;
                 download_query[Object.keys(download_query)[0]] = $("#download-name").val()
                 request_file(download_query); //request download
             }
-            else
-            {
+            else {
                 ajax("/", JSON.stringify(query), initialize_return);
             }
             $("#alert").css("display", "none");
@@ -462,6 +457,8 @@ $(document).ready(function () {
         $("#alert-stuff").html("");
     }
     function download(dict) {
+        if (dict["name"] == "")
+            dict["name"] = dict["extension"];
         var fileName = dict["name"] + "." + dict["extension"]; //create filename
         var data = dict["file"]; //retrieve file data
         var element = document.createElement("a"); //create invisible link to click to download
@@ -486,14 +483,13 @@ $(document).ready(function () {
         {
             if (upload_after_download) //if there is something waiting to upload
             {
-                    upload_after_download = false; //reset flag
-                    document.getElementById("file-upload-form").submit(); //submit file upload form
-                    initialize();
+                upload_after_download = false; //reset flag
+                document.getElementById("file-upload-form").submit(); //submit file upload form
+                initialize();
             }
-            else if (clear_after_download)
-            {
-                    ajax("/", JSON.stringify(clear_after_download), initialize_return);
-                    clear_after_download = false;
+            else if (clear_after_download) {
+                ajax("/", JSON.stringify(clear_after_download), initialize_return);
+                clear_after_download = false;
             }
         }, 100);
 
