@@ -152,13 +152,13 @@ def train_existing_model(user_data):
     return model
 
 #get the path to the model on the disk
-def get_path(model_name):
-    return os.path.join(os.getcwd(), "application", "data", "ai", model_name)
+def get_model_path(model_name):
+    return os.path.join(app.config["ai_path"], model_name)
 
 #try to load the model from memory, then from the disk, or lastly creates a model if none exists.
 def load_model(user_data, model_name=None):
     if not app.config["ai_model"]: #if the model is not in memory, load it first
-        model_path = get_path(model_name if model_name else user_data["model_name"])
+        model_path = get_model_path(model_name if model_name else user_data["model_name"])
         if os.path.exists(model_path):#load the model if it exists but is not in memory
             app.config["ai_model"] = tf.keras.models.load_model(model_path)
         else: 
@@ -190,7 +190,7 @@ def save_model(model, model_name):
         print("No model currently in memory")
         return
 
-    model_path = get_path(model_name)
+    model_path = get_model_path(model_name)
     if not os.path.isdir(model_path):
         os.makedirs(model_path)
     if not model_name:

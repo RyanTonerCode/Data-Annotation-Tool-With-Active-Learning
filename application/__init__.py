@@ -18,6 +18,9 @@ app.config["SESSION_TYPE"] = "filesystem"
 #app.config["SECRET_KEY"] = os.environ.get('SECRET_KEY')
 app.config["SECRET_KEY"] = os.urandom(24) #make a new secret key every time the server starts
 app.config["ai_model"] = None
+app.config["ai_path"] = os.path.join(os.getcwd(), "application", "data", "ai")
+app.config["upload_path"] = os.path.join(os.getcwd(), "application", "data", "upload")
+app.config["json_path"] = os.path.join(os.getcwd(), "application", "data", "data.json")
 
 Session(app)
 
