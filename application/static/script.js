@@ -7,6 +7,7 @@ $(document).ready(function () {
     function initialize_return(data) {
         update_tags(data["tag_data"]);
         update_sentences(data["sentence_data"]);
+        $(".run").toggle($(".sentences-area").html() != "");
         $(".tags-area-overlay, .clear-model, .save-model-block, .run-update-model, .run-model").toggle(data["ai"]); //show/hide AI-related buttons, disabling tags too (based on whether there is a model path even if empty)
         // ai_model = data["ai"];
     }
@@ -356,6 +357,10 @@ $(document).ready(function () {
                 download_query[Object.keys(download_query)[0]] = $("#download-name").val()
                 request_file(download_query); //request download
             }
+            else
+            {
+                ajax("/", JSON.stringify(query), initialize_return);
+            }
             $("#alert").css("display", "none");
             $("#alert-stuff").html("");
         });
@@ -472,29 +477,26 @@ $(document).ready(function () {
             var url = "data:text/plain;charset=utf-8," + encodeURIComponent(data);
         }
 
-
         element.href = url;
         element.download = fileName;
         element.click(); //download the file
         window.URL.revokeObjectURL(url); //I think this means: don't actually open a new window?
 
-        if (upload_after_download) //if there is something waiting to upload
+        setTimeout(function () //wait 100ms to give enough time to download (is this reliable?)
         {
-            setTimeout(function () //wait 100ms to give enough time to download (is this reliable?)
+            if (upload_after_download) //if there is something waiting to upload
             {
-                upload_after_download = false; //reset flag
-                document.getElementById("file-upload-form").submit(); //submit file upload form
-                initialize();
-            }, 100);
-        }
-        else if (clear_after_download)
-        {
-            setTimeout(function () //wait 100ms to give enough time to download (is this reliable?)
+                    upload_after_download = false; //reset flag
+                    document.getElementById("file-upload-form").submit(); //submit file upload form
+                    initialize();
+            }
+            else if (clear_after_download)
             {
-                ajax("/", JSON.stringify(clear_after_download), initialize_return);
-                clear_after_download = false;
-            }, 100);
-        }
+                    ajax("/", JSON.stringify(clear_after_download), initialize_return);
+                    clear_after_download = false;
+            }
+        }, 100);
+
     }
 
 
