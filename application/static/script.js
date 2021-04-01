@@ -120,13 +120,31 @@ $(document).ready(function () {
             start_ai(0)
         });
     });
+    $(document).on("click", ".load-model", function () //when we click CREATE-MODEL button
+    {
+        ajax("/", JSON.stringify({"load_model": ""}), load_model);
+    });
+    function load_model(html)
+    {
+        //Running the AI means that tags can no longer be modified, because the model will only be trained on those tags
+        $(':focus').blur();
+        $(".search-box").removeClass("top");
+        var content = "Running the AI entails that tags cannot be modified again. Click continue if you are satisfied with your current set of tags. <br><br>";
+        content += "But first, give your new model a filename: <br><br> <input type='text' name='model-name' placeholder='Filename' id='model-name' class='new-tag-input' autofocus> <br><br>";
+        var button = "<button id='ai-continue-button' class='form-button'>CONTINUE</button>";
+        showAlert(content, button);
+
+        $(document).on("click", "#ai-continue-button", function (e) {
+            start_ai(0);
+        });
+    }
     $(document).on("click", ".run-update-model", function () //when we click RUN-MODEL button
     {
-        start_ai(1)
+        start_ai(1);
     });
     $(document).on("click", ".run-model", function () //when we click RUN-MODEL button
     {
-        start_ai(2)
+        start_ai(2);
     });
     function start_ai(create_model) {
         var test_sentences = $(".sentences-area .checkbox-container input:checked").parent().parent().parent().map(function () { return $(this).data('index'); }).get();
