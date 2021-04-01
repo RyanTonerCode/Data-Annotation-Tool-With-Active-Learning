@@ -127,10 +127,8 @@ $(document).ready(function () {
     function load_model(html)
     {
         //Running the AI means that tags can no longer be modified, because the model will only be trained on those tags
-        $(':focus').blur();
-        $(".search-box").removeClass("top");
         var content = "Running the AI entails that tags cannot be modified again. Click continue if you are satisfied with your current set of tags. <br><br>";
-        content += "But first, give your new model a filename: <br><br> <input type='text' name='model-name' placeholder='Filename' id='model-name' class='new-tag-input' autofocus> <br><br>";
+        content += html;
         var button = "<button id='ai-continue-button' class='form-button'>CONTINUE</button>";
         showAlert(content, button);
 

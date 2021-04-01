@@ -186,11 +186,12 @@ def home(alert = None):
 
         if key=="load_model":
             user_data = read_json()
-            models = os.listdir(os.path.join(os.path.getcwd(), "application", "data", "ai"))
+            models = os.listdir(os.path.join(os.getcwd(), "application", "data", "ai"))
             html = '<div class="alert-list">'
             for model in models:
                 html += '<button class="alert-list-item">' + model + '</button>'
             html += '</div>'
+            return html
 
 
         if key=="tag_word": #tag a word or remove its tag and return updated sentence HTML
