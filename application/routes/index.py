@@ -436,9 +436,10 @@ def home(alert = None):
 # user_data["tag_data"]["tags"] = a dictionary: keys = tag ID numbers (strings), values = dictionary: "name", "color"
 # user_data["tag_data"]["tags"][tag ID number]["name"] = name of tag (string)
 # user_data["tag_data"]["tags"][tag ID number]["color"] = color of tag (string)
+# user_data["model_name"] = name of currently loaded model, if any (key may not exist)
 
 # export all --> JSON of original data.json file on server
 # export tags --> JSON of tag_data in dict with key "tag_data"
 # export sentences --> TXT of raw sentences
 # export CSV --> combines user_data
-#   format: word░{"name":"name"+"color":"color"},
+#   format: word, name, color, index\n
