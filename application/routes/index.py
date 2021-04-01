@@ -1,3 +1,4 @@
+import io
 import csv
 from json import load
 
@@ -195,14 +196,15 @@ def home(alert = None):
         if key=="model_names":
             user_data = read_json()
             models = []
-            for item in os.listdir(app.config["ai_path"]):
-                item_path = os.path.join(app.config["ai_path"], item)
-                if os.path.isdir(item_path):
-                    tags_path = os.path.join(item_path, "tags.json")
-                    if os.path.exists(tags_path):
-                        model_tags = read_json(tags_path)
-                        if model_tags["tag_data"] == user_data["tag_data"]:
-                            models.append(item)
+            if os.path.isdir(app.config["ai_path"]):
+                for item in os.listdir(app.config["ai_path"]):
+                    item_path = os.path.join(app.config["ai_path"], item)
+                    if os.path.isdir(item_path):
+                        tags_path = os.path.join(item_path, "tags.json")
+                        if os.path.exists(tags_path):
+                            model_tags = read_json(tags_path)
+                            if model_tags["tag_data"] == user_data["tag_data"]:
+                                models.append(item)
 
             html = '<div class="alert-list">'
             if len(models) == 0:
@@ -303,20 +305,18 @@ def home(alert = None):
 
         if key=="download_csv": #download a CSV of all data (both words and their tags), in format: word░{"name":"tag_name"+"color":"tag_color"},
             user_data = read_json()
-            file_str = ",".join(["Word", "Tag Name", "Tag Color", "Tag Index"]) + "\n"
-
+            file_str = io.StringIO()
+            csv_writer = csv.writer(file_str)
+            csv_writer.writerow(["Word", "Tag Name", "Tag Color", "Tag Index"])
             for sentence_index, sentence in enumerate(user_data["sentences"]):
                 for word_index, word in enumerate(sentence.split()):
                     tag_index = str(user_data["sentence_tags"][sentence_index][word_index]) #get tag index ID number from current word
                     cur_tag = user_data["tag_data"]["tags"][tag_index] if int(tag_index) > 0 else None
                     tag_name, tag_color = (cur_tag["name"], cur_tag["color"]) if cur_tag else ("no_tag", "no_tag")
-                    #put word in quotes if it has a comma, to avoid csv issues
-                    word_ = ('"' + word + '"') if "," in word else word
-                    #create a row in the csv
-                    row =  ",".join([word_, tag_name, tag_color, tag_index])               
-                    file_str += row + "\n" #add new line
+                    csv_writer.writerow([word, tag_name, tag_color, tag_index])
 
-            return {"file": file_str, "name": input, "extension": "csv"}
+            return {"file": file_str.getvalue(), "name": input, "extension": "csv"}
+
 
 
         if key=="save_model": #download AI model

@@ -8,11 +8,13 @@ $(document).ready(function () {
         update_tags(data["tag_data"]);
         update_sentences(data["sentence_data"]);
         $(".run").toggle($(".sentence-tag").length > 0);
+        $(".clear-footer-block, .download-footer-block").toggle($(".tags .radio-container").length > 0 || $(".sentence-area").length > 0);
+        $(".clear-tags, .download-tags").toggle($(".tags .radio-container").length > 0);
+        $(".clear-sentences, .download-sentences").toggle($(".sentence-area").length > 0);
         $(".tags-area-overlay, .clear-model, .save-model-block, .run-update-model, .run-model").toggle(data["ai"]); //show/hide AI-related buttons, disabling tags too (based on whether there is a model path even if empty)
         // ai_model = data["ai"];
     }
     initialize();
-
 
 
 
@@ -100,6 +102,10 @@ $(document).ready(function () {
     $(document).on("click", ".run-options button", function () //when we click a RUN AI... menu button
     {
         $(".run-options").hide();
+    });
+    $("#text-box-field").keyup(function() //only show the add text button if there is text to add
+    {
+        $(".add-text").toggle($("#text-box-field").val() != "");
     });
     $(document).on("click", ".add-text", function () //when we click ADD TEXT button
     {
@@ -200,8 +206,11 @@ $(document).ready(function () {
     var selected_word = 0;
 
     $(document).keydown(function (e) {
+        if (e.key == "Enter")
+        {
+            $(".form-button").click();
+        }
         var sentence_area = $(".sentence-area");
-
         var number_of_sentences = sentence_area.length;
         if ($("input").is(":focus") || $("textarea").is(":focus") || number_of_sentences == 0) { return; }
         //dont do stuff from keys if typing somewhere (text field) or if there arent any sentences yet

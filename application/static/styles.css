@@ -218,7 +218,7 @@ div.top
     top: 0; bottom: 0; left: 0; right: 0;
     z-index: 2;
 }
-.btn1
+.btn1, .tags-area button.btn1
 {   
     font-size: 16px;
     color: white;
@@ -237,7 +237,7 @@ div.top
 {
     margin-bottom: 10px;
 }
-.btn1:hover
+.btn1:hover, .tags-area button.btn1:hover
 {
     color: white;
     background-color: gray;
