@@ -1,6 +1,5 @@
 $(document).ready(function () {
 
-    // var ai_model = false;
     function initialize() {
         ajax("/", JSON.stringify({ "run_manual": "" }), initialize_return);
     }
@@ -12,7 +11,6 @@ $(document).ready(function () {
         $(".clear-tags, .download-tags").toggle($(".tags .radio-container").length > 0);
         $(".clear-sentences, .download-sentences").toggle($(".sentence-area").length > 0);
         $(".tags-area-overlay, .clear-model, .save-model-block, .run-update-model, .run-model").toggle(data["ai"]); //show/hide AI-related buttons, disabling tags too (based on whether there is a model path even if empty)
-        // ai_model = data["ai"];
     }
     initialize();
 
@@ -31,10 +29,7 @@ $(document).ready(function () {
     {
         $(".color-selector-options").toggle(); //hide the menu
         var color_html = e.target;
-        if (color_html.className != "color-selector-option") //if we clicked on the content inside the button, get the data from the encapsulating button
-        {
-            color_html = color_html.parentElement;
-        }
+        if (color_html.className != "color-selector-option") { color_html = color_html.parentElement; } //if we clicked on the content inside the button, get the data from the encapsulating button
         color_html = color_html.firstElementChild.className.replace('tag-color ', ''); //get the color from inside the button
         // color_html = color_html.firstElementChild.dataset.color;
         $(".color-selector-button").css("background-color", color_html); //set background color of button to color we chose
@@ -59,11 +54,9 @@ $(document).ready(function () {
     });
     $(document).on("click", ".tag-overlay", function (e) //when we click edit button on a tag
     {
-        var shown = $(e.target).next().is(":visible");
-        $(".tag-edit-menu").hide();
-        if (!shown) {
-            $(e.target).next().toggle();
-        }
+        var shown = $(e.target).next().is(":visible"); //get status before hiding no matter what
+        $(".tag-edit-menu").hide(); //hide all popups
+        if (!shown) { $(e.target).next().toggle(); } //toggle based on whether it was shown before
     });
     $(document).on("click", ".tag-edit-menu-item", function (e) //when we click a menu item for a tag after clicking edit
     {
@@ -87,9 +80,7 @@ $(document).ready(function () {
     });
 
     function update_tags(data) {
-        if (data != "") {
-            $(".tags-area .tags").html(data);
-        }
+        if (data != "") { $(".tags-area .tags").html(data); }
     }
 
 
@@ -124,10 +115,10 @@ $(document).ready(function () {
         showAlert(content, button);
 
         // $(document).on("click", "#ai-continue-button", function (e) 
-        $("#ai-continue-button").off("click").click(function (e) 
+        $("#ai-continue-button").off("click").click(function (e) //reset event handler
         {
             var model_name = $("#model-name").val();
-            if (model_name.replace(/\s+/g, '') == "") {
+            if (model_name.replace(/\s+/g, '') == "") { //ensure model name not empty, nor whitespace
                 showAlert("You must input a name for your model. Please try again.");
                 return;
             }
@@ -141,7 +132,7 @@ $(document).ready(function () {
     function load_model(html) {
         var content = "Choose a model to load below. It must have been created on this dataset or have the exact same set of tags. <br><br>";
         content += html;
-        var button = " ";
+        var button = " "; //make empty button to replace okay button, since the user needs to click the content instead
         showAlert(content, button);
 
         // $(document).on("click", ".load-model-name", function (e) 
@@ -164,7 +155,7 @@ $(document).ready(function () {
     function start_ai(query) {
         $("#loading").show();
         ajax("/", JSON.stringify(query), update_sentences);
-        $(".create-tag").hide();
+        $(".create-tag").hide(); //don't keep the tag creator stuck open if already open
         $(".tags-area-overlay, .clear-model, .save-model-block, .run-update-model, .run-model").show(); //show AI-related buttons, disabling tags too
         $("#alert").css("display", "none");
         $("#alert-stuff").html("");
@@ -189,8 +180,8 @@ $(document).ready(function () {
     function change_tag(e, tag_index) {
         var sentence_index = $(e.target).closest(".sentence-area").data("index");
         var word_index = $(e.target).closest(".word").data("index");
-        entire_sentence_selected = document.getElementsByClassName("selected").length > 1;
-        if (selected_sentence != sentence_index) {
+        entire_sentence_selected = document.getElementsByClassName("selected").length > 1; //is the entire sentence selected or just one word?
+        if (selected_sentence != sentence_index) { //make sure not to operate on the entire sentence if user clicks on word in a different sentence from selected
             entire_sentence_selected = false;
         }
         var tag_word = [sentence_index, word_index, entire_sentence_selected, tag_index];
@@ -206,10 +197,7 @@ $(document).ready(function () {
     var selected_word = 0;
 
     $(document).keydown(function (e) {
-        if (e.key == "Enter")
-        {
-            $(".form-button").click();
-        }
+        if (e.key == "Enter") { $(".form-button").click(); } //submit forms/popups on enter
         var sentence_area = $(".sentence-area");
         var number_of_sentences = sentence_area.length;
         if ($("input").is(":focus") || $("textarea").is(":focus") || number_of_sentences == 0) { return; }
@@ -217,12 +205,12 @@ $(document).ready(function () {
         var words_in_sentence = sentence_area[selected_sentence].children[1].children.length;
         sentence_area[selected_sentence].children[1].children[selected_word].classList.remove("selected")
 
-        var highlight_sentence_key_down = e.shiftKey && e.code == "KeyA"
-        var arrow_key_down = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"].includes(e.key);
+        var highlight_sentence_key_down = e.shiftKey && e.code == "KeyA" //if we click Shift-A
+        var arrow_key_down = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"].includes(e.key); //if we click an arrow key
         if (arrow_key_down || highlight_sentence_key_down) {
-            var entire_sentence_selected = $(".selected").length > 1;
+            var entire_sentence_selected = $(".selected").length > 1; //is the entire sentence selected?
             var children = sentence_area[selected_sentence].children[1].children;
-            for (var i = 0; i < children.length; i++) {
+            for (var i = 0; i < children.length; i++) { //set word selected based on if the sentence is not already highleted and it is the intention
                 children[i].classList.toggle("selected", (!entire_sentence_selected && highlight_sentence_key_down));
             }
         }
@@ -308,14 +296,14 @@ $(document).ready(function () {
     var lastChecked = null;
     $(document).on("click", ".sentence-area input[type=checkbox]", function (e) {
         if (lastChecked) {
-            if (e.shiftKey) {
+            if (e.shiftKey) { //holding shift selects a range
                 var from = $('.sentence-area .checkbox-container input').index(e.target);
                 var to = $('.sentence-area .checkbox-container input').index(lastChecked);
                 var start = Math.min(from, to);
                 var end = Math.max(from, to) + 1;
                 $('.sentence-area .checkbox-container input').slice(start, end).filter(':not(:disabled)').prop('checked', lastChecked.checked);
             }
-            else if (e.altKey) {
+            else if (e.altKey) { //holding option inverts selection
                 $('.sentence-area .checkbox-container input').each(function () {
                     this.checked = !this.checked;
                 });
@@ -323,7 +311,7 @@ $(document).ready(function () {
             }
         }
 
-        if (e.metaKey || e.key == "Control") {
+        if (e.metaKey || e.key == "Control") { //holding cmd/ctrl selects all
             var checkboxes = $('.sentence-area .checkbox-container input').length;
             var number_checked = $('.sentence-area .checkbox-container input:checked').length;
             var check_uncheck = !(checkboxes == number_checked + 1)
@@ -349,7 +337,7 @@ $(document).ready(function () {
     {
         are_you_sure_clear("sentence text and annotation labels", { "clear_sentences": "" }, { "download_all": null })
     });
-    $(document).on("click", ".clear-model", function () //when we click CLEAR SENTENCES
+    $(document).on("click", ".clear-model", function () //when we click CLEAR MODEL
     {
         are_you_sure_clear("AI model data", { "clear_model": "" })
     });
@@ -483,8 +471,7 @@ $(document).ready(function () {
         $("#alert-stuff").html("");
     }
     function download(dict) {
-        if (dict["name"] == "")
-            dict["name"] = dict["extension"];
+        if (dict["name"] == "") { dict["name"] = dict["extension"]; }
         var fileName = dict["name"] + "." + dict["extension"]; //create filename
         var data = dict["file"]; //retrieve file data
         var element = document.createElement("a"); //create invisible link to click to download
@@ -558,7 +545,6 @@ $(document).ready(function () {
     {
         $("#alert").css("display", "none");
         $("#alert-stuff").html("");
-        // $(document).off("click", ".form-button");
     });
 
 
