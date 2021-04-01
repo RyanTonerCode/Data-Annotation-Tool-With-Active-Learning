@@ -117,37 +117,61 @@ $(document).ready(function () {
         showAlert(content, button);
 
         $(document).on("click", "#ai-continue-button", function (e) {
-            start_ai(0)
+            // start_ai(0)
+            start_ai({ "run_create_model": $("#model-name").val() })
         });
     });
     $(document).on("click", ".load-model", function () //when we click CREATE-MODEL button
     {
-        ajax("/", JSON.stringify({"load_model": ""}), load_model);
+        ajax("/", JSON.stringify({"model_names": ""}), load_model);
     });
     function load_model(html)
     {
         //Running the AI means that tags can no longer be modified, because the model will only be trained on those tags
         var content = "Running the AI entails that tags cannot be modified again. Click continue if you are satisfied with your current set of tags. <br><br>";
         content += html;
-        var button = "<button id='ai-continue-button' class='form-button'>CONTINUE</button>";
+        var button = " ";
         showAlert(content, button);
 
-        $(document).on("click", "#ai-continue-button", function (e) {
-            start_ai(0);
+        $(document).on("click", ".load-model-name", function (e) {
+            var model_name = $(e.target).html();
+            // start_ai(3, name);
+            start_ai({ "run_load_model": model_name });
         });
     }
     $(document).on("click", ".run-update-model", function () //when we click RUN-MODEL button
     {
-        start_ai(1);
+        // start_ai(1);
+        start_ai({ "run_update_model": "" });
     });
     $(document).on("click", ".run-model", function () //when we click RUN-MODEL button
     {
-        start_ai(2);
+        // start_ai(2);
+        // var test_sentences = $(".sentences-area .checkbox-container input:checked").parent().parent().parent().map(function () { return $(this).data('index'); }).get();
+        var sentence_objects = $(".sentences-area .checkbox-container input:checked").closest(".sentence-area");
+        var test_sentences = sentence_objects.map(function () { return $(this).data('index'); }).get();
+        start_ai({ "run_model": test_sentences });
     });
-    function start_ai(create_model) {
-        var test_sentences = $(".sentences-area .checkbox-container input:checked").parent().parent().parent().map(function () { return $(this).data('index'); }).get();
+    function start_ai(query) {
+        // var test_sentences = $(".sentences-area .checkbox-container input:checked").parent().parent().parent().map(function () { return $(this).data('index'); }).get();
         // var filename = $("#model-name").is(":visible") ? $("#model-name").val() : "model"
-        var query = create_model == 0 ? { "run_create_model": $("#model-name").val() } : create_model == 1 ? { "run_update_model": "" } : { "run_model": test_sentences };
+        // var query = create_model == 0 ? { "run_create_model": $("#model-name").val() } : create_model == 1 ? { "run_update_model": "" } : create_model == 2 ? { "run_model": test_sentences } : { "load_model": model_name };
+        // if (create_model == 0)
+        // {
+        //     query == { "run_create_model": $("#model-name").val() }
+        // }
+        // else if (create_model == 1)
+        // {
+        //     query == { "run_update_model": "" }
+        // }        
+        // else if (create_model == 2)
+        // {
+        //     query == { "run_model": test_sentences }
+        // }
+        // else if (create_model == 3)
+        // {
+        //     query == { "load_model": model_name }
+        // }
 
         $("#loading").show();
         ajax("/", JSON.stringify(query), update_sentences);

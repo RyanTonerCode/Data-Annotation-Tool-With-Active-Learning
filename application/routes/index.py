@@ -1,8 +1,10 @@
 import csv
 from json import load
+
+from numpy.lib.function_base import append
 from application import app
 from application.imports import apology, session, render_template, os, request, json, redirect, secure_filename, time, send_file, after_this_request, send_from_directory, url_for, SharedDataMiddleware
-from application.routes.intelligence import initialize_model, run_model, save_model, train_existing_model
+from application.routes.intelligence import initialize_model, load_model, run_model, save_model, train_existing_model
 
 @app.route("/", methods = ["GET", "POST"]) #standard path url
 @app.route("/<alert>", methods = ["GET", "POST"]) #for redirect with alert
@@ -66,7 +68,8 @@ def home(alert = None):
                     
                     sentences_html += "<div class='sentence-area' data-index='" + str(sentence_index) + "'>"
                     sentences_html += "<div class='checkbox'><label class='checkbox-container'><input type='checkbox'><span class='checkbox-checkmark'></span></label></div><div class='sentence'>"
-                    
+                    # sentences_html += "<div class='checkbox'><label class='checkbox-container'><input type='checkbox' data-index='" + str(sentence_index) + "'><span class='checkbox-checkmark'></span></label></div><div class='sentence'>"
+
                     for word_index, word in enumerate(sentence.split()):
                         word_tag_index = sentence_tags[sentence_index][word_index] #see what the word's tag is
                         tag_html = "<button class='btn2 select-tag-button'>tag</button>"
@@ -171,6 +174,10 @@ def home(alert = None):
             if key == "run_create_model":
                 user_data["model_name"] = input
                 app.config["ai_model"] = initialize_model(user_data)
+            elif key == "run_load_model":
+                model_name = input
+                load_model(user_data, model_name)
+                user_data["model_name"] = model_name
             elif key == "run_update_model":
                 train_existing_model(user_data)
             elif key == "run_model":
@@ -184,14 +191,24 @@ def home(alert = None):
 
         
 
-        if key=="load_model":
+        if key=="model_names":
             user_data = read_json()
-            models = os.listdir(os.path.join(os.getcwd(), "application", "data", "ai"))
+            models = []
+            for item in os.listdir(app.config["ai_path"]):
+                if os.path.isdir(os.path.join(app.config["ai_path"], item)):
+                    models.append(item)
+
+            # html = '<div class="create-tag color-selector-custom" style="position: relative; display: block;"><button class="btn1 create-tag color-selector-button">Select Model...</button><div class="color-selector-options boxshadow" style="display: none; position: relative;">'
+            # for model in models:
+            #     html += '<button class="color-selector-option"><div class="tag-color red" data-color="' + model + '"></div><div class="color-selector-text">&nbsp ' + model + '</div></button>'
+
             html = '<div class="alert-list">'
             for model in models:
-                html += '<button class="alert-list-item">' + model + '</button>'
+                html += '<button class="alert-list-item load-model-name">' + model + '</button>'
             html += '</div>'
+            # html += '</div></div><br><br>'
             return html
+
 
 
         if key=="tag_word": #tag a word or remove its tag and return updated sentence HTML

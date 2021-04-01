@@ -947,6 +947,49 @@ input[type="file"]
 
 
 
+
+
+
+.alert-list
+{
+    /* z-index: 4; */
+    /* left: 0; */
+    top: 35px;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: white;
+    width: 200px;
+    box-sizing: border-box;
+}
+.alert-list-item
+{
+    display: block;
+    background-color: goldenrod;
+    /* color: rgb(54, 54, 54); */
+    color: white;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    display: inline-block;
+    font-family: 'avenir';
+    font-size: 16px;
+    text-align: left;
+    width: 190px;
+}
+.alert-list-item:hover
+{
+    background-color: rgb(160, 160, 160);
+    color: white;
+}
+
+
+
+
+
+
+
+
+
 .red
 {
     background-color: red;
