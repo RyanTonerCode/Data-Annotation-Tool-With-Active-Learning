@@ -19,14 +19,14 @@ def home(alert = None):
 
 
 
-        def read_json(file_path = "application/data/data.json"): #return json contents or original
+        def read_json(file_path = app.config["json_path"]): #return json contents or original
             if os.path.isfile(file_path):
                 with open(file_path) as json_file:
                     return json.load(json_file)
             else:
                 return {"sentences": [], "sentence_tags": [], "tag_data": {"index": 0, "tags": {}}}
 
-        def write_json(user_data, file_path = "application/data/data.json"):
+        def write_json(user_data, file_path = app.config["json_path"]):
             with open(file_path, 'w') as outfile:
                 json.dump(user_data, outfile)
 
@@ -205,7 +205,7 @@ def home(alert = None):
 
         if key=="clear_all": #delete all data. new empty file will be created after requests from client
             app.config.pop("ai_model", None)
-            file_path = "application/data/data.json"
+            file_path = app.config["json_path"]
             if os.path.isfile(file_path):
                 os.remove(file_path)
 
@@ -295,9 +295,8 @@ def home(alert = None):
 
 
         if request.files: #if there are files to upload from request
-            upload_folder = os.path.join(os.getcwd(), "application", "data", "upload")
-            if not os.path.isdir(upload_folder):
-                os.makedirs(upload_folder)
+            if not os.path.isdir(app.config["upload_path"]):
+                os.makedirs(app.config["upload_path"])
 
             allowed_extensions = {'txt', 'json', 'csv'}
             uploaded_file = request.files["file"]
@@ -306,7 +305,7 @@ def home(alert = None):
                 file_extension = filename.rsplit('.', 1)[1].lower()
                 if '.' in filename and file_extension in allowed_extensions:
 
-                    upload_save_location = os.path.join(upload_folder, filename)
+                    upload_save_location = os.path.join(app.config["upload_path"], filename)
 
                     uploaded_file.save(upload_save_location) #save uploaded file on server
 
@@ -380,9 +379,9 @@ def home(alert = None):
                         user_data["tag_data"] = tag_data
                         write_json(user_data)
 
-                    filelist = [f for f in os.listdir("application/data/upload")] #remove upload files after use
+                    filelist = [f for f in os.listdir(app.config["upload_path"])] #remove upload files after use
                     for f in filelist:
-                        os.remove(os.path.join("application/data/upload", f))
+                        os.remove(os.path.join(app.config["upload_path"], f))
 
                     return redirect(url_for("home", alert="file upload successful"))
 
