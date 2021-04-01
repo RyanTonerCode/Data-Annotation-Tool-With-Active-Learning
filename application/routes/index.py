@@ -309,7 +309,7 @@ def home(alert = None):
                 for word_index, word in enumerate(sentence.split()):
                     tag_index = str(user_data["sentence_tags"][sentence_index][word_index]) #get tag index ID number from current word
                     cur_tag = user_data["tag_data"]["tags"][tag_index] if int(tag_index) > 0 else None
-                    tag_name, tag_color = (cur_tag["name"], cur_tag["color"]) if int(tag_index) > 0 else ("no_tag", "no_tag")
+                    tag_name, tag_color = (cur_tag["name"], cur_tag["color"]) if cur_tag else ("no_tag", "no_tag")
                     #put word in quotes if it has a comma, to avoid csv issues
                     word_ = ('"' + word + '"') if "," in word else word
                     #create a row in the csv
