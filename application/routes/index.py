@@ -17,7 +17,6 @@ def home(alert = None):
         input = ""
         if not request.files: #get JSON object key and value if not an upload, otherwise skip to bottom in upload section
             # print(request.get_json())
-            print(request.get_json())
             key = next(iter(request.get_json().keys()))
             input = request.get_json()[key]
 
@@ -38,24 +37,22 @@ def home(alert = None):
 
         def create_tag_html(tag_data): #from tag_data in user_data, create the HTML tag bar below the main textarea
             tags_html = ""
-            first = True
-            for tag_index in tag_data["tags"]:
+            for count, tag_index in enumerate(tag_data["tags"]):
                 tag_name = tag_data["tags"][tag_index]["name"]
                 tag_color = tag_data["tags"][tag_index]["color"]
 
                 radio_button = "<label class='radio-container'><input type='radio' "
-                radio_button += "checked='checked' " if first else ""
+                radio_button += "checked='checked' " if count == 0 else ""
                 radio_button += "name='radio' value='" + str(tag_index) + "'><span class='radio-checkmark " + tag_color + "'></span></label>"
-                first = False
                 
                 tags_html += "<div class='tag-container'>" + radio_button + "<div class='tag'><div class='tag-name'>" + tag_name + "</div>"
                 tags_html += "<div class='tag-overlay' data-index='" + str(tag_index) + "'>edit</div>"
                 tags_html += "<div class='tag-edit-menu boxshadow' style='display: none;'><div class='tag-edit-menu-item modify'>modify</div><div class='tag-edit-menu-item delete'>delete</div></div></div></div>"
             
-            if tags_html == "": 
-                tags_html = "<div class='tag no-tags'><div class='tag-name'>No Tags</div></div>"
+            # if tags_html == "": 
+            #     tags_html = "<div class='tag no-tags'><div class='tag-name'>No Tags</div></div>"
             
-            return tags_html
+            return tags_html if tags_html != "" else "<div class='tag no-tags'><div class='tag-name'>No Tags</div></div>"
 
 
 
@@ -224,9 +221,8 @@ def home(alert = None):
             tag_index = int(indices[3])
             new_sentence_index = int(indices[4]) if len(indices) > 4 else sentence_index #when using keyboard, move to next word but not using mouse
             new_word_index = int(indices[5]) if len(indices) > 4 else word_index # ^
-            user_data = None
-
             user_data = read_json()
+
             for index in range(len(user_data["sentence_tags"][sentence_index])) if entire_sentence_selected else [word_index]:
                 user_data["sentence_tags"][sentence_index][index] = tag_index #iterate through the entire sentence if selected, else only the one word's index
             write_json(user_data)
@@ -241,7 +237,8 @@ def home(alert = None):
             if os.path.isfile(file_path):
                 os.remove(file_path)
 
-            return initialize(read_json())
+            user_data = read_json()
+            return initialize(user_data)
 
 
 
@@ -272,16 +269,15 @@ def home(alert = None):
         if key=="clear_model": #remove AI model
             user_data = read_json()
             user_data.pop("model_name", None)
-            print("Model path removed")
             app.config["ai_model"] = None
-            print("Model data cleared from memory")
             write_json(user_data)
             return initialize(user_data)
 
 
 
         if key=="download_all": #download data.json file (user_data) in its entirety
-            return {"file": read_json(), "name": input, "extension": "json"}
+            user_data = read_json()
+            return {"file": user_data, "name": input, "extension": "json"}
 
 
 
@@ -336,7 +332,6 @@ def home(alert = None):
                 if '.' in filename and file_extension in allowed_extensions:
 
                     upload_save_location = os.path.join(app.config["upload_path"], filename)
-
                     uploaded_file.save(upload_save_location) #save uploaded file on server
 
                     if file_extension == "json": #replace all data or replace all tag data
