@@ -16,4 +16,6 @@ import re
 def apology(message, code, route="error"):
     #return render_template("error.html", message=message, code=code, route=route)
     print(message, code, route)
-    return render_template(route + ".html", alert=message)
+    # return render_template(route + ".html", alert=message)
+    alert = str(code) + " " + message
+    return render_template("index.html", alert=alert)

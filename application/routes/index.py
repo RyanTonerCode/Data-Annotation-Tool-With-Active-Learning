@@ -380,11 +380,11 @@ def home(alert = None):
                             word = row[0]
                             tag_name = row[1]
                             tag_color = row[2]
-                            tag_index = row[3]
+                            tag_index = int(row[3])
 
                             sentence += word
 
-                            if int(tag_index) != 0: 
+                            if tag_index != 0: 
                                 tag = {"name": tag_name, "color": tag_color}
                                 if str(tag_index) not in tag_data["tags"].keys():
                                     tag_data["index"] += 1 #increment tag index with each new one we see
@@ -409,6 +409,7 @@ def home(alert = None):
                         user_data["tag_data"] = tag_data
                         write_json(user_data)
 
+                    # filelist = os.listdir(app.config["upload_path"]) #will this work instead?
                     filelist = [f for f in os.listdir(app.config["upload_path"])] #remove upload files after use
                     for f in filelist:
                         os.remove(os.path.join(app.config["upload_path"], f))
@@ -417,7 +418,7 @@ def home(alert = None):
 
             return render_template("index.html", alert="error uploading files")
 
-    return render_template("index.html", alert=alert) #if request method is GET or POST function does not return
+    return render_template("index.html", alert=alert) #if request method is GET, or POST function does not return
    
 
 
