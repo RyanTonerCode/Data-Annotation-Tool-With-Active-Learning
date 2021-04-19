@@ -119,7 +119,7 @@ def initialize_model(user_data):
     model = None
 
     #run active learning by iterating the model, manipulating the training data, and gaming the subsequent model
-    for i in range(1):
+    for i in range(3):
         print('*' * 50)
 
         text_encoder = TextVectorization(max_tokens=VOCAB_SIZE)
