@@ -6,7 +6,7 @@ $(document).ready(function () {
     function initialize_return(data) {
         update_tags(data["tag_data"]);
         update_sentences(data["sentence_data"]);
-        $(".run").toggle($(".sentence-tag").length > 0);
+        $(".run").toggle(data["sentence_data"].length > 0);
         $(".clear-footer-block, .download-footer-block").toggle($(".tags .radio-container").length > 0 || $(".sentence-area").length > 0);
         $(".clear-tags, .download-tags").toggle($(".tags .radio-container").length > 0);
         $(".clear-sentences, .download-sentences").toggle($(".sentence-area").length > 0);
