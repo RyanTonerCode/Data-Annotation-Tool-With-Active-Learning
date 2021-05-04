@@ -18,5 +18,4 @@ The Process is simple:
 * Flask
 
 
-### User Manual
-
+### [User Manual](https://github.com/RyanTonerCode/Data-Annotation-Tool-With-Active-Learning/blob/main/Data%20Annotation%20Tool%20User%20Manual.docx)
